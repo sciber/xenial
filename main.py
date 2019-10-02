@@ -14,8 +14,7 @@ class ApplicationRoot(NavigationDrawer):
 
 class XenialApp(App):
     def build(self):
-        global app
-        app = self
+        return ApplicationRoot()
 
     def on_pause(self):
         return True
