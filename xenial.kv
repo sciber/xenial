@@ -1,0 +1,341 @@
+#:kivy 1.11.1
+
+<NavigationPanel@BoxLayout>:
+    orientation: 'vertical'
+    Button:
+        text: 'Search'
+        on_release:
+            app.root.ids.manager.current = 'search'
+            app.root.toggle_state()
+    Button:
+        text: 'Categories'
+        on_release:
+            app.root.ids.manager.current = 'categories'
+            app.root.toggle_state()
+    Button:
+        text: 'Tags'
+        on_release:
+            app.root.ids.manager.current = 'tags'
+            app.root.toggle_state()
+    Button:
+        text: 'Articles'
+        on_release:
+            app.root.ids.manager.current = 'articles'
+            app.root.toggle_state()
+    Button:
+        text: 'Bookmarks'
+        on_release:
+            app.root.ids.manager.current = 'bookmarks'
+            app.root.toggle_state()
+    Button:
+        text: 'Guides'
+        on_release:
+            app.root.ids.manager.current = 'guides'
+            app.root.toggle_state()
+
+<SearchScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Search'
+
+<TagsScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Tags'
+            size_hint_y: None
+            height: '40dp'
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                text: 'Tag 1'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 2'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 3'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 4'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 5'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 6'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 7'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 8'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 9'
+                on_release: app.root.ids.manager.current = 'tag'
+
+<TagScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Tag'
+            size_hint_y: None
+            height: '40dp'
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                text: 'Article 1'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 2'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 3'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 4'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 5'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 6'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 7'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 8'
+                on_release: app.root.ids.manager.current = 'article'
+
+<CategoriesScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Categories'
+            size_hint_y: None
+            height: '40dp'
+        GridLayout:
+            cols: 3
+            Button:
+                text: 'Category 1'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 2'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 3'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 4'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 5'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 6'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 6'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 8'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 9'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 10'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 11'
+                on_release: app.root.ids.manager.current = 'category'
+            Button:
+                text: 'Category 12'
+                on_release: app.root.ids.manager.current = 'category'
+
+<CategoryScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Category'
+            size_hint_y: None
+            height: '40dp'
+        GridLayout:
+            rows: 2
+            size_hint_y: None
+            height: '80dp'
+            Button:
+                text: 'Tag 1'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 2'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 3'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 4'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 5'
+                on_release: app.root.ids.manager.current = 'tag'
+        BoxLayout:
+            orientation: 'vertical'
+            Button:
+                text: 'Article 1'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 2'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 3'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 4'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 5'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 6'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 7'
+                on_release: app.root.ids.manager.current = 'article'
+            Button:
+                text: 'Article 8'
+                on_release: app.root.ids.manager.current = 'article'
+
+<ArticlesScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Articles'
+            size_hint_y: None
+            height: '40dp'
+        Button:
+            text: 'Article 1'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Article 2'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Article 3'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Article 4'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Article 5'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Article 6'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Article 7'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Article 8'
+            on_release: app.root.ids.manager.current = 'article'
+
+<ArticleScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Article'
+            size_hint_y: None
+            height: '40dp'
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: 'Article content...'
+        GridLayout:
+            rows: 2
+            size_hint_y: None
+            height: '80dp'
+            Button:
+                text: 'Tag 1'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 2'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 3'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 4'
+                on_release: app.root.ids.manager.current = 'tag'
+            Button:
+                text: 'Tag 5'
+                on_release: app.root.ids.manager.current = 'tag'
+
+<BookmarksScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Bookmarks'
+            size_hint_y: None
+            height: '40dp'
+        Button:
+            text: 'Bookmark 1'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Bookmark 2'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Bookmark 3'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Bookmark 4'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Bookmark 5'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Bookmark 6'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Bookmark 7'
+            on_release: app.root.ids.manager.current = 'article'
+        Button:
+            text: 'Bookmark 8'
+            on_release: app.root.ids.manager.current = 'article'
+
+<GuidesScreen@Screen>:
+    name: 'SearchScreen'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: 'Guides'
+
+ApplicationRoot
+    anim_type: 'slide_above_simple'
+    NavigationPanel
+    ScreenManager
+        id: manager
+        CategoriesScreen
+            name: 'categories'
+        CategoryScreen
+            name: 'category'
+        TagsScreen
+            name: 'tags'
+        TagScreen
+            name: 'tag'
+        ArticlesScreen
+            name: 'articles'
+        ArticleScreen
+            name: 'article'
+        BookmarksScreen
+            name: 'bookmarks'
+        SearchScreen
+            name: 'search'
+        GuidesScreen
+            name: 'guides'
+
+
+
+
+
