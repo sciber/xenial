@@ -1,49 +1,86 @@
 #:kivy 1.11.1
 
 <NavigationPanelButton@Button>:
-    color: .2, .2, .2, 1
-    font_size: '20dp'
+    title: 'Item'
+    image: 'assets/img/picture.png'
+    size_hint_y: None
+    height: '60dp'
     background_normal: ''
+    BoxLayout:
+        orientation: 'horizontal'
+        pos: self.parent.pos
+        size_hint: None, None
+        size: self.parent.size
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            size_hint_x: None
+            width: '50dp'
+            padding: '8dp'
+            Image:
+                source: root.image
+        Label:
+            text: root.title
+            text_size: self.size
+            halign: 'left'
+            valign: 'center'
+            font_size: '18dp'
+            color: .2, .2, .2, 1
 
-<NavigationPanel@BoxLayout>:
-    orientation: 'vertical'
-    padding: '4dp'
-    canvas:
+<NavigationPanel@ScrollView>:
+    canvas.before:
         Color:
             rgba: 1, 1, 1, 1
         Rectangle:
             pos: self.pos
             size: self.size
-    NavigationPanelButton:
-        text: 'Search'
-        on_release:
-            app.root.ids.manager.current = 'search'
-            app.root.toggle_state()
-    NavigationPanelButton:
-        text: 'Categories'
-        on_release:
-            app.root.ids.manager.current = 'categories'
-            app.root.toggle_state()
-    NavigationPanelButton:
-        text: 'Tags'
-        on_release:
-            app.root.ids.manager.current = 'tags'
-            app.root.toggle_state()
-    NavigationPanelButton:
-        text: 'Articles'
-        on_release:
-            app.root.ids.manager.current = 'articles'
-            app.root.toggle_state()
-    NavigationPanelButton:
-        text: 'Bookmarks'
-        on_release:
-            app.root.ids.manager.current = 'bookmarks'
-            app.root.toggle_state()
-    NavigationPanelButton:
-        text: 'Guides'
-        on_release:
-            app.root.ids.manager.current = 'guides'
-            app.root.toggle_state()
+    StackLayout:
+        orientation: 'lr-tb'
+        size_hint_y: None
+        height: self.minimum_height
+        padding: '4dp'
+        NavigationPanelButton:
+            title: 'Search'
+            image: 'assets/img/search.png'
+            on_release:
+                app.root.ids.manager.current = 'search'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Categories'
+            image: 'assets/img/category.png'
+            on_release:
+                app.root.ids.manager.current = 'categories'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Tags'
+            image: 'assets/img/tag.png'
+            on_release:
+                app.root.ids.manager.current = 'tags'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Articles'
+            image: 'assets/img/article.png'
+            on_release:
+                app.root.ids.manager.current = 'articles'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Bookmarks'
+            image: 'assets/img/bookmark.png'
+            on_release:
+                app.root.ids.manager.current = 'bookmarks'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Guides'
+            image: 'assets/img/guide.png'
+            on_release:
+                app.root.ids.manager.current = 'guides'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Settings'
+            image: 'assets/img/settings.png'
+            on_release:
+                app.root.ids.manager.current = 'settings'
+                app.root.toggle_state()
 
 <TitleBar@BoxLayout>:
     orientation: 'horizontal'
@@ -88,7 +125,7 @@
         size_hint: None, None
         size: self.parent.size
         Image:
-            source: 'assets/img/category.png'
+            source: 'assets/img/category-color.png'
             size_hint_y: .6
         Label:
             text: root.title
@@ -146,6 +183,9 @@
     size_hint: None, None
     size: self.texture_size
     padding: '8dp', '4dp'
+    background_normal: ''
+    color: 1, 1, 1, 1
+    background_color: 0, .7, .7, 1
     on_release: app.root.ids.manager.current = 'tag'
 
 <CategoryTagsLayout@StackLayout>:
@@ -176,7 +216,7 @@
         size_hint: None, None
         size: self.parent.size
         Image:
-            source: 'assets/img/article.png'
+            source: 'assets/img/article-color.png'
             size_hint_x: None
             width: self.height
         BoxLayout:
@@ -216,14 +256,23 @@
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                spacing: '6dp'
-                Label:
-                    text: 'Category title'
-                    font_size: '24dp'
-                    bold: True
-                    color: .2, .2, .2, 1
+                spacing: '8dp'
+                padding: '4dp'
+                BoxLayout:
+                    orientation: 'horizontal'
                     size_hint_y: None
-                    height: '60dp'
+                    height: '100dp'
+                    Image:
+                        source: 'assets/img/category-color.png'
+                        size_hint_x: None
+                        width: self.height
+                    Label:
+                        text: 'Category title'
+                        font_size: '24dp'
+                        bold: True
+                        text_size: self.size
+                        valign: 'middle'
+                        color: .2, .2, .2, 1
                 CategoryTagsLayout
                 BoxLayout:
                     orientation: 'vertical'
@@ -256,9 +305,12 @@
 
 <TagsMenuItem@Button>:
     title: 'Tag'
+    num_categories: '0'
+    num_articles: '0'
     size_hint_y: None
     height: '60dp'
     background_normal: ''
+    background_color: 0, .7, .7, 1
     padding: '20dp', '20dp'
     on_release: app.root.ids.manager.current = 'tag'
     BoxLayout:
@@ -271,7 +323,54 @@
             font_size: '18dp'
             text_size: self.size
             valign: 'middle'
-            color: .2, .2, .2, 1
+            color: 1, 1, 1, 1
+        AnchorLayout:
+            anchor_x: 'right'
+            anchor_y: 'bottom'
+            size_hint_x: None
+            width: self.height
+            padding: '4dp'
+            Image:
+                pos: self.parent.pos
+                source: 'assets/img/article.png'
+                size_hint_x: None
+                width: self.height
+                color: 1, 1, 1, .5
+            Label:
+                size_hint: .5, .5
+                text: root.num_articles
+                font_size: '12dp'
+                bold: True
+                color: .2, .2, .2, 1
+                canvas.before:
+                    Color:
+                        rgba: .7, .7, .7, 1
+                    Ellipse:
+                        pos: self.pos
+                        size: self.size
+        AnchorLayout:
+            anchor_x: 'right'
+            anchor_y: 'bottom'
+            size_hint_x: None
+            width: self.height
+            padding: '4dp'
+            Image:
+                source: 'assets/img/category.png'
+                size_hint_x: None
+                width: self.height
+                color: 1, 1, 1, .5
+            Label:
+                size_hint: .5, .5
+                text: root.num_categories
+                font_size: '12dp'
+                bold: True
+                color: .2, .2, .2, 1
+                canvas.before:
+                    Color:
+                        rgba: .7, .7, .7, 1
+                    Ellipse:
+                        pos: self.pos
+                        size: self.size
 
 <TagsMenuScreen@Screen>:
     BoxLayout:
@@ -290,24 +389,43 @@
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
+                spacing: '2dp'
                 TagsMenuItem:
                     title: 'Tag 1'
+                    num_articles: '10'
+                    num_categories: '3'
                 TagsMenuItem:
                     title: 'Tag 2'
+                    num_articles: '4'
+                    num_categories: '1'
                 TagsMenuItem:
                     title: 'Tag 3'
+                    num_articles: '6'
+                    num_categories: '2'
                 TagsMenuItem:
                     title: 'Tag 4'
+                    num_articles: '10'
+                    num_categories: '3'
                 TagsMenuItem:
                     title: 'Tag 5'
+                    num_articles: '10'
+                    num_categories: '3'
                 TagsMenuItem:
                     title: 'Tag 6'
+                    num_articles: '19'
+                    num_categories: '2'
                 TagsMenuItem:
                     title: 'Tag 7'
+                    num_articles: '3'
+                    num_categories: '0'
                 TagsMenuItem:
                     title: 'Tag 8'
+                    num_articles: '22'
+                    num_categories: '5'
                 TagsMenuItem:
                     title: 'Tag 9'
+                    num_articles: '11'
+                    num_categories: '2'
 
 <TagScreen@Screen>:
     BoxLayout:
@@ -326,17 +444,44 @@
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                Label:
-                    text: 'Categories'
-                    font_size: '18dp'
-                    bold: True
-                    padding: '8dp', '8dp'
+                AnchorLayout:
+                    anchor_x: 'center'
+                    anchor_y: 'center'
+                    size_hint_y: None
+                    height: '100dp'
+                    Label:
+                        text: 'Tag name'
+                        font_size: '24dp'
+                        bold: True
+                        size_hint: None, None
+                        size: self.texture_size
+                        padding: '16dp', '8dp'
+                        color: 1, 1, 1, 1
+                        canvas.before:
+                            Color:
+                                rgba: 0, .7, .7, 1
+                            Rectangle:
+                                pos: self.pos
+                                size: self.size
+                BoxLayout:
+                    orientation: 'horizontal'
                     size_hint_y: None
                     height: '40dp'
-                    text_size: self.width, self.height
-                    halign: 'left'
-                    valign: 'middle'
-                    color: .6, .6, .6, 1
+                    Image:
+                        pos: self.parent.pos
+                        source: 'assets/img/category.png'
+                        size_hint_x: None
+                        width: self.height
+                        color: 1, 1, 1, .5
+                    Label:
+                        text: 'Categories'
+                        font_size: '18dp'
+                        bold: True
+                        padding: '8dp', '8dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .6, .6, .6, 1
                 GridLayout:
                     cols: 4
                     size_hint_y: None
@@ -376,18 +521,27 @@
                         size_hint_y: None
                         height: '100dp'
                         on_release: app.root.ids.manager.current = 'category'
-
-                Label:
-                    text: 'Articles'
-                    font_size: '18dp'
-                    bold: True
-                    padding: '8dp', '8dp'
+                BoxLayout:
+                    orientation: 'horizontal'
                     size_hint_y: None
                     height: '40dp'
-                    text_size: self.width, self.height
-                    halign: 'left'
-                    valign: 'middle'
-                    color: .6, .6, .6, 1
+                    Image:
+                        pos: self.parent.pos
+                        source: 'assets/img/article.png'
+                        size_hint_x: None
+                        width: self.height
+                        color: 1, 1, 1, .5
+                    Label:
+                        text: 'Articles'
+                        font_size: '18dp'
+                        bold: True
+                        padding: '8dp', '8dp'
+                        size_hint_y: None
+                        height: '40dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .6, .6, .6, 1
                 BoxLayout:
                     orientation: 'vertical'
                     size_hint_y: None
@@ -613,26 +767,45 @@
             color: .2, .2, .2, 1
             font_size: '30dp'
 
+<SettingsScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '4dp'
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        TitleBar:
+            title: 'Settings'
+        Label:
+            text: 'Settings'
+            color: .2, .2, .2, 1
+            font_size: '30dp'
+
 <ApplicationRoot>:
     anim_type: 'slide_above_simple'
     NavigationPanel
     ScreenManager
         id: manager
-        CategoriesMenuScreen
+        CategoriesMenuScreen:
             name: 'categories'
-        CategoryArticlesMenuScreen
+        CategoryArticlesMenuScreen:
             name: 'category'
-        TagsMenuScreen
+        TagsMenuScreen:
             name: 'tags'
-        TagScreen
+        TagScreen:
             name: 'tag'
-        ArticlesScreen
+        ArticlesScreen:
             name: 'articles'
-        ArticleScreen
+        ArticleScreen:
             name: 'article'
-        BookmarksScreen
+        BookmarksScreen:
             name: 'bookmarks'
-        SearchScreen
+        SearchScreen:
             name: 'search'
-        GuidesScreen
+        GuidesScreen:
             name: 'guides'
+        SettingsScreen:
+            name: 'settings'
