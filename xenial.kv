@@ -188,7 +188,7 @@
     background_color: 0, .7, .7, 1
     on_release: app.root.ids.manager.current = 'tag'
 
-<CategoryTagsLayout@StackLayout>:
+<AssignedTagsLayout@StackLayout>:
     size_hint_y: None
     height: self.minimum_height
     spacing: '2dp'
@@ -203,7 +203,7 @@
     CategoryTagButton:
         text: 'Fifth tag'
 
-<CategoryArticlesMenuItem@Button>:
+<ArticlesMenuItem@Button>:
     title: 'Article'
     synopsis: 'Article synopsis'
     size_hint_y: None
@@ -273,33 +273,33 @@
                         text_size: self.size
                         valign: 'middle'
                         color: .2, .2, .2, 1
-                CategoryTagsLayout
+                AssignedTagsLayout
                 BoxLayout:
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
-                    CategoryArticlesMenuItem:
+                    ArticlesMenuItem:
                         title: 'Article 1 title'
                         synopsis: 'Article 1 synopsis can span over two rows'
-                    CategoryArticlesMenuItem:
+                    ArticlesMenuItem:
                         title: 'Article 2 title'
                         synopsis: 'Article 2 synopsis can span over two rows'
-                    CategoryArticlesMenuItem:
+                    ArticlesMenuItem:
                         title: 'Article 3 title'
                         synopsis: 'Article 3 synopsis can span over two rows'
-                    CategoryArticlesMenuItem:
+                    ArticlesMenuItem:
                         title: 'Article 4 title'
                         synopsis: 'Article 4 synopsis can span over two rows'
-                    CategoryArticlesMenuItem:
+                    ArticlesMenuItem:
                         title: 'Article 5 title'
                         synopsis: 'Article 5 synopsis can span over two rows'
-                    CategoryArticlesMenuItem:
+                    ArticlesMenuItem:
                         title: 'Article 6 title'
                         synopsis: 'Article 6 synopsis can span over two rows'
-                    CategoryArticlesMenuItem:
+                    ArticlesMenuItem:
                         title: 'Article 7 title'
                         synopsis: 'Article 7 synopsis can span over two rows'
-                    CategoryArticlesMenuItem:
+                    ArticlesMenuItem:
                         title: 'Article 8 title'
                         synopsis: 'Article 8 synopsis can span over two rows'
 
@@ -332,7 +332,7 @@
             padding: '4dp'
             Image:
                 pos: self.parent.pos
-                source: 'assets/img/article.png'
+                source: 'assets/img/article-white.png'
                 size_hint_x: None
                 width: self.height
                 color: 1, 1, 1, .5
@@ -341,13 +341,18 @@
                 text: root.num_articles
                 font_size: '12dp'
                 bold: True
-                color: .2, .2, .2, 1
+                color: 1, 1, 1, 1
                 canvas.before:
                     Color:
-                        rgba: .7, .7, .7, 1
+                        rgba: 0, .7, .7, 1
                     Ellipse:
                         pos: self.pos
                         size: self.size
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    Line:
+                        width: 1
+                        ellipse:  self.x, self.y, self.width, self.height
         AnchorLayout:
             anchor_x: 'right'
             anchor_y: 'bottom'
@@ -355,7 +360,7 @@
             width: self.height
             padding: '4dp'
             Image:
-                source: 'assets/img/category.png'
+                source: 'assets/img/category-white.png'
                 size_hint_x: None
                 width: self.height
                 color: 1, 1, 1, .5
@@ -364,13 +369,18 @@
                 text: root.num_categories
                 font_size: '12dp'
                 bold: True
-                color: .2, .2, .2, 1
+                color: 1, 1, 1, 1
                 canvas.before:
                     Color:
-                        rgba: .7, .7, .7, 1
+                        rgba: 0, .7, .7, 1
                     Ellipse:
                         pos: self.pos
                         size: self.size
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    Line:
+                        width: 1
+                        ellipse:  self.x, self.y, self.width, self.height
 
 <TagsMenuScreen@Screen>:
     BoxLayout:
@@ -483,44 +493,19 @@
                         valign: 'middle'
                         color: .6, .6, .6, 1
                 GridLayout:
-                    cols: 4
+                    cols: 3
                     size_hint_y: None
                     height: self.minimum_height
-                    Button:
-                        text: 'Category 1'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        size_hint_y: None
-                        height: '100dp'
-                        on_release: app.root.ids.manager.current = 'category'
-                    Button:
-                        text: 'Category 2'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        size_hint_y: None
-                        height: '100dp'
-                        on_release: app.root.ids.manager.current = 'category'
-                    Button:
-                        text: 'Category 3'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        size_hint_y: None
-                        height: '100dp'
-                        on_release: app.root.ids.manager.current = 'category'
-                    Button:
-                        text: 'Category 4'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        size_hint_y: None
-                        height: '100dp'
-                        on_release: app.root.ids.manager.current = 'category'
-                    Button:
-                        text: 'Category 5'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        size_hint_y: None
-                        height: '100dp'
-                        on_release: app.root.ids.manager.current = 'category'
+                    CategoriesMenuItem:
+                        title: 'Category 1'
+                    CategoriesMenuItem:
+                        title: 'Category 2'
+                    CategoriesMenuItem:
+                        title: 'Category 3'
+                    CategoriesMenuItem:
+                        title: 'Category 4'
+                    CategoriesMenuItem:
+                        title: 'Category 5'
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
@@ -546,67 +531,32 @@
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
-                    Button:
-                        text: 'Article 1'
-                        text_size: self.size
-                        halign: 'left'
-                        valign: 'middle'
-                        size_hint_y: None
-                        height: '80dp'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        on_release: app.root.ids.manager.current = 'article'
-                    Button:
-                        text: 'Article 2'
-                        size_hint_y: None
-                        height: '80dp'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        on_release: app.root.ids.manager.current = 'article'
-                    Button:
-                        text: 'Article 3'
-                        size_hint_y: None
-                        height: '80dp'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        on_release: app.root.ids.manager.current = 'article'
-                    Button:
-                        text: 'Article 4'
-                        size_hint_y: None
-                        height: '80dp'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        on_release: app.root.ids.manager.current = 'article'
-                    Button:
-                        text: 'Article 5'
-                        size_hint_y: None
-                        height: '80dp'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        on_release: app.root.ids.manager.current = 'article'
-                    Button:
-                        text: 'Article 6'
-                        size_hint_y: None
-                        height: '80dp'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        on_release: app.root.ids.manager.current = 'article'
-                    Button:
-                        text: 'Article 7'
-                        size_hint_y: None
-                        height: '80dp'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        on_release: app.root.ids.manager.current = 'article'
-                    Button:
-                        text: 'Article 8'
-                        size_hint_y: None
-                        height: '80dp'
-                        color: .2, .2, .2, 1
-                        background_normal: ''
-                        on_release: app.root.ids.manager.current = 'article'
+                    ArticlesMenuItem:
+                        title: 'Article 1 title'
+                        synopsis: 'Article 1 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 2 title'
+                        synopsis: 'Article 2 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 3 title'
+                        synopsis: 'Article 3 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 4 title'
+                        synopsis: 'Article 4 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 5 title'
+                        synopsis: 'Article 5 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 6 title'
+                        synopsis: 'Article 6 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 7 title'
+                        synopsis: 'Article 7 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 8 title'
+                        synopsis: 'Article 8 synopsis can span over two rows'
 
-<ArticlesScreen@Screen>:
+<ArticlesMenuScreen@Screen>:
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -618,30 +568,35 @@
                 size: self.size
         TitleBar:
             title: 'Articles'
-        Button:
-            text: 'Article 1'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Article 2'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Article 3'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Article 4'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Article 5'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Article 6'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Article 7'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Article 8'
-            on_release: app.root.ids.manager.current = 'article'
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                ArticlesMenuItem:
+                    title: 'Article 1 title'
+                    synopsis: 'Article 1 synopsis can span over two rows'
+                ArticlesMenuItem:
+                    title: 'Article 2 title'
+                    synopsis: 'Article 2 synopsis can span over two rows'
+                ArticlesMenuItem:
+                    title: 'Article 3 title'
+                    synopsis: 'Article 3 synopsis can span over two rows'
+                ArticlesMenuItem:
+                    title: 'Article 4 title'
+                    synopsis: 'Article 4 synopsis can span over two rows'
+                ArticlesMenuItem:
+                    title: 'Article 5 title'
+                    synopsis: 'Article 5 synopsis can span over two rows'
+                ArticlesMenuItem:
+                    title: 'Article 6 title'
+                    synopsis: 'Article 6 synopsis can span over two rows'
+                ArticlesMenuItem:
+                    title: 'Article 7 title'
+                    synopsis: 'Article 7 synopsis can span over two rows'
+                ArticlesMenuItem:
+                    title: 'Article 8 title'
+                    synopsis: 'Article 8 synopsis can span over two rows'
 
 <ArticleScreen@Screen>:
     BoxLayout:
@@ -655,46 +610,177 @@
                 size: self.size
         TitleBar:
             title: 'Article'
-        StackLayout:
-            size_hint_y: None
-            height: self.minimum_height
-            spacing: '2dp'
-            Button:
-                text: 'First tag'
-                size_hint: None, None
-                size: self.texture_size
-                padding: '8dp', '4dp'
-                on_release: app.root.ids.manager.current = 'tag'
-            Button:
-                text: 'Second tag'
-                size_hint: None, None
-                size: self.texture_size
-                padding: '8dp', '4dp'
-                on_release: app.root.ids.manager.current = 'tag'
-            Button:
-                text: 'Third tag'
-                size_hint: None, None
-                size: self.texture_size
-                padding: '8dp', '4dp'
-                on_release: app.root.ids.manager.current = 'tag'
-            Button:
-                text: 'Fourth tag'
-                size_hint: None, None
-                size: self.texture_size
-                padding: '8dp', '4dp'
-                on_release: app.root.ids.manager.current = 'tag'
-            Button:
-                text: 'Fifth tag'
-                size_hint: None, None
-                size: self.texture_size
-                padding: '8dp', '4dp'
-                on_release: app.root.ids.manager.current = 'tag'
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '8dp'
+                padding: '4dp'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '100dp'
+                    Image:
+                        source: 'assets/img/article-color.png'
+                        size_hint_x: None
+                        width: self.height
+                    Label:
+                        text: 'Article title'
+                        font_size: '24dp'
+                        bold: True
+                        text_size: self.size
+                        valign: 'middle'
+                        color: .2, .2, .2, 1
+                AssignedTagsLayout
+                AnchorLayout:
+                    anchor_x: 'center'
+                    anchor_y: 'center'
+                    size_hint_y: None
+                    height: '400dp'
+                    Label:
+                        text: 'Article content'
+                        font_size: '30dp'
+                        color: .2, .2, .2, 1
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '40dp'
+                    Image:
+                        pos: self.parent.pos
+                        source: 'assets/img/category.png'
+                        size_hint_x: None
+                        width: self.height
+                        color: 1, 1, 1, .5
+                    Label:
+                        text: 'Related categories'
+                        font_size: '18dp'
+                        bold: True
+                        padding: '8dp', '8dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .6, .6, .6, 1
+                GridLayout:
+                    cols: 3
+                    size_hint_y: None
+                    height: self.minimum_height
+                    CategoriesMenuItem:
+                        title: 'Category 1'
+                    CategoriesMenuItem:
+                        title: 'Category 2'
+                    CategoriesMenuItem:
+                        title: 'Category 3'
+                    CategoriesMenuItem:
+                        title: 'Category 4'
+                    CategoriesMenuItem:
+                        title: 'Category 5'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '40dp'
+                    Image:
+                        pos: self.parent.pos
+                        source: 'assets/img/article.png'
+                        size_hint_x: None
+                        width: self.height
+                        color: 1, 1, 1, .5
+                    Label:
+                        text: 'Related articles'
+                        font_size: '18dp'
+                        bold: True
+                        padding: '8dp', '8dp'
+                        size_hint_y: None
+                        height: '40dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .6, .6, .6, 1
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                    ArticlesMenuItem:
+                        title: 'Article 1 title'
+                        synopsis: 'Article 1 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 2 title'
+                        synopsis: 'Article 2 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 3 title'
+                        synopsis: 'Article 3 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 4 title'
+                        synopsis: 'Article 4 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 5 title'
+                        synopsis: 'Article 5 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 6 title'
+                        synopsis: 'Article 6 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 7 title'
+                        synopsis: 'Article 7 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 8 title'
+                        synopsis: 'Article 8 synopsis can span over two rows'
+
+<BookmarksMenuItem@BoxLayout>:
+    title: 'Article'
+    synopsis: 'Article synopsis'
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '80dp'
+    Button:
+        background_normal: ''
+        on_release: app.root.ids.manager.current = 'article'
         BoxLayout:
-            orientation: 'vertical'
-            Label:
-                text: 'Article content...'
-                font_size: '30dp'
-                color: .2, .2, .2, 1
+            orientation: 'horizontal'
+            pos: self.parent.pos
+            size_hint: None, None
+            size: self.parent.size
+            Image:
+                source: 'assets/img/article-color.png'
+                size_hint_x: None
+                width: self.height
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    text: root.title
+                    color: .2, .2, .2, 1
+                    font_size: '16dp'
+                    size_hint_y: .4
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
+                Label:
+                    text: root.synopsis
+                    color: .4, .4, .4, 1
+                    font_size: '14dp'
+                    size_hint_y: .6
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'top'
+    Button:
+        size_hint_x: None
+        width: self.height
+        background_normal: ''
+        on_release: pass
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            pos: self.parent.pos
+            size: self.parent.size
+            canvas:
+                Color:
+                    rgba: .9, .3, .3, 1
+                Line:
+                    width: 1
+                    ellipse: self.x + dp(12), self.y + dp(12), self.width - dp(24), self.height - dp(24)
+            Image:
+                source: 'assets/img/delete-red.png'
+                size_hint: .5, .5
+
 
 <BookmarksScreen@Screen>:
     BoxLayout:
@@ -708,30 +794,35 @@
                 size: self.size
         TitleBar:
             title: 'Bookmarks'
-        Button:
-            text: 'Bookmark 1'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Bookmark 2'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Bookmark 3'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Bookmark 4'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Bookmark 5'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Bookmark 6'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Bookmark 7'
-            on_release: app.root.ids.manager.current = 'article'
-        Button:
-            text: 'Bookmark 8'
-            on_release: app.root.ids.manager.current = 'article'
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                BookmarksMenuItem:
+                    title: 'Article 1 title'
+                    synopsis: 'Article 1 synopsis can span over two rows'
+                BookmarksMenuItem:
+                    title: 'Article 2 title'
+                    synopsis: 'Article 2 synopsis can span over two rows'
+                BookmarksMenuItem:
+                    title: 'Article 3 title'
+                    synopsis: 'Article 3 synopsis can span over two rows'
+                BookmarksMenuItem:
+                    title: 'Article 4 title'
+                    synopsis: 'Article 4 synopsis can span over two rows'
+                BookmarksMenuItem:
+                    title: 'Article 5 title'
+                    synopsis: 'Article 5 synopsis can span over two rows'
+                BookmarksMenuItem:
+                    title: 'Article 6 title'
+                    synopsis: 'Article 6 synopsis can span over two rows'
+                BookmarksMenuItem:
+                    title: 'Article 7 title'
+                    synopsis: 'Article 7 synopsis can span over two rows'
+                BookmarksMenuItem:
+                    title: 'Article 8 title'
+                    synopsis: 'Article 8 synopsis can span over two rows'
 
 <SearchScreen@Screen>:
     BoxLayout:
@@ -745,15 +836,106 @@
                 size: self.size
         TitleBar:
             title: 'Search'
-        Label:
-            text: 'Search'
-            color: .2, .2, .2, 1
-            font_size: '30dp'
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                padding: '4dp'
+                spacing: '12dp'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '50dp'
+                    TextInput:
+                        hint_text: 'Search guide articles'
+                        font_size: '20dp'
+                        padding: '12dp', '12dp', '12dp', '12dp'
+                        multiline: False
+                    Button:
+                        size_hint_x: None
+                        width: self.height
+                        background_normal: ''
+                        Image:
+                            source: 'assets/img/search.png'
+                            pos: self.parent.pos
+                            size: self.parent.size
+                Label:
+                    text: 'Your search did not match any articles'
+                    size_hint_y: None
+                    height: '50dp'
+                    font_size: '18dp'
+                    color: .4, .4, .4, 1
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                    ArticlesMenuItem:
+                        title: 'Article 1 title'
+                        synopsis: 'Article 1 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 2 title'
+                        synopsis: 'Article 2 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 3 title'
+                        synopsis: 'Article 3 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 4 title'
+                        synopsis: 'Article 4 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 5 title'
+                        synopsis: 'Article 5 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 6 title'
+                        synopsis: 'Article 6 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 7 title'
+                        synopsis: 'Article 7 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 8 title'
+                        synopsis: 'Article 8 synopsis can span over two rows'
 
-<GuidesScreen@Screen>:
+<GuidesMenuItem@BoxLayout>:
+    title: 'Guide'
+    active: 'normal'
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '80dp'
+    Image:
+        source: 'assets/img/guide-color.png'
+        size_hint_x: None
+        width: self.height
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: root.title
+            color: .2, .2, .2, 1
+            font_size: '18dp'
+            bold: True
+            size_hint_y: .5
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+        Label:
+            text: 'From Country 1 to Country 2'
+            color: .2, .2, .2, 1
+            font_size: '14dp'
+            size_hint_y: .5
+            text_size: self.size
+            halign: 'left'
+            valign: 'middle'
+    CheckBox:
+        active: root.active
+        group: 'guides'
+        size_hint_x: None
+        width: self.height
+        color: .2, .2, .2, 1
+
+<GuidesMenuScreen@Screen>:
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
+        spacing: '4dp'
         canvas:
             Color:
                 rgba: 1, 1, 1, 1
@@ -762,10 +944,43 @@
                 size: self.size
         TitleBar:
             title: 'Guides'
-        Label:
-            text: 'Guides'
-            color: .2, .2, .2, 1
-            font_size: '30dp'
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '8dp'
+                padding: '4dp'
+                GuidesMenuItem:
+                    title: 'Guide 1'
+                    active: 'down'
+                GuidesMenuItem:
+                    title: 'Guide 2'
+                GuidesMenuItem:
+                    title: 'Guide 3'
+                GuidesMenuItem:
+                    title: 'Guide 4'
+                GuidesMenuItem:
+                    title: 'Guide 5'
+                AnchorLayout:
+                    anchor_x: 'center'
+                    anchor_y: 'center'
+                    size_hint_y: None
+                    height: '80dp'
+                    Button:
+                        text: 'Import new guide'
+                        font_size: '18dp'
+                        size_hint: None, None
+                        size: self.texture_size
+                        padding: '24dp', '14dp'
+                        color: .4, .4, .4, 1
+                        background_normal: ''
+                        canvas:
+                            Color:
+                                rgba: .4, .4, .4, 1
+                            Line:
+                                width: 1
+                                rectangle: self.x, self.y, self.width, self.height
 
 <SettingsScreen@Screen>:
     BoxLayout:
@@ -779,10 +994,54 @@
                 size: self.size
         TitleBar:
             title: 'Settings'
-        Label:
-            text: 'Settings'
-            color: .2, .2, .2, 1
-            font_size: '30dp'
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                Label:
+                    text: 'Application language'
+                    font_size: '18dp'
+                    bold: True
+                    size_hint_y: None
+                    height: '60dp'
+                    padding: '8dp', '8dp'
+                    text_size: self.width, self.height
+                    halign: 'left'
+                    valign: 'middle'
+                    color: .6, .6, .6, 1
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '50dp'
+                    padding: '16dp', '8dp', '8dp', '8dp'
+                    Label:
+                        text: 'English'
+                        font_size: '18dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .2, .2, .2, 1
+                    CheckBox:
+                        group: 'app_lang'
+                        color: .2, .2, .2, 1
+                        active: 'down'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '50dp'
+                    padding: '16dp', '8dp', '8dp', '8dp'
+                    Label:
+                        text: 'Slovenčina'
+                        font_size: '18dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .2, .2, .2, 1
+                    CheckBox:
+                        group: 'app_lang'
+                        color: .2, .2, .2, 1
+                        active: 'normal'
 
 <ApplicationRoot>:
     anim_type: 'slide_above_simple'
@@ -797,7 +1056,7 @@
             name: 'tags'
         TagScreen:
             name: 'tag'
-        ArticlesScreen:
+        ArticlesMenuScreen:
             name: 'articles'
         ArticleScreen:
             name: 'article'
@@ -805,7 +1064,7 @@
             name: 'bookmarks'
         SearchScreen:
             name: 'search'
-        GuidesScreen:
+        GuidesMenuScreen:
             name: 'guides'
         SettingsScreen:
             name: 'settings'
