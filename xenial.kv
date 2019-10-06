@@ -598,6 +598,105 @@
                     title: 'Article 8 title'
                     synopsis: 'Article 8 synopsis can span over two rows'
 
+<ArticleContentLayout@BoxLayout>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    padding: 0, 0, 0, '10dp'
+    spacing: '20dp'
+    # ArticleSubtitle
+    Label:
+        text: 'Article subtitle 1'
+        font_size: '20dp'
+        bold: True
+        size_hint_y: None
+        height: '50dp'
+        text_size: self.size
+        halign: 'left'
+        valign: 'middle'
+        color: .2, .2, .2, 1
+    # ArticleParagraph
+    Label:
+        text: 'Article paragraph can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+        font_size: '16dp'
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]
+        color: .2, .2, .2, 1
+        markup: True
+    # ArticleImage
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: '8dp'
+        Image:
+            source: 'assets/article_data/pexels-photo-2907206.jpeg'
+            size_hint: None, None
+            width: self.parent.width - (2 * self.parent.padding[0])
+            height: self.parent.width/self.image_ratio
+            keep_ratio: True
+            allow_stretch: True
+        Label:
+            text: 'Image caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+            font_size: '14dp'
+            text_size: self.width, None
+            size_hint_y: None
+            height: self.texture_size[1]
+            color: .4, .4, .4, 1
+            markup: True
+    # ArticleAudio
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: '8dp'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '80dp'
+            padding: '4dp'
+            canvas:
+                Color:
+                    rgba: .2, .2, .2, 1
+                Line:
+                    width: 1
+                    rectangle: self.x, self.y, self.width, self.height
+            Button:
+                size_hint_x: None
+                width: '80dp'
+                background_normal: ''
+                Image:
+                    source: 'assets/img/play.png'
+                    pos: self.parent.pos
+                    size: self.parent.size
+            BoxLayout:
+                orientation: 'vertical'
+                padding: '8dp'
+                Slider:
+                    orientation: 'horizontal'
+                    value: 50
+                    step: 1
+                    value_track: True
+                    value_track_color: 0, .6, .8, 1
+                Label:
+                    text: '00:30 / 01:00'
+                    text_size: self.size
+                    halign: 'right'
+                    color: .2, .2, .2, 1
+        Label:
+            text: 'Audio caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+            font_size: '14dp'
+            text_size: self.width, None
+            size_hint_y: None
+            height: self.texture_size[1]
+            color: .4, .4, .4, 1
+            markup: True
+
+    # ArticleVideo
+
+
+
 <ArticleScreen@Screen>:
     BoxLayout:
         orientation: 'vertical'
@@ -633,15 +732,7 @@
                         valign: 'middle'
                         color: .2, .2, .2, 1
                 AssignedTagsLayout
-                AnchorLayout:
-                    anchor_x: 'center'
-                    anchor_y: 'center'
-                    size_hint_y: None
-                    height: '400dp'
-                    Label:
-                        text: 'Article content'
-                        font_size: '30dp'
-                        color: .2, .2, .2, 1
+                ArticleContentLayout
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
