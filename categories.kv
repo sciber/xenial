@@ -1,0 +1,79 @@
+#:kivy 1.11.1
+
+<CategoriesMenuItem@Button>:
+    icon: None
+    title: 'Category'
+    background_normal: ''
+    size_hint_y: None
+    height: '160dp'
+    on_release: app.root.ids.manager.current = 'category'
+    BoxLayout:
+        orientation: 'vertical'
+        pos: self.parent.pos
+        size_hint: None, None
+        size: self.parent.size
+        Image:
+            source: root.icon
+            size_hint_y: .6
+        Label:
+            text: root.title
+            color: .2, .2, .2, 1
+            font_size: '16dp'
+            size_hint_y: .4
+            text_size: self.size
+            halign: 'center'
+            valign: 'top'
+
+<CategoriesMenuScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '4dp'
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        TitleBar:
+            title: 'Categories'
+        ScrollView:
+            GridLayout:
+                cols: round(root.width // 130) + 1
+                size_hint_y: None
+                height: self.minimum_height
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 1'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 2'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 3'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 4'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 5'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 6'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 7'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 8'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 9'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 10'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 11'
+                CategoriesMenuItem:
+                    icon: 'assets/img/category-color.png'
+                    title: 'Category 12'

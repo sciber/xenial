@@ -1,0 +1,72 @@
+#:kivy 1.11.1
+
+<SearchScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '4dp'
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        TitleBar:
+            title: 'Search'
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                padding: '4dp'
+                spacing: '12dp'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '50dp'
+                    TextInput:
+                        hint_text: 'Search guide articles'
+                        font_size: '20dp'
+                        padding: '12dp', '12dp', '12dp', '12dp'
+                        multiline: False
+                    Button:
+                        size_hint_x: None
+                        width: self.height
+                        background_normal: ''
+                        Image:
+                            source: 'assets/img/search.png'
+                            pos: self.parent.pos
+                            size: self.parent.size
+                Label:
+                    text: 'Your search did not match any articles'
+                    size_hint_y: None
+                    height: '50dp'
+                    font_size: '18dp'
+                    color: .4, .4, .4, 1
+                BoxLayout:
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                    ArticlesMenuItem:
+                        title: 'Article 1 title'
+                        synopsis: 'Article 1 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 2 title'
+                        synopsis: 'Article 2 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 3 title'
+                        synopsis: 'Article 3 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 4 title'
+                        synopsis: 'Article 4 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 5 title'
+                        synopsis: 'Article 5 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 6 title'
+                        synopsis: 'Article 6 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 7 title'
+                        synopsis: 'Article 7 synopsis can span over two rows'
+                    ArticlesMenuItem:
+                        title: 'Article 8 title'
+                        synopsis: 'Article 8 synopsis can span over two rows'

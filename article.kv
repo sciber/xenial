@@ -1,0 +1,427 @@
+#:kivy 1.11.1
+
+<ArticleAssignedTag@Button>:
+    text: ''
+    size_hint: None, None
+    size: self.texture_size
+    padding: '8dp', '4dp'
+    background_normal: ''
+    color: 1, 1, 1, 1
+    background_color: 0, .7, .7, 1
+    on_release: app.root.ids.manager.current = 'tag'
+
+<ArticleAssignedTagsList@StackLayout>:
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: '2dp'
+    ArticleAssignedTag:
+        text: 'First tag'
+    ArticleAssignedTag:
+        text: 'Second tag'
+    ArticleAssignedTag:
+        text: 'Third tag'
+    ArticleAssignedTag:
+        text: 'Fourth tag'
+    ArticleAssignedTag:
+        text: 'Fifth tag'
+
+<ArticleTitle@BoxLayout>:
+    icon: None
+    title: 'Untitled'
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '100dp'
+    Image:
+        source: root.icon
+        size_hint_x: None
+        width: self.height
+    Label:
+        text: root.title
+        font_size: '24dp'
+        bold: True
+        text_size: self.size
+        valign: 'middle'
+        color: .2, .2, .2, 1
+
+<ArticleSubtitle@Label>:
+    text: ''
+    font_size: '20dp'
+    bold: True
+    size_hint_y: None
+    height: '50dp'
+    text_size: self.size
+    halign: 'left'
+    valign: 'middle'
+    color: .2, .2, .2, 1
+
+<ArticleParagraph@Label>:
+    text: ''
+    font_size: '16dp'
+    text_size: self.width, None
+    size_hint_y: None
+    height: self.texture_size[1]
+    color: .2, .2, .2, 1
+    markup: True
+
+<ArticleImage@BoxLayout>:
+    image: None
+    caption: ''
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: '8dp'
+    Image:
+        source: root.image
+        size_hint: None, None
+        width: self.parent.width - (2 * self.parent.padding[0])
+        height: self.parent.width/self.image_ratio
+        keep_ratio: True
+        allow_stretch: True
+    Label:
+        text: root.caption
+        font_size: '14dp'
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]
+        color: .4, .4, .4, 1
+        markup: True
+
+<ArticleAudio@BoxLayout>:
+    audio: None
+    caption: ''
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: '8dp'
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: '80dp'
+        padding: '4dp'
+        canvas:
+            Color:
+                rgba: .2, .2, .2, 1
+            Line:
+                width: 1
+                rectangle: self.x, self.y, self.width, self.height
+        Button:
+            size_hint_x: None
+            width: '80dp'
+            background_normal: ''
+            Image:
+                source: 'assets/img/play-darkgray.png'
+                pos: self.parent.pos
+                size: self.parent.size
+        BoxLayout:
+            orientation: 'vertical'
+            padding: '8dp'
+            Slider:
+                orientation: 'horizontal'
+                value: 50
+                step: 1
+                value_track: True
+                value_track_color: 0, .6, .7, 1
+            Label:
+                text: '00:30 / 01:00'
+                text_size: self.size
+                halign: 'right'
+                color: .2, .2, .2, 1
+    Label:
+        text: root.caption
+        font_size: '14dp'
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]
+        color: .4, .4, .4, 1
+        markup: True
+
+<ArticleVideo@BoxLayout>:
+    image: None
+    video: None
+    caption: ''
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: '8dp'
+    BoxLayout:
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        Image:
+            source: root.image
+            size_hint: None, None
+            width: self.parent.width - (2 * self.parent.padding[0])
+            height: self.parent.width/self.image_ratio
+            keep_ratio: True
+            allow_stretch: True
+            canvas:
+                Color:
+                    rgba: .2, .2, .2, 1
+                Line:
+                    width: 1
+                    rectangle: self.x, self.y, self.width, self.height
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '80dp'
+            padding: '4dp'
+            canvas:
+                Color:
+                    rgba: .2, .2, .2, 1
+                Line:
+                    width: 1
+                    rectangle: self.x, self.y, self.width, self.height
+            Button:
+                size_hint_x: None
+                width: '80dp'
+                background_normal: ''
+                Image:
+                    source: 'assets/img/play-darkgray.png'
+                    pos: self.parent.pos
+                    size: self.parent.size
+            BoxLayout:
+                orientation: 'vertical'
+                padding: '8dp'
+                Slider:
+                    orientation: 'horizontal'
+                    value: 50
+                    step: 1
+                    value_track: True
+                    value_track_color: 0, .6, .7, 1
+                Label:
+                    text: '00:30 / 01:00'
+                    text_size: self.size
+                    halign: 'right'
+                    color: .2, .2, .2, 1
+    Label:
+        text: root.caption
+        font_size: '14dp'
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]
+        color: .4, .4, .4, 1
+        markup: True
+
+<ArticleContent@BoxLayout>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    padding: 0, 0, 0, '10dp'
+    spacing: '20dp'
+    ArticleSubtitle:
+        text: 'Paragraph subtitle'
+    ArticleParagraph:
+        text: 'Article paragraph can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+    ArticleSubtitle:
+        text: 'Image subtitle'
+    ArticleImage:
+        image: 'assets/article_data/pexels-photo-2907206.jpeg'
+        caption: 'Image caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+    ArticleSubtitle:
+        text: 'Audio subtitle'
+    ArticleAudio:
+        audio: None
+        caption: 'Audio caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+    ArticleSubtitle:
+        text: 'Video subtitle'
+    ArticleVideo:
+        image: 'assets/article_data/pexels-photo-887821.jpeg'
+        video: None
+        caption: 'Video caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+
+<ArticleRelatedArticlesMenuItem@Button>:
+    icon: None
+    title: 'Article'
+    synopsis: 'Article synopsis'
+    size_hint_y: None
+    height: '60dp'
+    background_normal: ''
+    on_release: app.root.ids.manager.current = 'article'
+    BoxLayout:
+        orientation: 'horizontal'
+        pos: self.parent.pos
+        size_hint: None, None
+        size: self.parent.size
+        Image:
+            source: root.icon
+            size_hint_x: None
+            width: self.height
+        BoxLayout:
+            orientation: 'vertical'
+            Label:
+                text: root.title
+                color: .2, .2, .2, 1
+                font_size: '14dp'
+                size_hint_y: .4
+                text_size: self.size
+                halign: 'left'
+                valign: 'middle'
+            Label:
+                text: root.synopsis
+                color: .4, .4, .4, 1
+                font_size: '12dp'
+                size_hint_y: .6
+                text_size: self.size
+                halign: 'left'
+                valign: 'top'
+
+<ArticleRelatedArticlesMenu@BoxLayout>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: '8dp'
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: '40dp'
+        Image:
+            pos: self.parent.pos
+            source: 'assets/img/article.png'
+            size_hint_x: None
+            width: self.height
+            color: 1, 1, 1, .5
+        Label:
+            text: 'Related articles'
+            font_size: '18dp'
+            bold: True
+            padding: '8dp', '8dp'
+            size_hint_y: None
+            height: '40dp'
+            text_size: self.width, self.height
+            halign: 'left'
+            valign: 'middle'
+            color: .6, .6, .6, 1
+    GridLayout:
+        cols: round(root.width // 640) + 1
+        size_hint_y: None
+        height: self.minimum_height
+        ArticleRelatedArticlesMenuItem:
+            icon: 'assets/img/article-color.png'
+            title: 'Article 1 title'
+            synopsis: 'Article 1 synopsis can span over two rows'
+        ArticleRelatedArticlesMenuItem:
+            icon: 'assets/img/article-color.png'
+            title: 'Article 2 title'
+            synopsis: 'Article 2 synopsis can span over two rows'
+        ArticleRelatedArticlesMenuItem:
+            icon: 'assets/img/article-color.png'
+            title: 'Article 3 title'
+            synopsis: 'Article 3 synopsis can span over two rows'
+        ArticleRelatedArticlesMenuItem:
+            icon: 'assets/img/article-color.png'
+            title: 'Article 4 title'
+            synopsis: 'Article 4 synopsis can span over two rows'
+        ArticleRelatedArticlesMenuItem:
+            icon: 'assets/img/article-color.png'
+            title: 'Article 5 title'
+            synopsis: 'Article 5 synopsis can span over two rows'
+        ArticleRelatedArticlesMenuItem:
+            icon: 'assets/img/article-color.png'
+            title: 'Article 6 title'
+            synopsis: 'Article 6 synopsis can span over two rows'
+        ArticleRelatedArticlesMenuItem:
+            icon: 'assets/img/article-color.png'
+            title: 'Article 7 title'
+            synopsis: 'Article 7 synopsis can span over two rows'
+        ArticleRelatedArticlesMenuItem:
+            icon: 'assets/img/article-color.png'
+            title: 'Article 8 title'
+            synopsis: 'Article 8 synopsis can span over two rows'
+
+<ArticleRelatedCategoriesMenuItem@Button>:
+    icon: None
+    title: ''
+    background_normal: ''
+    size_hint: None, None
+    size: '80dp', '100dp'
+    on_release: app.root.ids.manager.current = 'category'
+    BoxLayout:
+        orientation: 'vertical'
+        pos: self.parent.pos
+        size_hint: None, None
+        size: self.parent.size
+        Image:
+            source: root.icon
+            size_hint_y: .6
+        Label:
+            text: root.title
+            color: .2, .2, .2, 1
+            font_size: '12dp'
+            size_hint_y: .4
+            text_size: self.size
+            halign: 'center'
+            valign: 'top'
+
+<ArticleRelatedCategoriesMenu@BoxLayout>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: '40dp'
+        Image:
+            pos: self.parent.pos
+            source: 'assets/img/category.png'
+            size_hint_x: None
+            width: self.height
+            color: 1, 1, 1, .5
+        Label:
+            text: 'Related categories'
+            font_size: '18dp'
+            bold: True
+            padding: '8dp', '8dp'
+            text_size: self.width, self.height
+            halign: 'left'
+            valign: 'middle'
+            color: .6, .6, .6, 1
+    StackLayout:
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: '2dp'
+        padding: '6dp'
+        ArticleRelatedCategoriesMenuItem:
+            icon: 'assets/img/category-color.png'
+            title: 'Category 1'
+        ArticleRelatedCategoriesMenuItem:
+            icon: 'assets/img/category-color.png'
+            title: 'Category 2'
+        ArticleRelatedCategoriesMenuItem:
+            icon: 'assets/img/category-color.png'
+            title: 'Category 3'
+        ArticleRelatedCategoriesMenuItem:
+            icon: 'assets/img/category-color.png'
+            title: 'Category 4'
+        ArticleRelatedCategoriesMenuItem:
+            icon: 'assets/img/category-color.png'
+            title: 'Category 5'
+
+<ArticleScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '4dp'
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        TitleBar:
+            title: 'Article'
+            action_disabled: False
+            action_image: 'assets/img/bookmark.png'
+            action_callback: root.toggle_bookmark
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '8dp'
+                padding: '4dp'
+                ArticleTitle:
+                    icon: 'assets/img/article-color.png'
+                    title: 'Article title'
+                ArticleAssignedTagsList
+                ArticleContent
+                ArticleRelatedArticlesMenu
+                ArticleRelatedCategoriesMenu

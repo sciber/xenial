@@ -1,0 +1,136 @@
+#:kivy 1.11.1
+
+<TagsMenuItem@Button>:
+    title: 'Tag'
+    num_categories: '0'
+    num_articles: '0'
+    size_hint_y: None
+    height: '60dp'
+    background_normal: ''
+    background_color: 0, .7, .7, 1
+    padding: '20dp', '20dp'
+    on_release: app.root.ids.manager.current = 'tag'
+    BoxLayout:
+        orientation: 'horizontal'
+        pos: self.parent.pos[0] + dp(8), self.parent.pos[1]
+        size_hint: None, None
+        size: self.parent.size[0] - dp(8), self.parent.size[1]
+        Label:
+            text: root.title
+            font_size: '18dp'
+            text_size: self.size
+            valign: 'middle'
+            color: 1, 1, 1, 1
+        AnchorLayout:
+            anchor_x: 'right'
+            anchor_y: 'bottom'
+            size_hint_x: None
+            width: self.height
+            padding: '4dp'
+            Image:
+                pos: self.parent.pos
+                source: 'assets/img/article-white.png'
+                size_hint_x: None
+                width: self.height
+                color: 1, 1, 1, .5
+            Label:
+                size_hint: .5, .5
+                text: root.num_articles
+                font_size: '12dp'
+                bold: True
+                color: 1, 1, 1, 1
+                canvas.before:
+                    Color:
+                        rgba: 0, .7, .7, 1
+                    Ellipse:
+                        pos: self.pos
+                        size: self.size
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    Line:
+                        width: 1
+                        ellipse:  self.x, self.y, self.width, self.height
+        AnchorLayout:
+            anchor_x: 'right'
+            anchor_y: 'bottom'
+            size_hint_x: None
+            width: self.height
+            padding: '4dp'
+            Image:
+                source: 'assets/img/category-white.png'
+                size_hint_x: None
+                width: self.height
+                color: 1, 1, 1, .5
+            Label:
+                size_hint: .5, .5
+                text: root.num_categories
+                font_size: '12dp'
+                bold: True
+                color: 1, 1, 1, 1
+                canvas.before:
+                    Color:
+                        rgba: 0, .7, .7, 1
+                    Ellipse:
+                        pos: self.pos
+                        size: self.size
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    Line:
+                        width: 1
+                        ellipse:  self.x, self.y, self.width, self.height
+
+<TagsMenuScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '4dp'
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        TitleBar:
+            title: 'Tags'
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '2dp'
+                TagsMenuItem:
+                    title: 'Tag 1'
+                    num_articles: '10'
+                    num_categories: '3'
+                TagsMenuItem:
+                    title: 'Tag 2'
+                    num_articles: '4'
+                    num_categories: '1'
+                TagsMenuItem:
+                    title: 'Tag 3'
+                    num_articles: '6'
+                    num_categories: '2'
+                TagsMenuItem:
+                    title: 'Tag 4'
+                    num_articles: '10'
+                    num_categories: '3'
+                TagsMenuItem:
+                    title: 'Tag 5'
+                    num_articles: '10'
+                    num_categories: '3'
+                TagsMenuItem:
+                    title: 'Tag 6'
+                    num_articles: '19'
+                    num_categories: '2'
+                TagsMenuItem:
+                    title: 'Tag 7'
+                    num_articles: '3'
+                    num_categories: '0'
+                TagsMenuItem:
+                    title: 'Tag 8'
+                    num_articles: '22'
+                    num_categories: '5'
+                TagsMenuItem:
+                    title: 'Tag 9'
+                    num_articles: '11'
+                    num_categories: '2'
+

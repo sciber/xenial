@@ -1,0 +1,118 @@
+#:kivy 1.11.1
+
+<TitleBar@BoxLayout>:
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '50dp'
+    title: 'No title'
+    action_disabled: True
+    action_image: None
+    action_callback: lambda: None
+    Button:
+        size_hint_x: None
+        width: self.height
+        background_normal: ''
+        on_release: app.root.toggle_state()
+        Image:
+            source: 'assets/img/hamburger_menu.png'
+            pos: self.parent.pos
+            size: self.parent.size
+            allow_stretch: True
+    Label:
+        text: root.title
+        color: .2, .2, .2, 1
+        font_size: '20dp'
+    Button:
+        disabled: root.action_disabled
+        size_hint_x: None
+        width: self.height
+        background_normal: ''
+        background_disabled_normal: ''
+        on_release: root.action_callback()
+        Image:
+            source: root.action_image
+            pos: self.parent.pos
+            size: self.parent.size
+            allow_stretch: True
+
+<NavigationPanelButton@Button>:
+    title: 'Item'
+    image: 'assets/img/picture.png'
+    size_hint_y: None
+    height: '60dp'
+    background_normal: ''
+    BoxLayout:
+        orientation: 'horizontal'
+        pos: self.parent.pos
+        size_hint: None, None
+        size: self.parent.size
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            size_hint_x: None
+            width: '50dp'
+            padding: '8dp'
+            Image:
+                source: root.image
+        Label:
+            text: root.title
+            text_size: self.size
+            halign: 'left'
+            valign: 'center'
+            font_size: '18dp'
+            color: .2, .2, .2, 1
+
+<NavigationPanel@ScrollView>:
+    canvas.before:
+        Color:
+            rgba: 1, 1, 1, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
+    StackLayout:
+        orientation: 'lr-tb'
+        size_hint_y: None
+        height: self.minimum_height
+        padding: '4dp'
+        NavigationPanelButton:
+            title: 'Search'
+            image: 'assets/img/search.png'
+            on_release:
+                app.root.ids.manager.current = 'search'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Categories'
+            image: 'assets/img/category.png'
+            on_release:
+                app.root.ids.manager.current = 'categories'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Tags'
+            image: 'assets/img/tag.png'
+            on_release:
+                app.root.ids.manager.current = 'tags'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Articles'
+            image: 'assets/img/article.png'
+            on_release:
+                app.root.ids.manager.current = 'articles'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Bookmarks'
+            image: 'assets/img/bookmark.png'
+            on_release:
+                app.root.ids.manager.current = 'bookmarks'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Guides'
+            image: 'assets/img/guide.png'
+            on_release:
+                app.root.ids.manager.current = 'guides'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Settings'
+            image: 'assets/img/settings.png'
+            on_release:
+                app.root.ids.manager.current = 'settings'
+                app.root.toggle_state()

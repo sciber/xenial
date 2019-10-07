@@ -1,0 +1,62 @@
+#:kivy 1.11.1
+
+<SettingsScreen@Screen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '4dp'
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        TitleBar:
+            title: 'Settings'
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                Label:
+                    text: 'Application language'
+                    font_size: '18dp'
+                    bold: True
+                    size_hint_y: None
+                    height: '60dp'
+                    padding: '8dp', '8dp'
+                    text_size: self.width, self.height
+                    halign: 'left'
+                    valign: 'middle'
+                    color: .6, .6, .6, 1
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '50dp'
+                    padding: '16dp', '8dp', '8dp', '8dp'
+                    Label:
+                        text: 'English'
+                        font_size: '18dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .2, .2, .2, 1
+                    CheckBox:
+                        group: 'app_lang'
+                        color: .2, .2, .2, 1
+                        active: 'down'
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '50dp'
+                    padding: '16dp', '8dp', '8dp', '8dp'
+                    Label:
+                        text: 'Slovenčina'
+                        font_size: '18dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .2, .2, .2, 1
+                    CheckBox:
+                        group: 'app_lang'
+                        color: .2, .2, .2, 1
+                        active: 'normal'
