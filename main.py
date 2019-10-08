@@ -1,9 +1,19 @@
 import kivy
 
+from kivy.config import Config
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.uix.screenmanager import Screen
 from kivy.garden.navigationdrawer import NavigationDrawer
+
+Config.set('kivy', 'default_font',
+'''
+["Noto Sans", 
+ "assets/fonts/NotoSans-Regular.ttf",
+ "assets/fonts/NotoSans-Italic.ttf",
+ "assets/fonts/NotoSans-Bold.ttf",
+ "assets/fonts/NotoSans-BoldItalic.ttf"
+]''')
 
 Builder.load_file('ui-components.kv')
 Builder.load_file('search.kv')
