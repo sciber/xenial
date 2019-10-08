@@ -7,13 +7,12 @@ from kivy.uix.screenmanager import Screen
 from kivy.garden.navigationdrawer import NavigationDrawer
 
 Config.set('kivy', 'default_font',
-'''
-["Noto Sans", 
- "assets/fonts/NotoSans-Regular.ttf",
- "assets/fonts/NotoSans-Italic.ttf",
- "assets/fonts/NotoSans-Bold.ttf",
- "assets/fonts/NotoSans-BoldItalic.ttf"
-]''')
+           '''["Noto Sans", 
+               "assets/fonts/NotoSans-Regular.ttf",
+               "assets/fonts/NotoSans-Italic.ttf",
+               "assets/fonts/NotoSans-Bold.ttf",
+               "assets/fonts/NotoSans-BoldItalic.ttf"
+              ]''')
 
 Builder.load_file('ui-components.kv')
 Builder.load_file('search.kv')
@@ -36,8 +35,13 @@ class ArticleScreen(Screen):
 
 
 class ApplicationRoot(NavigationDrawer):
+    from guides.dummy.guide import guide
+
     def __init__(self, **kwargs):
         super(NavigationDrawer, self).__init__(**kwargs)
+
+        print(self.guides)
+
 
 
 class XenialApp(App):
