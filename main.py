@@ -40,7 +40,7 @@ class ApplicationRoot(NavigationDrawer):
     def __init__(self, **kwargs):
         super(NavigationDrawer, self).__init__(**kwargs)
 
-        print(self.guides)
+        print(self.guide)
 
 
 
