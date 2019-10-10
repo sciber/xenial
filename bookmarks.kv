@@ -1,6 +1,7 @@
 #:kivy 1.11.1
 
-<BookmarksMenuItem@BoxLayout>:
+<BookmarksMenuItem>:
+    icon: None
     title: 'Article'
     synopsis: 'Article synopsis'
     orientation: 'horizontal'
@@ -14,10 +15,15 @@
             pos: self.parent.pos
             size_hint: None, None
             size: self.parent.size
-            Image:
-                source: 'assets/img/article-color.png'
+            AnchorLayout:
+                anchor_x: 'center'
+                anchor_y: 'center'
                 size_hint_x: None
                 width: self.height
+                Image:
+                    source: root.icon
+                    size_hint: None, None
+                    size: '60dp', '60dp'
             BoxLayout:
                 orientation: 'vertical'
                 Label:
@@ -30,6 +36,7 @@
                     valign: 'middle'
                 Label:
                     text: root.synopsis
+                    markup: True
                     color: .4, .4, .4, 1
                     font_size: '14dp'
                     size_hint_y: .6
@@ -40,24 +47,18 @@
         size_hint_x: None
         width: self.height
         background_normal: ''
-        on_release: pass
+        on_release: root.delete_bookmark()
         AnchorLayout:
             anchor_x: 'center'
             anchor_y: 'center'
             pos: self.parent.pos
             size: self.parent.size
-#            canvas:
-#                Color:
-#                    rgba: .9, .3, .3, 1
-#                Line:
-#                    width: 1
-#                    ellipse: self.x + dp(12), self.y + dp(12), self.width - dp(24), self.height - dp(24)
             Image:
-                source: 'assets/img/delete-red.png'
+                source: 'assets/img/delete.png'
                 size_hint: .5, .5
 
-
-<BookmarksMenuScreen@Screen>:
+<BookmarksMenuScreen>:
+    bookmarks_container: container
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -71,30 +72,7 @@
             title: 'Bookmarks'
         ScrollView:
             BoxLayout:
+                id: container
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                BookmarksMenuItem:
-                    title: 'Article 1 title'
-                    synopsis: 'Article 1 synopsis can span over two rows'
-                BookmarksMenuItem:
-                    title: 'Article 2 title'
-                    synopsis: 'Article 2 synopsis can span over two rows'
-                BookmarksMenuItem:
-                    title: 'Article 3 title'
-                    synopsis: 'Article 3 synopsis can span over two rows'
-                BookmarksMenuItem:
-                    title: 'Article 4 title'
-                    synopsis: 'Article 4 synopsis can span over two rows'
-                BookmarksMenuItem:
-                    title: 'Article 5 title'
-                    synopsis: 'Article 5 synopsis can span over two rows'
-                BookmarksMenuItem:
-                    title: 'Article 6 title'
-                    synopsis: 'Article 6 synopsis can span over two rows'
-                BookmarksMenuItem:
-                    title: 'Article 7 title'
-                    synopsis: 'Article 7 synopsis can span over two rows'
-                BookmarksMenuItem:
-                    title: 'Article 8 title'
-                    synopsis: 'Article 8 synopsis can span over two rows'

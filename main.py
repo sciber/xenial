@@ -3,7 +3,10 @@ import kivy
 from kivy.config import Config
 from kivy.app import App
 from kivy.lang.builder import Builder
+from kivy.clock import Clock
+from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import Screen
+from kivy.uix.boxlayout import BoxLayout
 from kivy.garden.navigationdrawer import NavigationDrawer
 
 Config.set('kivy', 'default_font',
@@ -34,17 +37,40 @@ class ArticleScreen(Screen):
         print('Article (un)bookmarked!')
 
 
-class ApplicationRoot(NavigationDrawer):
-    from guides.dummy.guide import guide
+class BookmarksMenuItem(BoxLayout):
+    def __init__(self, bookmark, **kwargs):
+        super(BookmarksMenuItem, self).__init__(**kwargs)
+        article = next(a for a in app.guide['articles'] if a['id'] == bookmark['article_id'])
+        self.icon = 'guides/dummy/icons/articles/' + article['icon']
+        self.title = article['content'][0]['text']
+        self.synopsis = article['content'][1]['text']
+        self.bookmark = bookmark
+
+    def delete_bookmark(self):
+        app.guide['bookmarks'].remove(self.bookmark)
+        self.parent.remove_widget(self)
+
+
+class BookmarksMenuScreen(Screen):
+    bookmarks_container = ObjectProperty()
+
+    def _post_init(self, dt):
+        for bookmark in app.guide['bookmarks']:
+            bookmarks_menu_item = BookmarksMenuItem(bookmark=bookmark)
+            self.bookmarks_container.add_widget(bookmarks_menu_item)
 
     def __init__(self, **kwargs):
-        super(NavigationDrawer, self).__init__(**kwargs)
+        super(BookmarksMenuScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self._post_init)
 
-        print(self.guide)
 
+class ApplicationRoot(NavigationDrawer):
+    pass
 
 
 class XenialApp(App):
+    from guides.dummy.guide import guide
+
     def build(self):
         return ApplicationRoot()
 
