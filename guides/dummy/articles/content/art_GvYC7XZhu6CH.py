@@ -1,13 +1,5 @@
 art_GvYC7XZhu6CH = [
     {
-        'type': 'title',
-        'text': 'Eighth Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Lorem ipsum dolor sit amet, [i]consectetur adipiscing[/i] elit. Cras vitae nulla in lacus viverra finibus. Nunc ac erat laoreet arcu venenatis consectetur eu non quam. Suspendisse facilisis condimentum pellentesque. Suspendisse laoreet in lorem eget pretium. Duis venenatis, sapien quis lacinia feugiat, eros urna iaculis arcu, in euismod est diam et nisl.'
-    },
-    {
         'type': 'subtitle',
         'text': 'Fusce sed ullamcorper odio'
     },

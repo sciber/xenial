@@ -1,11 +1,11 @@
 art_jBkNaCgiXjDQ = [
     {
         'type': 'title',
-        'text': 'Fourteenth Article'
+        'text': ''
     },
     {
         'type': 'paragraph',
-        'text': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras [u][color=#008888][ref=art_jBkNaCgiXjDQ]vitae nulla[/ref][/color][/u] in lacus viverra finibus. Nunc ac erat laoreet arcu venenatis consectetur eu non quam. Suspendisse facilisis condimentum pellentesque. Suspendisse laoreet in lorem eget pretium. Duis venenatis, sapien quis lacinia feugiat, eros urna iaculis arcu, in euismod est diam et nisl.'
+        'text': ''
     },
     {
         'type': 'subtitle',

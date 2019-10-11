@@ -4,9 +4,12 @@ from kivy.config import Config
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.clock import Clock
+from kivy.properties import ListProperty
 from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import Screen
+from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.stacklayout import StackLayout
 from kivy.garden.navigationdrawer import NavigationDrawer
 
 Config.set('kivy', 'default_font',
@@ -37,6 +40,139 @@ class ArticleScreen(Screen):
         print('Article (un)bookmarked!')
 
 
+class CategoriesMenuItem(Button):
+    def __init__(self, category, **kwargs):
+        super(CategoriesMenuItem, self).__init__(**kwargs)
+        self.icon = 'guides/dummy/icons/categories/' + category['icon']
+        self.name = category['name']
+
+    def show_category(self):
+        screen_manager = app.root.ids.manager
+        screens_names = [screen.name for screen in screen_manager.screens]
+        screen_name = 'Category: ' + self.name
+        if screen_name not in screens_names:
+            category_screen = CategoryScreen(category_name=self.name)
+            screen_manager.add_widget(category_screen)
+
+        screen_manager.current = screen_name
+
+
+class CategoriesMenuScreen(Screen):
+    items_container = ObjectProperty()
+
+    def _post_init(self, dt):
+        for category in app.guide['categories']:
+            categories_menu_item = CategoriesMenuItem(category=category)
+            self.items_container.add_widget(categories_menu_item)
+
+    def __init__(self, **kwargs):
+        super(CategoriesMenuScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self._post_init)
+
+
+class CategoryAssignedTag(Button):
+    pass
+
+
+class CategoryAssignedTagsList(StackLayout):
+    def __init__(self, tags, **kwargs):
+        super(CategoryAssignedTagsList, self).__init__(**kwargs)
+        for tag in tags:
+            tag_button = CategoryAssignedTag(text=tag)
+            self.add_widget(tag_button)
+
+
+class CategoryRelatedCategoriesMenuItem(Button):
+    def __init__(self, icon, name, **kwargs):
+        super(CategoryRelatedCategoriesMenuItem, self).__init__(**kwargs)
+        self.icon = icon
+        self.name = name
+
+    def show_category(self):
+        screen_manager = app.root.ids.manager
+        screens_names = [screen.name for screen in screen_manager.screens]
+        screen_name = 'Category: ' + self.name
+        if screen_name not in screens_names:
+            category_screen = CategoryScreen(category_name=self.name)
+            screen_manager.add_widget(category_screen)
+
+        screen_manager.current = screen_name
+
+
+class CategoryRelatedCategoriesMenu(BoxLayout):
+    items_container = ObjectProperty()
+
+    def __init__(self, categories, **kwargs):
+        super(CategoryRelatedCategoriesMenu, self).__init__(**kwargs)
+
+        for category in categories:
+            icon = 'guides/dummy/icons/categories/' + category['icon']
+            menu_item = CategoryRelatedCategoriesMenuItem(icon=icon,
+                                                          name=category['name'])
+            self.items_container.add_widget(menu_item)
+
+
+class CategoryArticlesMenuItem(Button):
+    def __init__(self, icon, title, synopsis, **kwargs):
+        super(CategoryArticlesMenuItem, self).__init__(**kwargs)
+        self.icon = icon
+        self.title = title
+        self.synopsis = synopsis
+
+class CategoryArticlesMenu(BoxLayout):
+    items_container = ObjectProperty()
+
+    def __init__(self, articles, **kwargs):
+        super(CategoryArticlesMenu, self).__init__(**kwargs)
+        self.items_container = self
+        for article in articles:
+            icon = 'guides/dummy/icons/articles/' + article['icon']
+            menu_item = CategoryArticlesMenuItem(icon=icon,
+                                                 title=article['title'],
+                                                 synopsis=article['synopsis'])
+            self.items_container.add_widget(menu_item)
+
+
+class CategoryScreen(Screen):
+    def _get_related_categories(self):
+        tagged_categories = []
+        for category in app.guide['categories']:
+            if category['name'] == self.category_name:
+                continue
+
+            categories_shared_tags = list(set(category['tags']) & set(self.category_assigned_tags))
+            if len(categories_shared_tags) > 0:
+                tagged_categories.append((category, len(categories_shared_tags)))
+
+            tagged_categories.sort(key=lambda c: c[1], reverse=True)
+            related_categories = [item[0] for item in tagged_categories]
+        return related_categories
+
+    def _get_articles(self):
+        tagged_articles = [a for a in app.guide['articles']  if all(t in a['tags'] for t in self.category_assigned_tags)]
+        return tagged_articles
+
+    def __init__(self, category_name, **kwargs):
+        super(CategoryScreen, self).__init__(**kwargs)
+        category = next(c for c in app.guide['categories'] if c['name'] == category_name)
+        self.category_icon = 'guides/dummy/icons/categories/' + category['icon']
+        self.category_name = category_name
+        self.name = 'Category: ' + self.category_name
+        self.category_assigned_tags = category['tags']
+        self.category_related_categories = self._get_related_categories()
+        self.category_articles = self._get_articles()
+
+        category_container = self.ids.container
+        category_assigned_tags_list = CategoryAssignedTagsList(tags=self.category_assigned_tags)
+        category_container.add_widget(category_assigned_tags_list)
+        if len(self.category_related_categories) > 0:
+            category_related_categories_menu = CategoryRelatedCategoriesMenu(categories=self.category_related_categories)
+            category_container.add_widget(category_related_categories_menu)
+        if len(self.category_articles) > 0:
+            category_articles_menu = CategoryArticlesMenu(articles=self.category_articles)
+            category_container.add_widget(category_articles_menu)
+
+
 class BookmarksMenuItem(BoxLayout):
     def __init__(self, bookmark, **kwargs):
         super(BookmarksMenuItem, self).__init__(**kwargs)
@@ -52,12 +188,12 @@ class BookmarksMenuItem(BoxLayout):
 
 
 class BookmarksMenuScreen(Screen):
-    bookmarks_container = ObjectProperty()
+    items_container = ObjectProperty()
 
     def _post_init(self, dt):
         for bookmark in app.guide['bookmarks']:
             bookmarks_menu_item = BookmarksMenuItem(bookmark=bookmark)
-            self.bookmarks_container.add_widget(bookmarks_menu_item)
+            self.items_container.add_widget(bookmarks_menu_item)
 
     def __init__(self, **kwargs):
         super(BookmarksMenuScreen, self).__init__(**kwargs)

@@ -1,13 +1,5 @@
 art_dbMp9og7my9H = [
     {
-        'type': 'title',
-        'text': 'Nineteenth Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Lorem ipsum dolor sit amet, consectetur [u][color=#008888][ref=art_9j4G7Ta2qCdJ]adipiscing elit[/ref][/color][/u]. Cras vitae nulla in lacus viverra finibus. Nunc ac erat laoreet arcu venenatis consectetur eu non quam. Suspendisse facilisis condimentum pellentesque. Suspendisse laoreet in lorem eget pretium. Duis venenatis, sapien quis lacinia feugiat, eros urna iaculis arcu, in euismod est diam et nisl.'
-    },
-    {
         'type': 'subtitle',
         'text': 'Fusce sed ullamcorper odio'
     },

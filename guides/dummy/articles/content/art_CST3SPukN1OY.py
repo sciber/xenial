@@ -1,13 +1,5 @@
 art_CST3SPukN1OY = [
     {
-        'type': 'title',
-        'text': 'Eleventh Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Lorem ipsum dolor sit amet, consectetur [b]adipiscing elit[/b]. Cras vitae nulla in lacus viverra finibus. Nunc ac erat laoreet arcu venenatis consectetur eu non quam. Suspendisse facilisis condimentum pellentesque. Suspendisse laoreet in lorem eget pretium. Duis venenatis, sapien quis lacinia feugiat, eros urna iaculis arcu, in euismod est diam et nisl.'
-    },
-    {
         'type': 'subtitle',
         'text': 'Fusce sed ullamcorper odio'
     },

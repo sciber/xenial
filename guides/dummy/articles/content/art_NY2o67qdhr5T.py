@@ -1,13 +1,5 @@
 art_NY2o67qdhr5T = [
     {
-        'type': 'title',
-        'text': 'First Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae nulla in lacus [b]viverra finibus[/b]. Nunc ac erat laoreet arcu venenatis consectetur eu non quam. Suspendisse facilisis condimentum pellentesque. Suspendisse laoreet in lorem eget pretium. Duis venenatis, sapien quis lacinia feugiat, eros urna iaculis arcu, in euismod est diam et nisl.'
-    },
-    {
         'type': 'subtitle',
         'text': 'Fusce sed ullamcorper odio'
     },

@@ -1,13 +1,5 @@
 art_QHp65pMR0LtG = [
     {
-        'type': 'title',
-        'text': 'Sixteenth Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Lorem ipsum dolor sit amet, [u][color=#008888][ref=art_CST3SPukN1OY]consectetur adipiscing elit[/ref][/color][/u]. Cras vitae nulla in lacus viverra finibus. Nunc ac erat [b]laoreet[/b] arcu venenatis consectetur [i]eu non quam[/i]. Suspendisse facilisis condimentum pellentesque. Suspendisse laoreet in lorem eget pretium. Duis venenatis, sapien quis lacinia feugiat, eros urna iaculis arcu, in euismod est diam et nisl.'
-    },
-    {
         'type': 'subtitle',
         'text': 'Fusce sed ullamcorper odio'
     },

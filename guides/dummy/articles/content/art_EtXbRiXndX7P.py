@@ -1,13 +1,5 @@
 art_EtXbRiXndX7P = [
     {
-        'type': 'title',
-        'text': 'Third Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Lorem ipsum dolor sit amet, consectetur [i]adipiscing elit[/i]. Cras vitae nulla in lacus viverra finibus. Nunc ac erat laoreet arcu venenatis consectetur eu non quam. Suspendisse facilisis [b]condimentum pellentesque[/b]. Suspendisse laoreet in lorem eget pretium. Duis venenatis, sapien quis lacinia feugiat, eros urna iaculis arcu, in euismod est diam et nisl.'
-    },
-    {
         'type': 'subtitle',
         'text': 'Fusce sed ullamcorper odio'
     },

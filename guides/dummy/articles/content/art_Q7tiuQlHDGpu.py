@@ -1,23 +1,6 @@
 
 art_Q7tiuQlHDGpu = [
     {
-        'type': 'title',
-        'text': 'Twelfth Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vitae nulla in lacus viverra finibus. Nunc ac erat laoreet arcu venenatis consectetur eu non quam. Suspendisse facilisis condimentum pellentesque. Suspendisse laoreet in lorem eget pretium. Duis venenatis, sapien quis lacinia feugiat, eros urna iaculis arcu, in euismod est diam et nisl.'
-    },
-    {
-        'type': 'subtitle',
-        'text': 'Fusce sed ullamcorper odio'
-    },
-    {
-        'type': 'image',
-        'src': 'pexels-photo-2144922.jpeg',
-        'caption': 'Maecenas nec lacus velit. [i]Integer posuere magna eget lorem[/i] sodales viverra. Nam consequat mi et ex interdum, ut pretium arcu pharetra.'
-    },
-    {
         'type': 'paragraph',
         'text': 'Vivamus nisi nisi, tempus vitae sollicitudin mollis, aliquam et lorem. Nullam in ligula [b]id lorem faucibus[]/b tincidunt ac vitae ante. Ut consequat, odio in tincidunt pulvinar, ante arcu eleifend nunc, quis molestie est odio at urna.'
     },

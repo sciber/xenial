@@ -1,13 +1,5 @@
 art_4dlZ0X9Vph2V = [
     {
-        'type': 'title',
-        'text': 'Seventeenth Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Lorem ipsum dolor sit amet, consectetur [b]adipiscing[/b] elit. Cras vitae nulla in lacus [i]viverra finibus[/i]. Nunc ac erat laoreet arcu venenatis consectetur eu non quam. Suspendisse facilisis [b]condimentum[/b] pellentesque. Suspendisse laoreet in lorem eget pretium. Duis venenatis, sapien quis lacinia feugiat, eros urna iaculis arcu, in euismod [i]est diam[/i] et nisl.'
-    },
-    {
         'type': 'subtitle',
         'text': 'Fusce sed ullamcorper odio'
     },

@@ -1,13 +1,5 @@
 art_9j4G7Ta2qCdJ = [
     {
-        'type': 'title',
-        'text': 'Second Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Integer viverra ex molestie, [i]interdum erat[/i] vitae, tempus ligula.'
-    },
-    {
         'type': 'subtitle',
         'text': 'In hac habitasse platea dictumst'
     },

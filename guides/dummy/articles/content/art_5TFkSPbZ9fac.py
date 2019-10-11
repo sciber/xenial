@@ -1,13 +1,5 @@
 art_5TFkSPbZ9fac = [
     {
-        'type': 'title',
-        'text': 'Sixth Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Phasellus ut dui lobortis ligula aliquet aliquet sit amet id quam. Nam [b]mauris tortor[/b], congue non accumsan at, faucibus ac lorem.'
-    },
-    {
         'type': 'subtitle',
         'text': 'Mauris quis ultrices metus'
     },

@@ -1,6 +1,6 @@
 #:kivy 1.11.1
 
-<CategoryAssignedTag@Button>:
+<CategoryAssignedTag>:
     text: ''
     size_hint: None, None
     size: self.texture_size
@@ -10,22 +10,12 @@
     background_color: 0, .7, .7, 1
     on_release: app.root.ids.manager.current = 'tag'
 
-<CategoryAssignedTagsList@StackLayout>:
+<CategoryAssignedTagsList>:
     size_hint_y: None
     height: self.minimum_height
     spacing: '2dp'
-    CategoryAssignedTag:
-        text: 'First tag'
-    CategoryAssignedTag:
-        text: 'Second tag'
-    CategoryAssignedTag:
-        text: 'Third tag'
-    CategoryAssignedTag:
-        text: 'Fourth tag'
-    CategoryAssignedTag:
-        text: 'Fifth tag'
 
-<CategoryArticlesMenuItem@Button>:
+<CategoryArticlesMenuItem>:
     icon: None
     title: ''
     synopsis: ''
@@ -38,10 +28,15 @@
         pos: self.parent.pos
         size_hint: None, None
         size: self.parent.size
-        Image:
-            source: root.icon
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
             size_hint_x: None
             width: self.height
+            Image:
+                source: root.icon
+                size_hint: None, None
+                size: '60dp', '60dp'
         BoxLayout:
             orientation: 'vertical'
             Label:
@@ -61,7 +56,7 @@
                 halign: 'left'
                 valign: 'top'
 
-<CategoryArticlesMenu@BoxLayout>:
+<CategoryArticlesMenu>:
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -88,56 +83,29 @@
             halign: 'left'
             valign: 'middle'
             color: .6, .6, .6, 1
-    CategoryArticlesMenuItem:
-        icon: 'assets/img/article-color.png'
-        title: 'Article 1 title'
-        synopsis: 'Article 1 synopsis can span over two rows'
-    CategoryArticlesMenuItem:
-        icon: 'assets/img/article-color.png'
-        title: 'Article 2 title'
-        synopsis: 'Article 2 synopsis can span over two rows'
-    CategoryArticlesMenuItem:
-        icon: 'assets/img/article-color.png'
-        title: 'Article 3 title'
-        synopsis: 'Article 3 synopsis can span over two rows'
-    CategoryArticlesMenuItem:
-        icon: 'assets/img/article-color.png'
-        title: 'Article 4 title'
-        synopsis: 'Article 4 synopsis can span over two rows'
-    CategoryArticlesMenuItem:
-        icon: 'assets/img/article-color.png'
-        title: 'Article 5 title'
-        synopsis: 'Article 5 synopsis can span over two rows'
-    CategoryArticlesMenuItem:
-        icon: 'assets/img/article-color.png'
-        title: 'Article 6 title'
-        synopsis: 'Article 6 synopsis can span over two rows'
-    CategoryArticlesMenuItem:
-        icon: 'assets/img/article-color.png'
-        title: 'Article 7 title'
-        synopsis: 'Article 7 synopsis can span over two rows'
-    CategoryArticlesMenuItem:
-        icon: 'assets/img/article-color.png'
-        title: 'Article 8 title'
-        synopsis: 'Article 8 synopsis can span over two rows'
 
-<CategoryRelatedCategoriesMenuItem@Button>:
+
+<CategoryRelatedCategoriesMenuItem>:
     icon: None
-    title: ''
+    name: ''
     background_normal: ''
     size_hint: None, None
     size: '80dp', '100dp'
-    on_release: app.root.ids.manager.current = 'category'
+    on_release: self.show_category()
     BoxLayout:
         orientation: 'vertical'
         pos: self.parent.pos
         size_hint: None, None
         size: self.parent.size
-        Image:
-            source: root.icon
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
             size_hint_y: .6
+            padding: '8dp'
+            Image:
+                source: root.icon
         Label:
-            text: root.title
+            text: root.name
             color: .2, .2, .2, 1
             font_size: '12dp'
             size_hint_y: .4
@@ -145,7 +113,8 @@
             halign: 'center'
             valign: 'top'
 
-<CategoryRelatedCategoriesMenu@BoxLayout>:
+<CategoryRelatedCategoriesMenu>:
+    items_container: container
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -169,27 +138,15 @@
             valign: 'middle'
             color: .6, .6, .6, 1
     StackLayout:
+        id: container
         size_hint_y: None
         height: self.minimum_height
         spacing: '2dp'
         padding: '6dp'
-        CategoryRelatedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 1'
-        CategoryRelatedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 2'
-        CategoryRelatedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 3'
-        CategoryRelatedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 4'
-        CategoryRelatedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 5'
 
-<CategoryScreen@Screen>:
+<CategoryScreen>:
+    category_icon: None
+    category_name: ''
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -204,6 +161,7 @@
             title: 'Category'
         ScrollView:
             BoxLayout:
+                id: container
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
@@ -212,18 +170,27 @@
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: '100dp'
-                    Image:
-                        source: 'assets/img/category-color.png'
+                    height: '80dp'
+                    AnchorLayout:
+                        anchor_x: 'center'
+                        anchor_y: 'center'
                         size_hint_x: None
                         width: self.height
+                        padding: '8dp'
+                        Image:
+                            source: root.category_icon
+                            size_hint_x: None
+                            width: self.height
                     Label:
-                        text: 'Category title'
+                        text: root.category_name
                         font_size: '24dp'
                         bold: True
                         text_size: self.size
                         valign: 'middle'
                         color: .2, .2, .2, 1
-                CategoryAssignedTagsList
-                CategoryArticlesMenu
-                CategoryRelatedCategoriesMenu
+#                CategoryAssignedTagsList
+#                    id: assigned_tags
+#                CategoryArticlesMenu
+#                    id: articles
+#                CategoryRelatedCategoriesMenu
+#                    id: related_categories

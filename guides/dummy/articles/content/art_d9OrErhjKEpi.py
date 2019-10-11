@@ -1,13 +1,5 @@
 art_d9OrErhjKEpi = [
     {
-        'type': 'title',
-        'text': 'Fifth Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. [u][color=#008888][ref=art_tSaGMPw2ifs1]Cras vitae nulla[/ref][/color][/u] in lacus viverra finibus. Nunc ac erat laoreet arcu venenatis consectetur eu non quam. Suspendisse facilisis condimentum pellentesque. Suspendisse laoreet in lorem eget pretium. Duis venenatis, sapien quis lacinia feugiat, eros urna iaculis arcu, in euismod est diam et nisl.'
-    },
-    {
         'type': 'subtitle',
         'text': 'Fusce sed ullamcorper odio'
     },

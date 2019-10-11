@@ -1,13 +1,5 @@
 art_7ymvb6EFDWaK = [
     {
-        'type': 'title',
-        'text': 'Eighteenth Article'
-    },
-    {
-        'type': 'paragraph',
-        'text': 'Fusce gravida sapien sem, id [i]vulputate mauris[/i] sollicitudin pretium. Donec laoreet lectus neque.'
-    },
-    {
         'type': 'subtitle',
         'text': 'Aenean eu dolor aliquet odio imperdiet mattis'
     },
