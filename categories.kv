@@ -2,11 +2,11 @@
 
 <CategoriesMenuItem>:
     icon: None
-    name: 'Category'
+    name: ''
     background_normal: ''
     size_hint_y: None
     height: '160dp'
-    on_release: self.show_category()
+    on_release: app.root.show_category_screen(self.name)
     BoxLayout:
         orientation: 'vertical'
         pos: self.parent.pos

@@ -1,22 +1,26 @@
 #:kivy 1.11.1
 
-<TaggedCategoriesMenuItem@Button>:
+<TaggedCategoriesMenuItem>:
     icon: None
-    title: 'Category'
+    name: ''
     background_normal: ''
-    size_hint_y: None
-    height: '160dp'
-    on_release: app.root.ids.manager.current = 'category'
+    size_hint: None, None
+    size: '80dp', '100dp'
+    on_release: app.root.show_category_screen(self.name)
     BoxLayout:
         orientation: 'vertical'
         pos: self.parent.pos
         size_hint: None, None
         size: self.parent.size
-        Image:
-            source: root.icon
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
             size_hint_y: .6
+            padding: '8dp'
+            Image:
+                source: root.icon
         Label:
-            text: root.title
+            text: root.name
             color: .2, .2, .2, 1
             font_size: '16dp'
             size_hint_y: .4
@@ -24,7 +28,8 @@
             halign: 'center'
             valign: 'top'
 
-<TaggedCategoriesMenu@BoxLayout>:
+<TaggedCategoriesMenu>:
+    items_container: container
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -48,24 +53,10 @@
             valign: 'middle'
             color: .6, .6, .6, 1
     GridLayout:
+        id: container
         cols: round(root.width // 130) + 1
         size_hint_y: None
         height: self.minimum_height
-        TaggedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 1'
-        TaggedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 2'
-        TaggedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 3'
-        TaggedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 4'
-        TaggedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 5'
 
 <TaggedArticlesMenuItem@Button>:
     icon: None
@@ -80,10 +71,15 @@
         pos: self.parent.pos
         size_hint: None, None
         size: self.parent.size
-        Image:
-            source: root.icon
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
             size_hint_x: None
             width: self.height
+            Image:
+                source: root.icon
+                size_hint: None, None
+                size: '60dp', '60dp'
         BoxLayout:
             orientation: 'vertical'
             Label:
@@ -96,6 +92,7 @@
                 valign: 'middle'
             Label:
                 text: root.synopsis
+                markup: True
                 color: .4, .4, .4, 1
                 font_size: '14dp'
                 size_hint_y: .6
@@ -103,7 +100,8 @@
                 halign: 'left'
                 valign: 'top'
 
-<TaggedArticlesMenu@BoxLayout>:
+<TaggedArticlesMenu>:
+    items_container: container
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -131,43 +129,45 @@
             valign: 'middle'
             color: .6, .6, .6, 1
     BoxLayout:
+        id: container
         orientation: 'vertical'
         size_hint_y: None
         height: self.minimum_height
-        TaggedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 1 title'
-            synopsis: 'Article 1 synopsis can span over two rows'
-        TaggedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 2 title'
-            synopsis: 'Article 2 synopsis can span over two rows'
-        TaggedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 3 title'
-            synopsis: 'Article 3 synopsis can span over two rows'
-        TaggedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 4 title'
-            synopsis: 'Article 4 synopsis can span over two rows'
-        TaggedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 5 title'
-            synopsis: 'Article 5 synopsis can span over two rows'
-        TaggedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 6 title'
-            synopsis: 'Article 6 synopsis can span over two rows'
-        TaggedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 7 title'
-            synopsis: 'Article 7 synopsis can span over two rows'
-        TaggedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 8 title'
-            synopsis: 'Article 8 synopsis can span over two rows'
+#        TaggedArticlesMenuItem:
+#            icon: 'assets/img/article-color.png'
+#            title: 'Article 1 title'
+#            synopsis: 'Article 1 synopsis can span over two rows'
+#        TaggedArticlesMenuItem:
+#            icon: 'assets/img/article-color.png'
+#            title: 'Article 2 title'
+#            synopsis: 'Article 2 synopsis can span over two rows'
+#        TaggedArticlesMenuItem:
+#            icon: 'assets/img/article-color.png'
+#            title: 'Article 3 title'
+#            synopsis: 'Article 3 synopsis can span over two rows'
+#        TaggedArticlesMenuItem:
+#            icon: 'assets/img/article-color.png'
+#            title: 'Article 4 title'
+#            synopsis: 'Article 4 synopsis can span over two rows'
+#        TaggedArticlesMenuItem:
+#            icon: 'assets/img/article-color.png'
+#            title: 'Article 5 title'
+#            synopsis: 'Article 5 synopsis can span over two rows'
+#        TaggedArticlesMenuItem:
+#            icon: 'assets/img/article-color.png'
+#            title: 'Article 6 title'
+#            synopsis: 'Article 6 synopsis can span over two rows'
+#        TaggedArticlesMenuItem:
+#            icon: 'assets/img/article-color.png'
+#            title: 'Article 7 title'
+#            synopsis: 'Article 7 synopsis can span over two rows'
+#        TaggedArticlesMenuItem:
+#            icon: 'assets/img/article-color.png'
+#            title: 'Article 8 title'
+#            synopsis: 'Article 8 synopsis can span over two rows'
 
-<TagScreen@Screen>:
+<TagScreen>:
+    tag_name: ''
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -181,6 +181,7 @@
             title: 'Tag'
         ScrollView:
             BoxLayout:
+                id: container
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
@@ -190,7 +191,7 @@
                     size_hint_y: None
                     height: '100dp'
                     Label:
-                        text: 'Tag name'
+                        text: root.tag_name
                         font_size: '24dp'
                         bold: True
                         size_hint: None, None
@@ -203,5 +204,5 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-                TaggedCategoriesMenu
-                TaggedArticlesMenu
+#                TaggedCategoriesMenu
+#                TaggedArticlesMenu
