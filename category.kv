@@ -16,13 +16,14 @@
     spacing: '2dp'
 
 <CategoryArticlesMenuItem>:
+    article_id: None
     icon: None
     title: ''
     synopsis: ''
     size_hint_y: None
     height: '80dp'
     background_normal: ''
-    on_release: app.root.ids.manager.current = 'article'
+    on_release: app.root.show_article_screen(self.article_id)
     BoxLayout:
         orientation: 'horizontal'
         pos: self.parent.pos
@@ -180,8 +181,6 @@
                         padding: '8dp'
                         Image:
                             source: root.category_icon
-                            size_hint_x: None
-                            width: self.height
                     Label:
                         text: root.category_name
                         font_size: '24dp'

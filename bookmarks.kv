@@ -1,15 +1,16 @@
 #:kivy 1.11.1
 
 <BookmarksMenuItem>:
+    article_id: None
     icon: None
-    title: 'Article'
-    synopsis: 'Article synopsis'
+    title: ''
+    synopsis: ''
     orientation: 'horizontal'
     size_hint_y: None
     height: '80dp'
     Button:
         background_normal: ''
-        on_release: app.root.ids.manager.current = 'article'
+        on_release: app.root.show_article_screen(root.article_id)
         BoxLayout:
             orientation: 'horizontal'
             pos: self.parent.pos

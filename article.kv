@@ -10,7 +10,7 @@
     background_color: 0, .7, .7, 1
     on_release: app.root.ids.manager.current = 'tag'
 
-<ArticleAssignedTagsList@StackLayout>:
+<ArticleAssignedTagsList>:
     size_hint_y: None
     height: self.minimum_height
     spacing: '2dp'
@@ -27,14 +27,18 @@
 
 <ArticleTitle@BoxLayout>:
     icon: None
-    title: 'Untitled'
+    title: ''
     orientation: 'horizontal'
     size_hint_y: None
-    height: '100dp'
-    Image:
-        source: root.icon
+    height: '80dp'
+    AnchorLayout:
+        anchor_x: 'center'
+        anchor_y: 'center'
         size_hint_x: None
         width: self.height
+        padding: '8dp'
+        Image:
+            source: root.icon
     Label:
         text: root.title
         font_size: '24dp'
@@ -202,7 +206,7 @@
         color: .4, .4, .4, 1
         markup: True
 
-<ArticleContent@BoxLayout>:
+<ArticleContent>:
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -265,7 +269,7 @@
                 halign: 'left'
                 valign: 'top'
 
-<ArticleRelatedArticlesMenu@BoxLayout>:
+<ArticleRelatedArticlesMenu>:
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -352,7 +356,7 @@
             halign: 'center'
             valign: 'top'
 
-<ArticleRelatedCategoriesMenu@BoxLayout>:
+<ArticleRelatedCategoriesMenu>:
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -397,6 +401,8 @@
             title: 'Category 5'
 
 <ArticleScreen>:
+    article_icon: None
+    article_title: ''
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -413,15 +419,16 @@
             action_callback: root.toggle_bookmark
         ScrollView:
             BoxLayout:
+                id: container
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
                 spacing: '8dp'
                 padding: '4dp'
                 ArticleTitle:
-                    icon: 'assets/img/article-color.png'
-                    title: 'Article title'
-                ArticleAssignedTagsList
-                ArticleContent
-                ArticleRelatedArticlesMenu
-                ArticleRelatedCategoriesMenu
+                    icon: root.article_icon
+                    title: root.article_title
+#                ArticleAssignedTagsList
+#                ArticleContent
+#                ArticleRelatedArticlesMenu
+#                ArticleRelatedCategoriesMenu
