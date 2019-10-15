@@ -1,6 +1,6 @@
 #:kivy 1.11.1
 
-<ArticleAssignedTag@Button>:
+<ArticleAssignedTag>:
     text: ''
     size_hint: None, None
     size: self.texture_size
@@ -8,22 +8,12 @@
     background_normal: ''
     color: 1, 1, 1, 1
     background_color: 0, .7, .7, 1
-    on_release: app.root.ids.manager.current = 'tag'
+    on_release: app.root.show_tag_screen(self.text)
 
 <ArticleAssignedTagsList>:
     size_hint_y: None
     height: self.minimum_height
     spacing: '2dp'
-    ArticleAssignedTag:
-        text: 'First tag'
-    ArticleAssignedTag:
-        text: 'Second tag'
-    ArticleAssignedTag:
-        text: 'Third tag'
-    ArticleAssignedTag:
-        text: 'Fourth tag'
-    ArticleAssignedTag:
-        text: 'Fifth tag'
 
 <ArticleTitle@BoxLayout>:
     icon: None
@@ -47,7 +37,7 @@
         valign: 'middle'
         color: .2, .2, .2, 1
 
-<ArticleSubtitle@Label>:
+<ArticleSubtitle>:
     text: ''
     font_size: '20dp'
     bold: True
@@ -58,7 +48,7 @@
     valign: 'middle'
     color: .2, .2, .2, 1
 
-<ArticleParagraph@Label>:
+<ArticleParagraph>:
     text: ''
     font_size: '16dp'
     text_size: self.width, None
@@ -67,7 +57,7 @@
     color: .2, .2, .2, 1
     markup: True
 
-<ArticleImage@BoxLayout>:
+<ArticleImage>:
     image: None
     caption: ''
     orientation: 'vertical'
@@ -90,7 +80,7 @@
         color: .4, .4, .4, 1
         markup: True
 
-<ArticleAudio@BoxLayout>:
+<ArticleAudio>:
     audio: None
     caption: ''
     orientation: 'vertical'
@@ -139,7 +129,7 @@
         color: .4, .4, .4, 1
         markup: True
 
-<ArticleVideo@BoxLayout>:
+<ArticleVideo>:
     image: None
     video: None
     caption: ''
@@ -212,44 +202,50 @@
     height: self.minimum_height
     padding: 0, 0, 0, '10dp'
     spacing: '20dp'
-    ArticleSubtitle:
-        text: 'Paragraph subtitle'
-    ArticleParagraph:
-        text: 'Article paragraph can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
-    ArticleSubtitle:
-        text: 'Image subtitle'
-    ArticleImage:
-        image: 'assets/article_data/pexels-photo-2907206.jpeg'
-        caption: 'Image caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
-    ArticleSubtitle:
-        text: 'Audio subtitle'
-    ArticleAudio:
-        audio: None
-        caption: 'Audio caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
-    ArticleSubtitle:
-        text: 'Video subtitle'
-    ArticleVideo:
-        image: 'assets/article_data/pexels-photo-887821.jpeg'
-        video: None
-        caption: 'Video caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+#    ArticleSubtitle:
+#        text: 'Paragraph subtitle'
+#    ArticleParagraph:
+#        text: 'Article paragraph can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+#    ArticleSubtitle:
+#        text: 'Image subtitle'
+#    ArticleImage:
+#        image: 'assets/article_data/pexels-photo-2907206.jpeg'
+#        caption: 'Image caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+#    ArticleSubtitle:
+#        text: 'Audio subtitle'
+#    ArticleAudio:
+#        audio: None
+#        caption: 'Audio caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
+#    ArticleSubtitle:
+#        text: 'Video subtitle'
+#    ArticleVideo:
+#        image: 'assets/article_data/pexels-photo-887821.jpeg'
+#        video: None
+#        caption: 'Video caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
 
-<ArticleRelatedArticlesMenuItem@Button>:
+<ArticleRelatedArticlesMenuItem>:
+    article_id: None
     icon: None
-    title: 'Article'
-    synopsis: 'Article synopsis'
+    title: ''
+    synopsis: ''
     size_hint_y: None
-    height: '60dp'
+    height: '80dp'
     background_normal: ''
-    on_release: app.root.ids.manager.current = 'article'
+    on_release: app.root.show_article_screen(self.article_id)
     BoxLayout:
         orientation: 'horizontal'
         pos: self.parent.pos
         size_hint: None, None
         size: self.parent.size
-        Image:
-            source: root.icon
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
             size_hint_x: None
             width: self.height
+            Image:
+                source: root.icon
+                size_hint: None, None
+                size: '50dp', '50dp'
         BoxLayout:
             orientation: 'vertical'
             Label:
@@ -262,6 +258,7 @@
                 valign: 'middle'
             Label:
                 text: root.synopsis
+                markup: True
                 color: .4, .4, .4, 1
                 font_size: '12dp'
                 size_hint_y: .6
@@ -270,9 +267,11 @@
                 valign: 'top'
 
 <ArticleRelatedArticlesMenu>:
+    items_container: container
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
+    padding: 0, '8dp'
     spacing: '8dp'
     BoxLayout:
         orientation: 'horizontal'
@@ -296,59 +295,32 @@
             valign: 'middle'
             color: .6, .6, .6, 1
     GridLayout:
+        id: container
         cols: round(root.width // 640) + 1
         size_hint_y: None
         height: self.minimum_height
-        ArticleRelatedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 1 title'
-            synopsis: 'Article 1 synopsis can span over two rows'
-        ArticleRelatedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 2 title'
-            synopsis: 'Article 2 synopsis can span over two rows'
-        ArticleRelatedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 3 title'
-            synopsis: 'Article 3 synopsis can span over two rows'
-        ArticleRelatedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 4 title'
-            synopsis: 'Article 4 synopsis can span over two rows'
-        ArticleRelatedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 5 title'
-            synopsis: 'Article 5 synopsis can span over two rows'
-        ArticleRelatedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 6 title'
-            synopsis: 'Article 6 synopsis can span over two rows'
-        ArticleRelatedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 7 title'
-            synopsis: 'Article 7 synopsis can span over two rows'
-        ArticleRelatedArticlesMenuItem:
-            icon: 'assets/img/article-color.png'
-            title: 'Article 8 title'
-            synopsis: 'Article 8 synopsis can span over two rows'
 
-<ArticleRelatedCategoriesMenuItem@Button>:
+<ArticleRelatedCategoriesMenuItem>:
     icon: None
-    title: ''
+    name: ''
     background_normal: ''
     size_hint: None, None
     size: '80dp', '100dp'
-    on_release: app.root.ids.manager.current = 'category'
+    on_release: app.root.show_category_screen(self.name)
     BoxLayout:
         orientation: 'vertical'
         pos: self.parent.pos
         size_hint: None, None
         size: self.parent.size
-        Image:
-            source: root.icon
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
             size_hint_y: .6
+            padding: '8dp'
+            Image:
+                source: root.icon
         Label:
-            text: root.title
+            text: root.name
             color: .2, .2, .2, 1
             font_size: '12dp'
             size_hint_y: .4
@@ -357,6 +329,7 @@
             valign: 'top'
 
 <ArticleRelatedCategoriesMenu>:
+    items_container: container
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -380,25 +353,11 @@
             valign: 'middle'
             color: .6, .6, .6, 1
     StackLayout:
+        id: container
         size_hint_y: None
         height: self.minimum_height
         spacing: '2dp'
         padding: '6dp'
-        ArticleRelatedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 1'
-        ArticleRelatedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 2'
-        ArticleRelatedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 3'
-        ArticleRelatedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 4'
-        ArticleRelatedCategoriesMenuItem:
-            icon: 'assets/img/category-color.png'
-            title: 'Category 5'
 
 <ArticleScreen>:
     article_icon: None
@@ -428,7 +387,3 @@
                 ArticleTitle:
                     icon: root.article_icon
                     title: root.article_title
-#                ArticleAssignedTagsList
-#                ArticleContent
-#                ArticleRelatedArticlesMenu
-#                ArticleRelatedCategoriesMenu

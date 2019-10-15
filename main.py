@@ -1,4 +1,4 @@
-from functools import reduce
+from functools import reduce, partial
 
 import kivy
 
@@ -8,6 +8,7 @@ from kivy.lang.builder import Builder
 from kivy.clock import Clock
 from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import Screen
+from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
@@ -123,8 +124,8 @@ class CategoryScreen(Screen):
             if len(categories_shared_tags) > 0:
                 tagged_categories.append((category, len(categories_shared_tags)))
 
-            tagged_categories.sort(key=lambda c: c[1], reverse=True)
-            related_categories = [item[0] for item in tagged_categories]
+        tagged_categories.sort(key=lambda c: c[1], reverse=True)
+        related_categories = [item[0] for item in tagged_categories]
         return related_categories
 
     def _get_articles(self):
@@ -267,61 +268,156 @@ class ArticlesMenuScreen(Screen):
         Clock.schedule_once(self._post_init)
 
 
+class ArticleAssignedTag(Button):
+    pass
+
+
 class ArticleAssignedTagsList(StackLayout):
+    def __init__(self, tags, **kwargs):
+        super(ArticleAssignedTagsList, self).__init__(**kwargs)
+        for tag in tags:
+            tag_button = ArticleAssignedTag(text=tag)
+            self.add_widget(tag_button)
+
+
+class ArticleSubtitle(Label):
+    pass
+
+
+class ArticleParagraph(Label):
+    pass
+
+
+class ArticleImage(BoxLayout):
+    pass
+
+
+class ArticleAudio(BoxLayout):
+    pass
+
+
+class ArticleVideo(BoxLayout):
     pass
 
 
 class ArticleContent(BoxLayout):
-    pass
+    items_container: ObjectProperty()
+
+    def __init__(self, content, **kwargs):
+        super(ArticleContent, self).__init__(**kwargs)
+        self.items_container = self
+
+        for content_item in content:
+            if content_item['type'] == 'subtitle':
+                item_widget = ArticleSubtitle(text=content_item['text'])
+            # elif content_item['type'] == 'paragraph':
+            #     item_widget = ArticleParagraph(text=content_item['text'])
+        #     elif content_item['type'] == 'image':
+        #         item_widget = ArticleImage(image=content_item['src'],
+        #                                    caption=content_item['caption'])
+        #     elif content_item['type'] == 'audio':
+        #         item_widget = ArticleAudio(audio=content_item['src'],
+        #                                    caption=content_item['caption'])
+        #     elif content_item['type'] == 'video':
+        #         item_widget = ArticleVideo(video=content_item['src'],
+        #                                    caption=content_item['caption'])
+        #     else:
+        #         raise Exception('Unknown article content block type: ' + content_item['type'])
+
+        self.items_container.add_widget(item_widget)
+
+
+class ArticleRelatedArticlesMenuItem(Button):
+    def __init__(self, article_id, icon, title, synopsis, **kwargs):
+        super(ArticleRelatedArticlesMenuItem, self).__init__(**kwargs)
+        self.article_id = article_id
+        self.icon = icon
+        self.title = title
+        self.synopsis = synopsis
 
 
 class ArticleRelatedArticlesMenu(BoxLayout):
-    pass
+    items_container = ObjectProperty()
+
+    def __init__(self, articles, **kwargs):
+        super(ArticleRelatedArticlesMenu, self).__init__(**kwargs)
+        for article in articles:
+            icon = 'guides/dummy/icons/articles/' + article['icon']
+            menu_item = ArticleRelatedArticlesMenuItem(article_id=article['id'],
+                                                       icon=icon,
+                                                       title=article['title'],
+                                                       synopsis=article['synopsis'])
+            self.items_container.add_widget(menu_item)
+
+
+class ArticleRelatedCategoriesMenuItem(Button):
+    def __init__(self, icon, name, **kwargs):
+        super(ArticleRelatedCategoriesMenuItem, self).__init__(**kwargs)
+        self.icon = icon
+        self.name = name
 
 
 class ArticleRelatedCategoriesMenu(BoxLayout):
-    pass
+    items_container = ObjectProperty()
+
+    def __init__(self, categories, **kwargs):
+        super(ArticleRelatedCategoriesMenu, self).__init__(**kwargs)
+        for category in categories:
+            icon = 'guides/dummy/icons/categories/' + category['icon']
+            menu_item = ArticleRelatedCategoriesMenuItem(icon=icon,
+                                                         name=category['name'])
+            self.items_container.add_widget(menu_item)
 
 
 class ArticleScreen(Screen):
     def _get_related_categories(self):
-        related_categories = []
+        tagged_categories = []
         for category in app.guide['categories']:
-            shared_tags = list(set(category['tags']) & set(self.article_assigned_tags))
-            if len(shared_tags) == len(self.article_assigned_tags):
-                related_categories.append(category)
+            article_category_shared_tags = list(set(category['tags']) & set(self.article_assigned_tags))
+            if len(article_category_shared_tags) > 0:
+                tagged_categories.append((category, len(article_category_shared_tags)))
 
+        tagged_categories.sort(key=lambda c: c[1], reverse=True)
+        related_categories = [item[0] for item in tagged_categories]
         return related_categories
 
     def _get_related_articles(self):
-        related_articles = []
+        tagged_articles = []
         for article in app.guide['articles']:
-            shared_tags = list(set(article['tags']) & set(self.article_assigned_tags))
-            if len(shared_tags)  == len(self.article_assigned_tags):
-                related_articles.append(article)
+            if article['id'] == self.article_id:
+                continue
 
+            articles_shared_tags = list(set(article['tags']) & set(self.article_assigned_tags))
+            if len(articles_shared_tags) > 0:
+                tagged_articles.append((article, len(articles_shared_tags)))
+
+        tagged_articles.sort(key=lambda a: a[1], reverse=True)
+        related_articles = [item[0] for item in tagged_articles]
         return related_articles
 
     def __init__(self, article_id, **kwargs):
         super(ArticleScreen, self).__init__(**kwargs)
         article = next(a for a in app.guide['articles'] if a['id'] == article_id)
+        self.article_id = article_id
         self.article_icon = 'guides/dummy/icons/articles/' + article['icon']
         self.article_title = article['title']
         self.article_assigned_tags = article['tags']
+        self.article_content = article['content']
         self.article_related_categories = self._get_related_categories()
         self.article_related_articles = self._get_related_articles()
 
         article_container = self.ids.container
-        article_assigned_tags_list = ArticleAssignedTagsList()
+        article_assigned_tags_list = ArticleAssignedTagsList(tags=self.article_assigned_tags)
         article_container.add_widget(article_assigned_tags_list)
 
-        article_content = ArticleContent()
-        article_container.add_widget(article_content)
+        article_content_wrapper = ArticleContent(content=self.article_content)
+        article_container.add_widget(article_content_wrapper)
 
-        article_related_articles_menu = ArticleRelatedArticlesMenu()
-        article_container.add_widget(article_related_articles_menu)
+        if len(self.article_related_articles) > 0:
+            article_related_articles_menu = ArticleRelatedArticlesMenu(articles=self.article_related_articles)
+            article_container.add_widget(article_related_articles_menu)
 
-        article_related_categories_menu = ArticleRelatedCategoriesMenu()
+        article_related_categories_menu = ArticleRelatedCategoriesMenu(categories=self.article_related_categories)
         article_container.add_widget(article_related_categories_menu)
 
     def toggle_bookmark(self):
