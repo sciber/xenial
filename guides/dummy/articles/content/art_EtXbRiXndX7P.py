@@ -5,7 +5,7 @@ art_EtXbRiXndX7P = [
     },
     {
         'type': 'image',
-        'src': 'YUI4SjFetxM.mp4',
+        'src': 'pexels-photo-2265247.jpeg',
         'caption': 'Maecenas nec lacus velit. Integer posuere magna eget lorem sodales viverra. Nam consequat [u][color=#008888][ref=art_jBkNaCgiXjDQ]art_tSaGMPw2ifs1]mi et ex interdum[/ref][/color][/u], ut pretium arcu pharetra.'
     },
     {

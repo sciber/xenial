@@ -81,8 +81,9 @@
         markup: True
 
 <ArticleAudio>:
-    audio: None
     caption: ''
+    slider_value: 0
+    sound_track_length: 0
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -98,12 +99,15 @@
             Line:
                 width: 1
                 rectangle: self.x, self.y, self.width, self.height
-        Button:
+        ToggleButton:
+            id: toggle_button
             size_hint_x: None
             width: '80dp'
             background_normal: ''
+            background_down: ''
+            on_state: root.toggle_audio_play(self.state)
             Image:
-                source: 'assets/img/play-darkgray.png'
+                source: 'assets/img/play-darkgray.png' if self.parent.state == 'normal' else 'assets/img/pause-darkgray.png'
                 pos: self.parent.pos
                 size: self.parent.size
         BoxLayout:
@@ -111,12 +115,15 @@
             padding: '8dp'
             Slider:
                 orientation: 'horizontal'
-                value: 50
+                min: 0
+                max: 100
                 step: 1
+                value: root.slider_value
                 value_track: True
                 value_track_color: 0, .6, .7, 1
+                on_value: root.on_slider_value_change(self.value)
             Label:
-                text: '00:30 / 01:00'
+                text: '{:>02}:{:02} / {:>02}:{:02}'.format(round((root.slider_value / 100) * (root.sound_track_length // 60)), round((root.slider_value / 100) * (root.sound_track_length % 60)), round(root.sound_track_length // 60), round(root.sound_track_length % 60))
                 text_size: self.size
                 halign: 'right'
                 color: .2, .2, .2, 1
@@ -130,9 +137,12 @@
         markup: True
 
 <ArticleVideo>:
-    image: None
-    video: None
+    video_player: video_player
+    video_source: None
+    cover_image_source: None
     caption: ''
+    slider_value: 0
+    video_track_length: 0
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -141,19 +151,35 @@
         orientation: 'vertical'
         size_hint_y: None
         height: self.minimum_height
-        Image:
-            source: root.image
+        AnchorLayout:
+            id: anchor_content_center
+            anchor_x: 'center'
+            anchor_y: 'center'
             size_hint: None, None
-            width: self.parent.width - (2 * self.parent.padding[0])
-            height: self.parent.width/self.image_ratio
-            keep_ratio: True
-            allow_stretch: True
-            canvas:
-                Color:
-                    rgba: .2, .2, .2, 1
-                Line:
-                    width: 1
-                    rectangle: self.x, self.y, self.width, self.height
+            size: video_cover_image.size
+            Video:
+                id: video_player
+                canvas:
+                    Color:
+                        rgba: .2, .2, .2, 1
+                    Line:
+                        width: 1
+                        rectangle: self.x, self.y, self.width, self.height
+            Image:
+                id: video_cover_image
+                source: root.cover_image_source
+                size_hint: None, None
+                width: root.width - (2 * root.padding[0])
+                height: root.width / self.image_ratio
+                keep_ratio: True
+                allow_stretch: True
+                opacity: 1 if video_player.state == 'stop' else 0
+                canvas:
+                    Color:
+                        rgba: .2, .2, .2, 1
+                    Line:
+                        width: 1
+                        rectangle: self.x, self.y, self.width, self.height
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
@@ -165,12 +191,15 @@
                 Line:
                     width: 1
                     rectangle: self.x, self.y, self.width, self.height
-            Button:
+            ToggleButton:
+                id: toggle_button
                 size_hint_x: None
                 width: '80dp'
                 background_normal: ''
+                background_down: ''
+                on_state: root.toggle_video_play(self.state)
                 Image:
-                    source: 'assets/img/play-darkgray.png'
+                    source: 'assets/img/play-darkgray.png' if self.parent.state == 'normal' else 'assets/img/pause-darkgray.png'
                     pos: self.parent.pos
                     size: self.parent.size
             BoxLayout:
@@ -178,12 +207,15 @@
                 padding: '8dp'
                 Slider:
                     orientation: 'horizontal'
-                    value: 50
+                    min: 0
+                    max: 100
                     step: 1
+                    value: root.slider_value
                     value_track: True
                     value_track_color: 0, .6, .7, 1
+                    on_value: root.on_slider_value_change(self.value)
                 Label:
-                    text: '00:30 / 01:00'
+                    text: '{:>02}:{:02} / {:>02}:{:02}'.format(round((root.slider_value / 100) * (root.video_track_length // 60)), round((root.slider_value / 100) * (root.video_track_length % 60)), round(root.video_track_length // 60), round(root.video_track_length % 60))
                     text_size: self.size
                     halign: 'right'
                     color: .2, .2, .2, 1
@@ -202,26 +234,6 @@
     height: self.minimum_height
     padding: 0, 0, 0, '10dp'
     spacing: '20dp'
-#    ArticleSubtitle:
-#        text: 'Paragraph subtitle'
-#    ArticleParagraph:
-#        text: 'Article paragraph can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
-#    ArticleSubtitle:
-#        text: 'Image subtitle'
-#    ArticleImage:
-#        image: 'assets/article_data/pexels-photo-2907206.jpeg'
-#        caption: 'Image caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
-#    ArticleSubtitle:
-#        text: 'Audio subtitle'
-#    ArticleAudio:
-#        audio: None
-#        caption: 'Audio caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
-#    ArticleSubtitle:
-#        text: 'Video subtitle'
-#    ArticleVideo:
-#        image: 'assets/article_data/pexels-photo-887821.jpeg'
-#        video: None
-#        caption: 'Video caption can contain [b]bold text[/b], [i]italic text[/i] and [u][color=#008888][ref=link]clickable links[/ref][/color][/u].'
 
 <ArticleRelatedArticlesMenuItem>:
     article_id: None
