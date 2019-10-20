@@ -374,6 +374,7 @@
 <ArticleScreen>:
     article_icon: None
     article_title: ''
+    is_bookmarked: False
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -386,7 +387,7 @@
         TitleBar:
             title: 'Article'
             action_disabled: False
-            action_image: 'assets/img/bookmark.png'
+            action_image: 'assets/img/bookmark-color.png' if root.is_bookmarked else 'assets/img/bookmark.png'
             action_callback: root.toggle_bookmark
         ScrollView:
             BoxLayout:

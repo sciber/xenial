@@ -1,4 +1,5 @@
 from functools import reduce
+from datetime import datetime
 
 import kivy
 
@@ -6,14 +7,13 @@ from kivy.config import Config
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.clock import Clock
-from kivy.properties import ObjectProperty, NumericProperty
+from kivy.properties import ObjectProperty, NumericProperty, BooleanProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
 from kivy.core.audio import SoundLoader
-from kivy.uix.video import Video
 
 from kivy.garden.navigationdrawer import NavigationDrawer
 
@@ -488,6 +488,8 @@ class ArticleRelatedCategoriesMenu(BoxLayout):
 
 
 class ArticleScreen(Screen):
+    is_bookmarked = BooleanProperty(False)
+
     def _get_related_categories(self):
         tagged_categories = []
         for category in app.guide['categories']:
@@ -521,6 +523,7 @@ class ArticleScreen(Screen):
         self.article_title = article['title']
         self.article_assigned_tags = article['tags']
         self.article_content = article['content']
+        self.is_bookmarked = reduce(lambda x, y: x or (y['article_id'] == article_id), app.guide['bookmarks'], False)
         self.article_related_categories = self._get_related_categories()
         self.article_related_articles = self._get_related_articles()
 
@@ -539,7 +542,13 @@ class ArticleScreen(Screen):
         article_container.add_widget(article_related_categories_menu)
 
     def toggle_bookmark(self):
-        print('Article (un)bookmarked!')
+        if self.is_bookmarked:
+            bookmark = next(b for b in app.guide['bookmarks'] if b['article_id'] == self.article_id)
+            app.guide['bookmarks'].remove(bookmark)
+        else:
+            app.guide['bookmarks'].append((self.article_id, str(datetime.now())))
+
+        self.is_bookmarked = not self.is_bookmarked
 
 
 class BookmarksMenuItem(BoxLayout):

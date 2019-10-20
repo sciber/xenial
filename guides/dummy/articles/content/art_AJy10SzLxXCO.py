@@ -15,7 +15,7 @@ art_AJy10SzLxXCO = [
     {
         'type': 'video',
         'src': '23LUWtG1LNM.mp4',
-        'text': 'Mauris eget consectetur sapien. Phasellus magna dui, facilisis id enim et, malesuada eleifend turpis. [i][b]Suspendisse ac pulvinar[/b][/i] nisi. Morbi sodales urna mi, in tristique lacus iaculis at. Sed sit amet dui diam. Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
+        'caption': 'Mauris eget consectetur sapien. Phasellus magna dui, facilisis id enim et, malesuada eleifend turpis. [i][b]Suspendisse ac pulvinar[/b][/i] nisi. Morbi sodales urna mi, in tristique lacus iaculis at. Sed sit amet dui diam. Lorem ipsum dolor sit amet, consectetur adipiscing elit.'
     },
     {
         'type': 'subtitle',
@@ -41,7 +41,7 @@ art_AJy10SzLxXCO = [
     {
         'type': 'video',
         'src': 'bT7PW02KhbI.mp4',
-        'text': 'Curabitur viverra [i]ipsum fringilla [b]aliquam commodo. Vivamus[/i] vestibulum[/b] lacus eget orci dapibus, in sodales velit pellentesque. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.'
+        'caption': 'Curabitur viverra [i]ipsum fringilla [b]aliquam commodo. Vivamus[/i] vestibulum[/b] lacus eget orci dapibus, in sodales velit pellentesque. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos.'
     },
     {
         'type': 'subtitle',
@@ -50,7 +50,7 @@ art_AJy10SzLxXCO = [
     {
         'type': 'video',
         'src': 'dn0LTPbM0h8.mp4',
-        'text': 'Donec sed nisl id neque posuere [b]dignissim [i]sit amet id mauris.[/b] Donec enim arcu, commodo[/i] vestibulum velit quis, pretium molestie tellus. Vivamus tempus elit et lorem congue, sit amet consequat dolor vehicula. Nunc id mauris pretium, ullamcorper mauris sed, commodo massa.'
+        'caption': 'Donec sed nisl id neque posuere [b]dignissim [i]sit amet id mauris.[/b] Donec enim arcu, commodo[/i] vestibulum velit quis, pretium molestie tellus. Vivamus tempus elit et lorem congue, sit amet consequat dolor vehicula. Nunc id mauris pretium, ullamcorper mauris sed, commodo massa.'
     },
     {
         'type': 'video',
