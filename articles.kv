@@ -1,14 +1,14 @@
 #:kivy 1.11.1
 
 <ArticlesMenuItem>:
-    article_id: None
+    id_: None
     icon: None
     title: ''
     synopsis: ''
     size_hint_y: None
     height: '80dp'
     background_normal: ''
-    on_release: app.root.show_article_screen(self.article_id)
+    on_release: app.root.show_article_screen(self.id_)
     BoxLayout:
         orientation: 'horizontal'
         pos: self.parent.pos
@@ -62,30 +62,3 @@
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-#                ArticlesMenuItem:
-#                    title: 'Article 1 title'
-#                    synopsis: 'Article 1 synopsis can span over two rows'
-#                ArticlesMenuItem:
-#                    title: 'Article 2 title'
-#                    synopsis: 'Article 2 synopsis can span over two rows'
-#                ArticlesMenuItem:
-#                    title: 'Article 3 title'
-#                    synopsis: 'Article 3 synopsis can span over two rows'
-#                ArticlesMenuItem:
-#                    title: 'Article 4 title'
-#                    synopsis: 'Article 4 synopsis can span over two rows'
-#                ArticlesMenuItem:
-#                    title: 'Article 5 title'
-#                    synopsis: 'Article 5 synopsis can span over two rows'
-#                ArticlesMenuItem:
-#                    title: 'Article 6 title'
-#                    synopsis: 'Article 6 synopsis can span over two rows'
-#                ArticlesMenuItem:
-#                    title: 'Article 7 title'
-#                    synopsis: 'Article 7 synopsis can span over two rows'
-#                ArticlesMenuItem:
-#                    title: 'Article 8 title'
-#                    synopsis: 'Article 8 synopsis can span over two rows'
-
-
-
