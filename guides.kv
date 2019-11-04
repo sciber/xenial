@@ -1,13 +1,14 @@
 #:kivy 1.11.1
 
 <GuidesMenuItem@BoxLayout>:
-    title: 'Guide'
+    title: ''
+    icon: None
     active: 'normal'
     orientation: 'horizontal'
     size_hint_y: None
     height: '80dp'
     Image:
-        source: 'assets/img/guide-color.png'
+        source: root.icon
         size_hint_x: None
         width: self.height
     BoxLayout:
@@ -36,7 +37,7 @@
         width: self.height
         color: .2, .2, .2, 1
 
-<GuidesMenuScreen@Screen>:
+<GuidesMenuScreen>:
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -56,28 +57,31 @@
                 height: self.minimum_height
                 spacing: '8dp'
                 padding: '4dp'
-                GuidesMenuItem:
-                    title: 'Guide 1'
-                    active: 'down'
-                GuidesMenuItem:
-                    title: 'Guide 2'
-                GuidesMenuItem:
-                    title: 'Guide 3'
-                GuidesMenuItem:
-                    title: 'Guide 4'
-                GuidesMenuItem:
-                    title: 'Guide 5'
+                BoxLayout:
+                    id: container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+#                    GuidesMenuItem:
+#                        title: 'Guide 1'
+#                        active: 'down'
+#                    GuidesMenuItem:
+#                        title: 'Guide 2'
+#                    GuidesMenuItem:
+#                        title: 'Guide 3'
+#                    GuidesMenuItem:
+#                        title: 'Guide 4'
+#                    GuidesMenuItem:
+#                        title: 'Guide 5'
                 AnchorLayout:
                     anchor_x: 'center'
                     anchor_y: 'center'
                     size_hint_y: None
                     height: '80dp'
+                    padding: '8dp'
                     Button:
-                        text: 'Import new guide'
+                        text: 'Import a guide'
                         font_size: '18dp'
-                        size_hint: None, None
-                        size: self.texture_size
-                        padding: '24dp', '14dp'
                         color: .4, .4, .4, 1
                         background_normal: ''
                         canvas:
