@@ -40,6 +40,8 @@ Builder.load_file('article.kv')
 Builder.load_file('bookmarks.kv')
 Builder.load_file('settings.kv')
 Builder.load_file('guides.kv')
+Builder.load_file('guide.kv')
+Builder.load_file('filechooser.kv')
 
 kivy.require('1.11.1')
 
@@ -616,10 +618,13 @@ class BookmarksMenuScreen(Screen):
 
 
 class GuidesMenuItem(BoxLayout):
-    def __init__(self, title, icon, **kwargs):
+    def __init__(self, name, title, icon, from_place, to_place, **kwargs):
         super(GuidesMenuItem, self).__init__(**kwargs)
+        self.name = name
         self.title = title
         self.icon = icon
+        self.from_place = from_place
+        self.to_place = to_place
 
 
 class GuidesMenuScreen(Screen):
@@ -628,12 +633,53 @@ class GuidesMenuScreen(Screen):
         for guide in app.guides:
             guide_dir = os.path.join(app.GUIDES_DIR, guide['name'], 'icons', 'guides')
             icon = os.path.join(guide_dir, guide['icon'])
-            guides_menu_item = GuidesMenuItem(title=guide['title'],
-                                              icon=icon)
+            guides_menu_item = GuidesMenuItem(name=guide['name'],
+                                              title=guide['title'],
+                                              icon=icon,
+                                              from_place=guide['from_place'],
+                                              to_place=guide['to_place'])
             container.add_widget(guides_menu_item)
 
     def __init__(self, **kwargs):
         super(GuidesMenuScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self._post_init)
+
+
+class GuideAssignedTag(Button):
+    pass
+
+
+class GuideAssignedTagsList(StackLayout):
+    def __init__(self, tags, **kwargs):
+        super(GuideAssignedTagsList, self).__init__(**kwargs)
+        for tag in tags:
+            tag_button = GuideAssignedTag(text=tag)
+            self.add_widget(tag_button)
+
+
+class GuideScreen(Screen):
+    def __init__(self, guide_name, **kwargs):
+        super(GuideScreen, self).__init__(**kwargs)
+        guide = next(g for g in app.guides if g['name'] == guide_name)
+        guide_dir = os.path.join(app.GUIDES_DIR, guide['name'], 'icons', 'guides')
+        self.guide_icon = os.path.join(guide_dir, guide['icon'])
+        self.guide_title = guide['title']
+        self.guide_assigned_tags = guide['tags']
+        self.guide_description = guide['description']
+        self.guide_lang = guide['lang']
+        self.guide_from_place = guide['from_place']
+        self.guide_to_place = guide['to_place']
+        guide_container = self.ids.container
+        guide_assigned_tags_list = GuideAssignedTagsList(tags=self.guide_assigned_tags)
+        guide_container.add_widget(guide_assigned_tags_list)
+
+
+class FileChooserScreen(Screen):
+    def _post_init(self, dt):
+        self.ids.filechooser.path = app.GUIDES_DIR
+
+    def __init__(self, **kwargs):
+        super(FileChooserScreen, self).__init__(**kwargs)
         Clock.schedule_once(self._post_init)
 
 
@@ -668,6 +714,17 @@ class ApplicationRoot(NavigationDrawer):
             article_screen = ArticleScreen(name=screen_name,
                                            article_id=article_id)
             screen_manager.add_widget(article_screen)
+
+        screen_manager.current = screen_name
+
+    def show_guide_screen(self, guide_name):
+        screen_manager = self.ids.manager
+        screen_names = [screen.name for screen in screen_manager.screens]
+        screen_name = 'Guide: ' + guide_name
+        if screen_name not in screen_names:
+            guide_screen = GuideScreen(name=screen_name,
+                                       guide_name=guide_name)
+            screen_manager.add_widget(guide_screen)
 
         screen_manager.current = screen_name
 
@@ -730,12 +787,13 @@ class XenialApp(App):
     def __init__(self, **kwargs):
         super(XenialApp, self).__init__(**kwargs)
         self._init_guides()
-        imported_guide_name = input('Name of a guide to be imported (None = Nothing imported):')
-        if imported_guide_name != '':
-            imported_guide_archive = os.path.join(self.GUIDES_DIR, imported_guide_name + '.tgz')
-            self.import_guide(imported_guide_archive)
+        # imported_guide_name = input('Name of a guide to be imported (None = Nothing imported):')
+        # if imported_guide_name != '':
+        #     imported_guide_archive = os.path.join(self.GUIDES_DIR, imported_guide_name + '.tgz')
+        #     self.import_guide(imported_guide_archive)
 
-        Clock.schedule_once(self._switch_to_guides)  # Temporal hack
+        if self.active_guide is None:
+            Clock.schedule_once(self._switch_to_guides)  # Temporal hack
 
     def build(self):
         self.root = ApplicationRoot()

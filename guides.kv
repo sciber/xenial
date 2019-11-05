@@ -1,35 +1,76 @@
 #:kivy 1.11.1
+#:import Factory kivy.factory.Factory
+
+<LoadGuidePopup@Popup>
+    auto_dismiss: False
+    title: 'Select a guide file'
+    title_color: 0, .7, .7, 1
+    separator_color: 0, .7, .7, 1
+    BoxLayout:
+        orientation: 'vertical'
+        FileChooserListView:
+            id: filechooser
+            path: app.GUIDES_DIR
+            dirselect: True
+            multiselect: False
+            color: 1, 0, 0, 1
+            font_size: '24dp'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '40dp'
+            Button:
+                text: 'Cancel'
+                on_release: root.dismiss()
+            Button:
+                text: 'Select'
 
 <GuidesMenuItem@BoxLayout>:
+    name: ''
     title: ''
     icon: None
+    from_place: ''
+    to_place: ''
     active: 'normal'
     orientation: 'horizontal'
     size_hint_y: None
     height: '80dp'
-    Image:
-        source: root.icon
-        size_hint_x: None
-        width: self.height
-    BoxLayout:
-        orientation: 'vertical'
-        Label:
-            text: root.title
-            color: .2, .2, .2, 1
-            font_size: '18dp'
-            bold: True
-            size_hint_y: .5
-            text_size: self.size
-            halign: 'left'
-            valign: 'middle'
-        Label:
-            text: 'From Country 1 to Country 2'
-            color: .2, .2, .2, 1
-            font_size: '14dp'
-            size_hint_y: .5
-            text_size: self.size
-            halign: 'left'
-            valign: 'middle'
+    Button:
+        background_normal: ''
+        on_release: app.root.show_guide_screen(root.name)
+        BoxLayout:
+            orientation: 'horizontal'
+            pos: self.parent.pos
+            size_hint: None, None
+            size: self.parent.size
+            AnchorLayout:
+                anchor_x: 'center'
+                anchor_y: 'center'
+                size_hint_x: None
+                width: self.height
+                Image:
+                    source: root.icon
+                    size_hint: None, None
+                    size: '60dp', '60dp'
+            BoxLayout:
+                orientation: 'vertical'
+                Label:
+                    text: root.title
+                    color: .2, .2, .2, 1
+                    font_size: '18dp'
+                    bold: True
+                    size_hint_y: .5
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
+                Label:
+                    text: 'From {} to {}'.format(root.from_place, root.to_place)
+                    color: .2, .2, .2, 1
+                    font_size: '14dp'
+                    size_hint_y: .5
+                    text_size: self.size
+                    halign: 'left'
+                    valign: 'middle'
     CheckBox:
         active: root.active
         group: 'guides'
@@ -62,17 +103,6 @@
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
-#                    GuidesMenuItem:
-#                        title: 'Guide 1'
-#                        active: 'down'
-#                    GuidesMenuItem:
-#                        title: 'Guide 2'
-#                    GuidesMenuItem:
-#                        title: 'Guide 3'
-#                    GuidesMenuItem:
-#                        title: 'Guide 4'
-#                    GuidesMenuItem:
-#                        title: 'Guide 5'
                 AnchorLayout:
                     anchor_x: 'center'
                     anchor_y: 'center'
@@ -84,6 +114,7 @@
                         font_size: '18dp'
                         color: .4, .4, .4, 1
                         background_normal: ''
+                        on_release: Factory.LoadGuidePopup().open()
                         canvas:
                             Color:
                                 rgba: .4, .4, .4, 1
