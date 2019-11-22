@@ -80,35 +80,35 @@
         NavigationPanelButton:
             title: 'Search'
             image: 'assets/img/search.png'
-            disabled: app.active_guide is None
+            disabled: not app.is_active_guide
             on_release:
                 app.root.ids.manager.current = 'search'
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Categories'
             image: 'assets/img/category.png'
-            disabled: app.active_guide is None
+            disabled: not app.is_active_guide
             on_release:
                 app.root.ids.manager.current = 'categories'
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Tags'
             image: 'assets/img/tag.png'
-            disabled: app.active_guide is None
+            disabled:  not app.is_active_guide
             on_release:
                 app.root.ids.manager.current = 'tags'
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Articles'
             image: 'assets/img/article.png'
-            disabled: app.active_guide is None
+            disabled: not app.is_active_guide
             on_release:
                 app.root.ids.manager.current = 'articles'
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Bookmarks'
             image: 'assets/img/bookmark.png'
-            disabled: app.active_guide is None
+            disabled: not app.is_active_guide
             on_release:
                 app.root.ids.manager.current = 'bookmarks'
                 app.root.toggle_state()

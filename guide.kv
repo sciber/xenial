@@ -1,7 +1,9 @@
 #:kivy 1.11.1
 #:import Factory kivy.factory.Factory
 
-<WarningPopup@Popup>:
+<UnloadGuideWarningPopup>:
+    guide_name: ''
+    guide_title: ''
     auto_dismiss: False
     title: 'Warning'
     title_color: 1, .4, .4, 1
@@ -11,7 +13,11 @@
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: 'Delete this guide?'
+            text: 'Delete guide\n"[b]{}[/b]"?'.format(root.guide_title)
+            text_size: self.size
+            valign: 'middle'
+            halign: 'center'
+            markup: True
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
@@ -22,8 +28,8 @@
             Button:
                 text: 'Delete'
                 on_release:
-                    print('Guide deleted')
                     root.dismiss()
+                    app.root.unload_guide(root.guide_name)
 
 <GuideAssignedTag>:
     text: ''
@@ -41,6 +47,7 @@
     spacing: '2dp'
 
 <GuideScreen>:
+    guide_name: ''
     guide_icon: None
     guide_title: ''
     guide_description: ''
@@ -120,7 +127,8 @@
                         font_size: '18dp'
                         color: 1, .4, .4, 1
                         background_normal: ''
-                        on_release: Factory.WarningPopup().open()
+                        on_release:
+                            Factory.UnloadGuideWarningPopup(guide_name=root.guide_name, guide_title=root.guide_title).open()
                         canvas:
                             Color:
                                 rgba: 1, .4, .4, 1
