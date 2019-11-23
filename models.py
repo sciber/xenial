@@ -39,17 +39,14 @@ class GuideModel:
         with open(os.path.join(self.GUIDES_DIR, 'guides.json'), 'w') as guides_list_file:
             json.dump(self.guides_list, guides_list_file, indent=4)
 
-    def load(self, guide_archive):
+    def load(self, guide_archive_path):
         """Load a guide from a corresponding archive"""
-        guide_name = os.path.basename(guide_archive)[:-4]  # Expects tgz file extension
+        guide_name = os.path.basename(guide_archive_path).split('.')[0]
         guide_path = os.path.join(self.GUIDES_DIR, guide_name)
         if os.path.exists(guide_path):
-            shutil.rmtree(guide_path)
-            for list_item in self.guides_list:
-                if list_item['name'] == guide_name:
-                    del list_item
+            self.unload(guide_name)
         os.mkdir(guide_path)
-        with tarfile.open(guide_archive, 'r:gz') as tar:
+        with tarfile.open(guide_archive_path, 'r:gz') as tar:
             tar.extractall(guide_path)
         with open(os.path.join(guide_path, 'guide.json'), 'r') as guide_file:
             guide = json.load(guide_file)

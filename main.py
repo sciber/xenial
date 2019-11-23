@@ -647,6 +647,13 @@ class ApplicationRoot(NavigationDrawer):
 
         screen_manager.current = screen_name
 
+    def load_guide(self, guide_archive_paths):
+        try:
+            guides.load(guide_archive_paths[0])
+        except:
+            guide_archive_name = os.path.basename(guide_archive_paths[0])
+            print('"{}" is not a guide archive file!'.format(guide_archive_name))
+
     def unload_guide(self, guide_name):
         guides.unload(guide_name)
         if guides.active_guide is None:
@@ -663,11 +670,6 @@ class XenialApp(App):
 
     def __init__(self, **kwargs):
         super(XenialApp, self).__init__(**kwargs)
-
-        imported_guide_name = input('Name of a guide to be imported (None = Nothing imported): ')
-        if imported_guide_name != '':
-            imported_guide_archive = os.path.join(guides.GUIDES_DIR, imported_guide_name + '.tgz')
-            guides.load(imported_guide_archive)
 
         if guides.active_guide is None:
             Clock.schedule_once(self._switch_to_guides)  # Temporary hack

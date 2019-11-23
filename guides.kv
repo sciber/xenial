@@ -1,5 +1,6 @@
 #:kivy 1.11.1
 #:import Factory kivy.factory.Factory
+#:import getcwd os.getcwd
 
 <LoadGuidePopup@Popup>
     auto_dismiss: False
@@ -10,8 +11,9 @@
         orientation: 'vertical'
         FileChooserListView:
             id: filechooser
-            path: app.GUIDES_DIR
-            dirselect: True
+            path: getcwd()
+            filters: ['*.tgz']
+            dirselect: False
             multiselect: False
             color: 1, 0, 0, 1
             font_size: '24dp'
@@ -23,7 +25,11 @@
                 text: 'Cancel'
                 on_release: root.dismiss()
             Button:
-                text: 'Select'
+                text: 'Load'
+                disabled: not filechooser.selection
+                on_release:
+                    root.dismiss()
+                    app.root.load_guide(filechooser.selection)
 
 <GuidesMenuItem@BoxLayout>:
     name: ''
