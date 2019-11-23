@@ -595,6 +595,12 @@ class FileChooserScreen(Screen):
         Clock.schedule_once(self._post_init)
 
 
+class GuideLoadFailedWarning(Popup):
+    def __init__(self, message, **kwargs):
+        super(GuideLoadFailedWarning, self).__init__(**kwargs)
+        self.message = message
+
+
 class UnloadGuideWarningPopup(Popup):
     def __init__(self, guide_name, guide_title, **kwargs):
         super(UnloadGuideWarningPopup, self).__init__(**kwargs)
@@ -652,7 +658,7 @@ class ApplicationRoot(NavigationDrawer):
             guides.load(guide_archive_paths[0])
         except:
             guide_archive_name = os.path.basename(guide_archive_paths[0])
-            print('"{}" is not a guide archive file!'.format(guide_archive_name))
+            GuideLoadFailedWarning('"[b]{}[/b]"\n guide load failed!'.format(guide_archive_name)).open()
 
     def unload_guide(self, guide_name):
         guides.unload(guide_name)
