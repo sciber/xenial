@@ -1,5 +1,4 @@
-from functools import reduce
-from datetime import datetime
+import os
 
 import kivy
 
@@ -7,15 +6,19 @@ from kivy.config import Config
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.clock import Clock
-from kivy.properties import ObjectProperty, NumericProperty, BooleanProperty
+from kivy.properties import ObjectProperty, NumericProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
+from kivy.uix.popup import Popup
 from kivy.core.audio import SoundLoader
 
 from kivy.garden.navigationdrawer import NavigationDrawer
+
+from models import guides, tags, categories, articles, bookmarks
+
 
 Config.set('kivy', 'default_font',
            '''["Noto Sans", 
@@ -36,6 +39,8 @@ Builder.load_file('article.kv')
 Builder.load_file('bookmarks.kv')
 Builder.load_file('settings.kv')
 Builder.load_file('guides.kv')
+Builder.load_file('guide.kv')
+Builder.load_file('filechooser.kv')
 
 kivy.require('1.11.1')
 
@@ -43,7 +48,8 @@ kivy.require('1.11.1')
 class CategoriesMenuItem(Button):
     def __init__(self, category, **kwargs):
         super(CategoriesMenuItem, self).__init__(**kwargs)
-        self.icon = 'guides/dummy/icons/categories/' + category['icon']
+        self.id_ = category['id']
+        self.icon = os.path.join(guides.active_guide_path, 'icons', 'categories', category['icon'])
         self.name = category['name']
 
 
@@ -51,7 +57,7 @@ class CategoriesMenuScreen(Screen):
     items_container = ObjectProperty()
 
     def _post_init(self, dt):
-        for category in app.guide['categories']:
+        for category in categories.all():
             categories_menu_item = CategoriesMenuItem(category=category)
             self.items_container.add_widget(categories_menu_item)
 
@@ -73,8 +79,9 @@ class CategoryAssignedTagsList(StackLayout):
 
 
 class CategoryRelatedCategoriesMenuItem(Button):
-    def __init__(self, icon, name, **kwargs):
+    def __init__(self, id_, icon, name, **kwargs):
         super(CategoryRelatedCategoriesMenuItem, self).__init__(**kwargs)
+        self.id_ = id_
         self.icon = icon
         self.name = name
 
@@ -86,16 +93,17 @@ class CategoryRelatedCategoriesMenu(BoxLayout):
         super(CategoryRelatedCategoriesMenu, self).__init__(**kwargs)
 
         for category in categories:
-            icon = 'guides/dummy/icons/categories/' + category['icon']
-            menu_item = CategoryRelatedCategoriesMenuItem(icon=icon,
+            icon = os.path.join(guides.active_guide_path, 'icons', 'categories', category['icon'])
+            menu_item = CategoryRelatedCategoriesMenuItem(id_=category['id'],
+                                                          icon=icon,
                                                           name=category['name'])
             self.items_container.add_widget(menu_item)
 
 
 class CategoryArticlesMenuItem(Button):
-    def __init__(self, article_id, icon, title, synopsis, **kwargs):
+    def __init__(self, id_, icon, title, synopsis, **kwargs):
         super(CategoryArticlesMenuItem, self).__init__(**kwargs)
-        self.article_id = article_id
+        self.id_ = id_
         self.icon = icon
         self.title = title
         self.synopsis = synopsis
@@ -108,8 +116,8 @@ class CategoryArticlesMenu(BoxLayout):
         super(CategoryArticlesMenu, self).__init__(**kwargs)
         self.items_container = self
         for article in articles:
-            icon = 'guides/dummy/icons/articles/' + article['icon']
-            menu_item = CategoryArticlesMenuItem(article_id=article['id'],
+            icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
+            menu_item = CategoryArticlesMenuItem(id_=article['id'],
                                                  icon=icon,
                                                  title=article['title'],
                                                  synopsis=article['synopsis'])
@@ -117,34 +125,16 @@ class CategoryArticlesMenu(BoxLayout):
 
 
 class CategoryScreen(Screen):
-    def _get_related_categories(self):
-        tagged_categories = []
-        for category in app.guide['categories']:
-            if category['name'] == self.category_name:
-                continue
-
-            categories_shared_tags = list(set(category['tags']) & set(self.category_assigned_tags))
-            if len(categories_shared_tags) > 0:
-                tagged_categories.append((category, len(categories_shared_tags)))
-
-        tagged_categories.sort(key=lambda c: c[1], reverse=True)
-        related_categories = [item[0] for item in tagged_categories]
-        return related_categories
-
-    def _get_articles(self):
-        tagged_articles = [a for a in app.guide['articles'] if all(t in a['tags'] for t in self.category_assigned_tags)]
-        return tagged_articles
-
-    def __init__(self, category_name, **kwargs):
+    def __init__(self, category_id, **kwargs):
         super(CategoryScreen, self).__init__(**kwargs)
-        category = next(c for c in app.guide['categories'] if c['name'] == category_name)
-        self.category_icon = 'guides/dummy/icons/categories/' + category['icon']
-        self.category_name = category_name
+        category = categories.by_id(category_id)
+        self.category_id = category_id
+        self.category_icon = os.path.join(guides.active_guide_path, 'icons', 'categories', category['icon'])
+        self.category_name = category['name']
         # self.name = 'Category: ' + self.category_name
         self.category_assigned_tags = category['tags']
-        self.category_related_categories = self._get_related_categories()
-        self.category_articles = self._get_articles()
-
+        self.category_related_categories = categories.related_categories(category_id)
+        self.category_articles = categories.related_articles(category_id)
         category_container = self.ids.container
         category_assigned_tags_list = CategoryAssignedTagsList(tags=self.category_assigned_tags)
         category_container.add_widget(category_assigned_tags_list)
@@ -157,26 +147,20 @@ class CategoryScreen(Screen):
 
 
 class TagsMenuItem(Button):
-    def _get_num_tagged_articles(self):
-        return reduce(lambda x, y: x + 1 if self.name in y['tags'] else x, app.guide['articles'], 0)
-
-    def _get_num_tagged_categories(self):
-        return reduce(lambda x, y: x + 1 if self.name in y['tags'] else x, app.guide['categories'], 0)
-
     def __init__(self, tag, **kwargs):
         super(TagsMenuItem, self).__init__(**kwargs)
         self.name = tag
-        self.num_articles = self._get_num_tagged_articles()
-        self.num_categories = self._get_num_tagged_categories()
+        self.num_articles = len(tags.related_articles(tag))
+        self.num_categories = len(tags.related_categories(tag))
 
 
 class TagsMenuScreen(Screen):
     items_container = ObjectProperty()
 
     def _post_init(self, dt):
-        for tag in app.guide['tags']:
-            tag_button = TagsMenuItem(tag=tag)
-            self.items_container.add_widget(tag_button)
+        for tag in tags.all():
+            tags_menu_item = TagsMenuItem(tag=tag)
+            self.items_container.add_widget(tags_menu_item)
 
     def __init__(self, **kwargs):
         super(TagsMenuScreen, self).__init__(**kwargs)
@@ -184,8 +168,9 @@ class TagsMenuScreen(Screen):
 
 
 class TaggedCategoriesMenuItem(Button):
-    def __init__(self, icon, name, **kwargs):
+    def __init__(self, id_, icon, name, **kwargs):
         super(TaggedCategoriesMenuItem, self).__init__(**kwargs)
+        self.id_ = id_
         self.icon = icon
         self.name = name
 
@@ -196,16 +181,17 @@ class TaggedCategoriesMenu(BoxLayout):
     def __init__(self, categories, **kwargs):
         super(TaggedCategoriesMenu, self).__init__(**kwargs)
         for category in categories:
-            icon = 'guides/dummy/icons/categories/' + category['icon']
-            menu_item = TaggedCategoriesMenuItem(icon=icon,
+            icon = os.path.join(guides.active_guide_path, 'icons', 'categories', category['icon'])
+            menu_item = TaggedCategoriesMenuItem(id_=category['id'],
+                                                 icon=icon,
                                                  name=category['name'])
             self.items_container.add_widget(menu_item)
 
 
 class TaggedArticlesMenuItem(Button):
-    def __init__(self, article_id, icon, title, synopsis, **kwargs):
+    def __init__(self, id_, icon, title, synopsis, **kwargs):
         super(TaggedArticlesMenuItem, self).__init__(**kwargs)
-        self.article_id = article_id
+        self.id_ = id_
         self.icon = icon
         self.title = title
         self.synopsis = synopsis
@@ -217,8 +203,8 @@ class TaggedArticlesMenu(BoxLayout):
     def __init__(self, articles, **kwargs):
         super(TaggedArticlesMenu, self).__init__(**kwargs)
         for article in articles:
-            icon = 'guides/dummy/icons/articles/' + article['icon']
-            menu_item = TaggedArticlesMenuItem(article_id=article['id'],
+            icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
+            menu_item = TaggedArticlesMenuItem(id_=article['id'],
                                                icon=icon,
                                                title=article['title'],
                                                synopsis=article['synopsis'])
@@ -226,19 +212,11 @@ class TaggedArticlesMenu(BoxLayout):
 
 
 class TagScreen(Screen):
-    def _get_tagged_categories(self):
-        tagged_categories = [c for c in app.guide['categories'] if self.tag_name in c['tags']]
-        return tagged_categories
-
-    def _get_tagged_articles(self):
-        tagged_articles = [a for a in app.guide['articles'] if self.tag_name in a['tags']]
-        return tagged_articles
-
     def __init__(self, tag_name, **kwargs):
         super(TagScreen, self).__init__(**kwargs)
         self.tag_name = tag_name
-        self.tagged_categories = self._get_tagged_categories()
-        self.tagged_articles = self._get_tagged_articles()
+        self.tagged_categories = tags.related_categories(tag_name)
+        self.tagged_articles = tags.related_articles(tag_name)
 
         tag_container = self.ids.container
         if len(self.tagged_categories) > 0:
@@ -252,8 +230,8 @@ class TagScreen(Screen):
 class ArticlesMenuItem(Button):
     def __init__(self, article, **kwargs):
         super(ArticlesMenuItem, self).__init__(**kwargs)
-        self.article_id = article['id']
-        self.icon = 'guides/dummy/icons/articles/' + article['icon']
+        self.id_ = article['id']
+        self.icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
         self.title = article['title']
         self.synopsis = article['synopsis']
 
@@ -262,7 +240,7 @@ class ArticlesMenuScreen(Screen):
     items_container = ObjectProperty()
 
     def _post_init(self, dt):
-        for article in app.guide['articles']:
+        for article in articles.all():
             articles_menu_item = ArticlesMenuItem(article=article)
             self.items_container.add_widget(articles_menu_item)
 
@@ -422,22 +400,22 @@ class ArticleContent(BoxLayout):
                 continue
 
             if content_item['type'] == 'image':
-                image = 'guides/dummy/articles/content/media/image/' + content_item['src']
+                image = os.path.join(guides.active_guide_path, 'content', 'media', 'image', content_item['source'])
                 item_widget = ArticleImage(image=image,
                                            caption=content_item['caption'])
                 self.add_widget(item_widget)
                 continue
 
             if content_item['type'] == 'audio':
-                audio_source = 'guides/dummy/articles/content/media/audio/' + content_item['src']
+                audio_source = os.path.join(guides.active_guide_path, 'content', 'media', 'audio', content_item['source'])
                 item_widget = ArticleAudio(audio_source=audio_source,
                                            caption=content_item['caption'])
                 self.add_widget(item_widget)
                 continue
 
             if content_item['type'] == 'video':
-                video_source = 'guides/dummy/articles/content/media/video/' + content_item['src']
-                cover_image_source = 'guides/dummy/articles/content/media/video/' + content_item['src'][:-4] + '.jpg'
+                video_source = os.path.join(guides.active_guide_path, 'content', 'media', 'video', content_item['source'])
+                cover_image_source = os.path.join(guides.active_guide_path, 'content', 'media', 'video', content_item['screenshot'])
                 item_widget = ArticleVideo(video_source=video_source,
                                            cover_image_source=cover_image_source,
                                            caption=content_item['caption'])
@@ -446,9 +424,9 @@ class ArticleContent(BoxLayout):
 
 
 class ArticleRelatedArticlesMenuItem(Button):
-    def __init__(self, article_id, icon, title, synopsis, **kwargs):
+    def __init__(self, id_, icon, title, synopsis, **kwargs):
         super(ArticleRelatedArticlesMenuItem, self).__init__(**kwargs)
-        self.article_id = article_id
+        self.id_ = id_
         self.icon = icon
         self.title = title
         self.synopsis = synopsis
@@ -460,8 +438,8 @@ class ArticleRelatedArticlesMenu(BoxLayout):
     def __init__(self, articles, **kwargs):
         super(ArticleRelatedArticlesMenu, self).__init__(**kwargs)
         for article in articles:
-            icon = 'guides/dummy/icons/articles/' + article['icon']
-            menu_item = ArticleRelatedArticlesMenuItem(article_id=article['id'],
+            icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
+            menu_item = ArticleRelatedArticlesMenuItem(id_=article['id'],
                                                        icon=icon,
                                                        title=article['title'],
                                                        synopsis=article['synopsis'])
@@ -469,8 +447,9 @@ class ArticleRelatedArticlesMenu(BoxLayout):
 
 
 class ArticleRelatedCategoriesMenuItem(Button):
-    def __init__(self, icon, name, **kwargs):
+    def __init__(self, id_, icon, name, **kwargs):
         super(ArticleRelatedCategoriesMenuItem, self).__init__(**kwargs)
+        self.id_ = id_
         self.icon = icon
         self.name = name
 
@@ -481,51 +460,25 @@ class ArticleRelatedCategoriesMenu(BoxLayout):
     def __init__(self, categories, **kwargs):
         super(ArticleRelatedCategoriesMenu, self).__init__(**kwargs)
         for category in categories:
-            icon = 'guides/dummy/icons/categories/' + category['icon']
-            menu_item = ArticleRelatedCategoriesMenuItem(icon=icon,
+            icon = os.path.join(guides.active_guide_path, 'icons', 'categories', category['icon'])
+            menu_item = ArticleRelatedCategoriesMenuItem(id_=category['id'],
+                                                         icon=icon,
                                                          name=category['name'])
             self.items_container.add_widget(menu_item)
 
 
 class ArticleScreen(Screen):
-    is_bookmarked = BooleanProperty(False)
-
-    def _get_related_categories(self):
-        tagged_categories = []
-        for category in app.guide['categories']:
-            article_category_shared_tags = list(set(category['tags']) & set(self.article_assigned_tags))
-            if len(article_category_shared_tags) > 0:
-                tagged_categories.append((category, len(article_category_shared_tags)))
-
-        tagged_categories.sort(key=lambda c: c[1], reverse=True)
-        related_categories = [item[0] for item in tagged_categories]
-        return related_categories
-
-    def _get_related_articles(self):
-        tagged_articles = []
-        for article in app.guide['articles']:
-            if article['id'] == self.article_id:
-                continue
-
-            articles_shared_tags = list(set(article['tags']) & set(self.article_assigned_tags))
-            if len(articles_shared_tags) > 0:
-                tagged_articles.append((article, len(articles_shared_tags)))
-
-        tagged_articles.sort(key=lambda a: a[1], reverse=True)
-        related_articles = [item[0] for item in tagged_articles]
-        return related_articles
-
     def __init__(self, article_id, **kwargs):
         super(ArticleScreen, self).__init__(**kwargs)
-        article = next(a for a in app.guide['articles'] if a['id'] == article_id)
+        article = articles.by_id(article_id)
         self.article_id = article_id
-        self.article_icon = 'guides/dummy/icons/articles/' + article['icon']
+        self.article_icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
         self.article_title = article['title']
         self.article_assigned_tags = article['tags']
         self.article_content = article['content']
-        self.is_bookmarked = reduce(lambda x, y: x or (y['article_id'] == article_id), app.guide['bookmarks'], False)
-        self.article_related_categories = self._get_related_categories()
-        self.article_related_articles = self._get_related_articles()
+        self.is_bookmarked = bookmarks.is_article_bookmarked(article_id)
+        self.article_related_categories = articles.related_categories(article_id)
+        self.article_related_articles = articles.related_articles(article_id)
 
         article_container = self.ids.container
         article_assigned_tags_list = ArticleAssignedTagsList(tags=self.article_assigned_tags)
@@ -543,26 +496,24 @@ class ArticleScreen(Screen):
 
     def toggle_bookmark(self):
         if self.is_bookmarked:
-            bookmark = next(b for b in app.guide['bookmarks'] if b['article_id'] == self.article_id)
-            app.guide['bookmarks'].remove(bookmark)
+            bookmarks.remove(self.article_id)
         else:
-            app.guide['bookmarks'].append((self.article_id, str(datetime.now())))
-
+            bookmarks.add(self.article_id)
         self.is_bookmarked = not self.is_bookmarked
 
 
 class BookmarksMenuItem(BoxLayout):
     def __init__(self, bookmark, **kwargs):
         super(BookmarksMenuItem, self).__init__(**kwargs)
-        article = next(a for a in app.guide['articles'] if a['id'] == bookmark['article_id'])
+        article = articles.by_id(bookmark['article_id'])
         self.article_id = article['id']
-        self.icon = 'guides/dummy/icons/articles/' + article['icon']
+        self.icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
         self.title = article['title']
         self.synopsis = article['synopsis']
         self.bookmark = bookmark
 
     def delete_bookmark(self):
-        app.guide['bookmarks'].remove(self.bookmark)
+        bookmarks.remove(self.bookmark['article_id'])
         self.parent.remove_widget(self)
 
 
@@ -570,7 +521,7 @@ class BookmarksMenuScreen(Screen):
     items_container = ObjectProperty()
 
     def _post_init(self, dt):
-        for bookmark in app.guide['bookmarks']:
+        for bookmark in bookmarks.all():
             bookmarks_menu_item = BookmarksMenuItem(bookmark=bookmark)
             self.items_container.add_widget(bookmarks_menu_item)
 
@@ -579,14 +530,86 @@ class BookmarksMenuScreen(Screen):
         Clock.schedule_once(self._post_init)
 
 
+class GuidesMenuItem(BoxLayout):
+    def __init__(self, name, title, icon, from_place, to_place, **kwargs):
+        super(GuidesMenuItem, self).__init__(**kwargs)
+        self.name = name
+        self.title = title
+        self.icon = icon
+        self.from_place = from_place
+        self.to_place = to_place
+
+
+class GuidesMenuScreen(Screen):
+    def _post_init(self, dt):
+        container = self.ids.container
+        for guide in guides.all():
+            icon = os.path.join(guides.GUIDES_DIR, guide['name'], 'icons', 'guide', guide['icon'])
+            guides_menu_item = GuidesMenuItem(name=guide['name'],
+                                              title=guide['title'],
+                                              icon=icon,
+                                              from_place=guide['from_place'],
+                                              to_place=guide['to_place'])
+            container.add_widget(guides_menu_item)
+
+    def __init__(self, **kwargs):
+        super(GuidesMenuScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self._post_init)
+
+
+class GuideAssignedTag(Button):
+    pass
+
+
+class GuideAssignedTagsList(StackLayout):
+    def __init__(self, tags, **kwargs):
+        super(GuideAssignedTagsList, self).__init__(**kwargs)
+        for tag in tags:
+            tag_button = GuideAssignedTag(text=tag)
+            self.add_widget(tag_button)
+
+
+class GuideScreen(Screen):
+    def __init__(self, guide_name, **kwargs):
+        super(GuideScreen, self).__init__(**kwargs)
+        guide = guides.by_name(guide_name)
+        self.guide_name = guide_name
+        self.guide_icon = os.path.join(guides.GUIDES_DIR, guide['name'], 'icons', 'guide', guide['icon'])
+        self.guide_title = guide['title']
+        self.guide_assigned_tags = guide['tags']
+        self.guide_description = guide['description']
+        self.guide_lang = guide['lang']
+        self.guide_from_place = guide['from_place']
+        self.guide_to_place = guide['to_place']
+        guide_container = self.ids.container
+        guide_assigned_tags_list = GuideAssignedTagsList(tags=guide['tags'])
+        guide_container.add_widget(guide_assigned_tags_list)
+
+
+class FileChooserScreen(Screen):
+    def _post_init(self, dt):
+        self.ids.filechooser.path = guides.GUIDES_DIR
+
+    def __init__(self, **kwargs):
+        super(FileChooserScreen, self).__init__(**kwargs)
+        Clock.schedule_once(self._post_init)
+
+
+class UnloadGuideWarningPopup(Popup):
+    def __init__(self, guide_name, guide_title, **kwargs):
+        super(UnloadGuideWarningPopup, self).__init__(**kwargs)
+        self.guide_name = guide_name
+        self.guide_title = guide_title
+
+
 class ApplicationRoot(NavigationDrawer):
-    def show_category_screen(self, category_name):
+    def show_category_screen(self, category_id):
         screen_manager = self.ids.manager
         screens_names = [screen.name for screen in screen_manager.screens]
-        screen_name = 'Category: ' + category_name
+        screen_name = 'Category: ' + str(category_id)
         if screen_name not in screens_names:
             category_screen = CategoryScreen(name=screen_name,
-                                             category_name=category_name)
+                                             category_id=category_id)
             screen_manager.add_widget(category_screen)
 
         screen_manager.current = screen_name
@@ -605,7 +628,7 @@ class ApplicationRoot(NavigationDrawer):
     def show_article_screen(self, article_id):
         screen_manager = self.ids.manager
         screen_names = [screen.name for screen in screen_manager.screens]
-        screen_name = 'Article: ' + article_id
+        screen_name = 'Article: ' + str(article_id)
         if screen_name not in screen_names:
             article_screen = ArticleScreen(name=screen_name,
                                            article_id=article_id)
@@ -613,12 +636,50 @@ class ApplicationRoot(NavigationDrawer):
 
         screen_manager.current = screen_name
 
+    def show_guide_screen(self, guide_name):
+        screen_manager = self.ids.manager
+        screen_names = [screen.name for screen in screen_manager.screens]
+        screen_name = 'Guide: ' + guide_name
+        if screen_name not in screen_names:
+            guide_screen = GuideScreen(name=screen_name,
+                                       guide_name=guide_name)
+            screen_manager.add_widget(guide_screen)
+
+        screen_manager.current = screen_name
+
+    def load_guide(self, guide_archive_paths):
+        try:
+            guides.load(guide_archive_paths[0])
+        except:
+            guide_archive_name = os.path.basename(guide_archive_paths[0])
+            print('"{}" is not a guide archive file!'.format(guide_archive_name))
+
+    def unload_guide(self, guide_name):
+        guides.unload(guide_name)
+        if guides.active_guide is None:
+            app.is_active_guide = False
+        screen_manager = self.ids.manager
+        screen_manager.current = 'guides'
+
 
 class XenialApp(App):
-    from guides.dummy.guide import guide
+    GUIDES_DIR = guides.GUIDES_DIR
+
+    def _switch_to_guides(self, dt):
+        self.root.ids.manager.current = 'guides'
+
+    def __init__(self, **kwargs):
+        super(XenialApp, self).__init__(**kwargs)
+
+        if guides.active_guide is None:
+            Clock.schedule_once(self._switch_to_guides)  # Temporary hack
+            self.is_active_guide = False
+        else:
+            self.is_active_guide = True
 
     def build(self):
-        return ApplicationRoot()
+        self.root = ApplicationRoot()
+        return self.root
 
     def on_pause(self):
         return True

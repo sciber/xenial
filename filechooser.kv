@@ -1,0 +1,20 @@
+#:kivy 1.11.1
+
+<FileChooserScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        FileChooserListView:
+            id: filechooser
+            dirselect: True
+            multiselect: False
+            color: 1, 0, 0, 1
+            font_size: '24dp'
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '40dp'
+            Button:
+                text: 'Cancel'
+                on_release: app.root.ids.manager.current = 'guides'
+            Button:
+                text: 'Select'

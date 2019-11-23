@@ -236,14 +236,14 @@
     spacing: '20dp'
 
 <ArticleRelatedArticlesMenuItem>:
-    article_id: None
+    id_: None
     icon: None
     title: ''
     synopsis: ''
     size_hint_y: None
     height: '80dp'
     background_normal: ''
-    on_release: app.root.show_article_screen(self.article_id)
+    on_release: app.root.show_article_screen(self.id_)
     BoxLayout:
         orientation: 'horizontal'
         pos: self.parent.pos
@@ -313,12 +313,13 @@
         height: self.minimum_height
 
 <ArticleRelatedCategoriesMenuItem>:
+    id_: None
     icon: None
     name: ''
     background_normal: ''
     size_hint: None, None
     size: '80dp', '100dp'
-    on_release: app.root.show_category_screen(self.name)
+    on_release: app.root.show_category_screen(self.id_)
     BoxLayout:
         orientation: 'vertical'
         pos: self.parent.pos
