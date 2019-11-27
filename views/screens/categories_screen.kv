@@ -1,0 +1,24 @@
+#:kivy 1.11.1
+
+<CategoriesScreen>:
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '4dp'
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                size: self.size
+                pos: self.pos
+        TitleBar:
+            title: 'Categories'
+        ScrollView:
+            AnchorLayout:
+                anchor_x: 'center'
+                anchor_y: 'top'
+                size: self.parent.size
+                pos: self.parent.pos
+                CategoriesMenu:
+                    size_hint_x: None
+                    width: int(root.width // categories_menu_item_width * categories_menu_item_width)
+                    data: root.categories_menu_items

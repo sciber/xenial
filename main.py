@@ -6,7 +6,7 @@ from kivy.config import Config
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.clock import Clock
-from kivy.properties import ObjectProperty, NumericProperty
+from kivy.properties import ListProperty, ObjectProperty, NumericProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -30,7 +30,10 @@ Config.set('kivy', 'default_font',
 
 Builder.load_file('ui-components.kv')
 Builder.load_file('search.kv')
-Builder.load_file('categories.kv')
+
+Builder.load_file('views/components/categories_menu.kv')
+Builder.load_file('views/screens/categories_screen.kv')
+
 Builder.load_file('category.kv')
 Builder.load_file('tags.kv')
 Builder.load_file('tag.kv')
@@ -45,25 +48,11 @@ Builder.load_file('filechooser.kv')
 kivy.require('1.11.1')
 
 
-class CategoriesMenuItem(Button):
-    def __init__(self, category, **kwargs):
-        super(CategoriesMenuItem, self).__init__(**kwargs)
-        self.id_ = category['id']
-        self.icon = os.path.join(guides.active_guide_path, 'icons', 'categories', category['icon'])
-        self.name = category['name']
-
-
-class CategoriesMenuScreen(Screen):
-    items_container = ObjectProperty()
-
-    def _post_init(self, dt):
-        for category in categories.all():
-            categories_menu_item = CategoriesMenuItem(category=category)
-            self.items_container.add_widget(categories_menu_item)
-
+class CategoriesScreen(Screen):
     def __init__(self, **kwargs):
-        super(CategoriesMenuScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._post_init)
+        super(CategoriesScreen, self).__init__(**kwargs)
+        item_keys = ('icon', 'name')
+        self.categories_menu_items = [{key: item[key] for key in item_keys} for item in categories.all()]
 
 
 class CategoryAssignedTag(Button):
