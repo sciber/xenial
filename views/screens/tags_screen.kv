@@ -1,26 +1,54 @@
 #:kivy 1.11.1
 
-<TagsMenuItem>:
-    name: ''
-    num_categories: 0
-    num_articles: 0
-    size_hint_y: None
-    height: '60dp'
+<TagsMenuItem@Button>:
+    tag_name: ''
+    num_tagged_categories: 0
+    num_tagged_articles: 0
     background_normal: ''
     background_color: 0, .7, .7, 1
     padding: '20dp', '20dp'
-    on_release: app.root.show_tag_screen(self.name)
+    on_release: app.root.show_tag_screen(self.tag_name)
     BoxLayout:
         orientation: 'horizontal'
         pos: self.parent.pos[0] + dp(8), self.parent.pos[1]
         size_hint: None, None
         size: self.parent.size[0] - dp(8), self.parent.size[1]
         Label:
-            text: root.name
+            text: root.tag_name
             font_size: '18dp'
             text_size: self.size
             valign: 'middle'
             color: 1, 1, 1, 1
+        AnchorLayout:
+            anchor_x: 'right'
+            anchor_y: 'bottom'
+            size_hint_x: None
+            width: self.height
+            padding: '4dp'
+            Image:
+                source: 'assets/img/category-white.png'
+                size_hint_x: None
+                width: self.height
+                color: 1, 1, 1, .5
+            Label:
+                visible: root.num_tagged_categories > 0
+                size_hint: (.5, .5) if self.visible else (0, 0)
+                opacity: 1 if self.visible else 0
+                text: str(root.num_tagged_categories)
+                font_size: '12dp'
+                bold: True
+                color: 1, 1, 1, 1
+                canvas.before:
+                    Color:
+                        rgba: 0, .7, .7, 1
+                    Ellipse:
+                        pos: self.pos
+                        size: self.size
+                    Color:
+                        rgba: 1, 1, 1, 1
+                    Line:
+                        width: 1
+                        ellipse:  self.x, self.y, self.width, self.height
         AnchorLayout:
             anchor_x: 'right'
             anchor_y: 'bottom'
@@ -34,10 +62,10 @@
                 width: self.height
                 color: 1, 1, 1, .5
             Label:
-                visible: root.num_articles > 0
+                visible: root.num_tagged_articles > 0
                 size_hint: (.5, .5) if self.visible else (0, 0)
                 opacity: 1 if self.visible else 0
-                text: str(root.num_articles)
+                text: str(root.num_tagged_articles)
                 font_size: '12dp'
                 bold: True
                 color: 1, 1, 1, 1
@@ -52,40 +80,9 @@
                     Line:
                         width: 1
                         ellipse:  self.x, self.y, self.width, self.height
-        AnchorLayout:
-            anchor_x: 'right'
-            anchor_y: 'bottom'
-            size_hint_x: None
-            width: self.height
-            padding: '4dp'
-            Image:
-                source: 'assets/img/category-white.png'
-                size_hint_x: None
-                width: self.height
-                color: 1, 1, 1, .5
-            Label:
-                visible: root.num_categories > 0
-                size_hint: (.5, .5) if self.visible else (0, 0)
-                opacity: 1 if self.visible else 0
-                text: str(root.num_categories)
-                font_size: '12dp'
-                bold: True
-                color: 1, 1, 1, 1
 
-                canvas.before:
-                    Color:
-                        rgba: 0, .7, .7, 1
-                    Ellipse:
-                        pos: self.pos
-                        size: self.size
-                    Color:
-                        rgba: 1, 1, 1, 1
-                    Line:
-                        width: 1
-                        ellipse:  self.x, self.y, self.width, self.height
-
-<TagsMenuScreen>:
-    items_container: container
+<TagsScreen>:
+    name: 'tags'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -98,9 +95,13 @@
         TitleBar:
             title: 'Tags'
         ScrollView:
-            BoxLayout:
-                id: container
-                orientation: 'vertical'
-                size_hint_y: None
-                height: self.minimum_height
-                spacing: '2dp'
+            RecycleView:
+                data: root.tags_screen_menu_items
+                viewclass: 'TagsMenuItem'
+                RecycleBoxLayout:
+                    orientation: 'vertical'
+                    default_size: None, dp(60)
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: '4dp'

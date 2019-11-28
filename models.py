@@ -84,7 +84,7 @@ class TagModel:
         guide_tags = guides.active_guide['tags']
         return guide_tags
 
-    def related_categories(self, tag_name):
+    def tagged_categories(self, tag_name):
         """Return all active guide categories to which the tag is assigned"""
         related_categories = []
         for tested_category in categories.all():
@@ -92,7 +92,7 @@ class TagModel:
                 related_categories.append(tested_category)
         return sorted(related_categories, key=lambda c: c['name'])
 
-    def related_articles(self, tag_name):
+    def tagged_articles(self, tag_name):
         """Return all active guides articles to which the tag is assigned """
         related_articles = []
         for tested_article in articles.all():

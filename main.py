@@ -31,11 +31,14 @@ Config.set('kivy', 'default_font',
 Builder.load_file('ui-components.kv')
 Builder.load_file('search.kv')
 
+# Views components
 Builder.load_file('views/components/categories_menu.kv')
+
+# Screens views
+Builder.load_file('views/screens/tags_screen.kv')
 Builder.load_file('views/screens/categories_screen.kv')
 
 Builder.load_file('category.kv')
-Builder.load_file('tags.kv')
 Builder.load_file('tag.kv')
 Builder.load_file('articles.kv')
 Builder.load_file('article.kv')
@@ -48,20 +51,50 @@ Builder.load_file('filechooser.kv')
 kivy.require('1.11.1')
 
 
+# class TagsMenuItem(Button):
+#     def __init__(self, tag, **kwargs):
+#         super(TagsMenuItem, self).__init__(**kwargs)
+#         self.tag_name = tag
+#         self.num_tagged_articles = len(tags.related_articles(tag))
+#         self.num_tagged_categories = len(tags.related_categories(tag))
+
+
+class TagsScreen(Screen):
+    from_guide_name = ''
+    tags_screen_menu_items = []
+
+    def __init__(self, **kwargs):
+        super(TagsScreen, self).__init__(**kwargs)
+        self.set_tags_screen_menu_items()
+
+    def set_tags_screen_menu_items(self):
+        if guides.active_guide is None or self.from_guide_name == guides.active_guide['name']:
+            return
+        self.from_guide_name = guides.active_guide['name']
+        print(tags.all())
+        self.tags_screen_menu_items = [{
+            'tag_name': tag_name,
+            'num_tagged_categories': len(tags.tagged_categories(tag_name)),
+            'num_tagged_articles': len(tags.tagged_articles(tag_name))
+        } for tag_name in tags.all()]
+
+
 class CategoriesScreen(Screen):
-    from_guide_name = None
+    from_guide_name = ''
     categories_menu_items = []
+
+    def __init__(self, **kwargs):
+        super(CategoriesScreen, self).__init__(**kwargs)
+        self.set_categories_menu_items()
 
     def set_categories_menu_items(self):
         if guides.active_guide is None or self.from_guide_name == guides.active_guide['name']:
             return
         self.from_guide_name = guides.active_guide['name']
         item_keys = ('icon', 'name')
-        self.categories_menu_items = [{('category_' + key): item[key] for key in item_keys} for item in categories.all()]
-
-    def __init__(self, **kwargs):
-        super(CategoriesScreen, self).__init__(**kwargs)
-        self.set_categories_menu_items()
+        self.categories_menu_items = [
+            {('category_' + key): item[key] for key in item_keys} for item in categories.all()
+        ]
 
 
 class CategoryAssignedTag(Button):
@@ -138,27 +171,6 @@ class CategoryScreen(Screen):
             category_container.add_widget(category_articles_menu)
 
 
-class TagsMenuItem(Button):
-    def __init__(self, tag, **kwargs):
-        super(TagsMenuItem, self).__init__(**kwargs)
-        self.name = tag
-        self.num_articles = len(tags.related_articles(tag))
-        self.num_categories = len(tags.related_categories(tag))
-
-
-class TagsMenuScreen(Screen):
-    items_container = ObjectProperty()
-
-    def _post_init(self, dt):
-        for tag in tags.all():
-            tags_menu_item = TagsMenuItem(tag=tag)
-            self.items_container.add_widget(tags_menu_item)
-
-    def __init__(self, **kwargs):
-        super(TagsMenuScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._post_init)
-
-
 class TaggedCategoriesMenuItem(Button):
     def __init__(self, icon, name, **kwargs):
         super(TaggedCategoriesMenuItem, self).__init__(**kwargs)
@@ -205,8 +217,8 @@ class TagScreen(Screen):
     def __init__(self, tag_name, **kwargs):
         super(TagScreen, self).__init__(**kwargs)
         self.tag_name = tag_name
-        self.tagged_categories = tags.related_categories(tag_name)
-        self.tagged_articles = tags.related_articles(tag_name)
+        self.tagged_categories = tags.tagged_categories(tag_name)
+        self.tagged_articles = tags.tagged_articles(tag_name)
 
         tag_container = self.ids.container
         if len(self.tagged_categories) > 0:
@@ -601,6 +613,15 @@ class ApplicationRoot(NavigationDrawer):
         super(ApplicationRoot, self).__init__(**kwargs)
         self.sm = self.ids.manager
 
+    def show_tag_screen(self, tag_name):
+        screens_names = [screen.name for screen in self.sm.screens]
+        screen_name = '{{"{0}":{{"tag": "{1}"}}}}'.format(guides.active_guide['name'], tag_name)
+        if screen_name not in screens_names:
+            tag_screen = TagScreen(name=screen_name,
+                                   tag_name=tag_name)
+            self.sm.add_widget(tag_screen)
+        self.sm.current = screen_name
+
     def show_category_screen(self, category_name):
         screens_names = [screen.name for screen in self.sm.screens]
         screen_name = '{{"{0}":{{"category": "{1}"}}}}'.format(guides.active_guide['name'], category_name)
@@ -609,17 +630,6 @@ class ApplicationRoot(NavigationDrawer):
                                              category_name=category_name)
             self.sm.add_widget(category_screen)
         self.sm.current = screen_name
-
-    def show_tag_screen(self, tag_name):
-        screen_manager = self.ids.manager
-        screens_names = [screen.name for screen in screen_manager.screens]
-        screen_name = 'Tag: ' + tag_name
-        if screen_name not in screens_names:
-            tag_screen = TagScreen(name=screen_name,
-                                   tag_name=tag_name)
-            screen_manager.add_widget(tag_screen)
-
-        screen_manager.current = screen_name
 
     def show_article_screen(self, article_name):
         screen_manager = self.ids.manager
