@@ -6,10 +6,10 @@
 #:set categories_menu_item_height dp(120)
 
 <CategoriesMenuItem@Button>:
-    icon: ''
-    name: ''
+    category_icon: ''
+    category_name: ''
     background_normal: ''
-    on_release: app.root.show_category_screen(self.name)
+    on_release: app.root.show_category_screen(self.category_name)
     BoxLayout:
         orientation: 'vertical'
         pos: self.parent.pos
@@ -22,9 +22,9 @@
             padding: '8dp'
             Image:
                 source:
-                    join_path(guides.active_guide_path, 'icons', 'categories', root.icon) if root.icon else None
+                    join_path(guides.active_guide_path, 'icons', 'categories', root.category_icon) if root.category_icon else None
         Label:
-            text: root.name
+            text: root.category_name
             color: .2, .2, .2, 1
             font_size: '14dp'
             size_hint_y: .4

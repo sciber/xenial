@@ -116,7 +116,7 @@ class CategoryModel:
         return categories_list
 
     def by_name(self, category_name):
-        """Return the active guide category data retrieved by its id"""
+        """Return the active guide category data retrieved by its name"""
         categories_list = self.all()
         if len(categories_list) == 0:
             return None
@@ -128,7 +128,7 @@ class CategoryModel:
         category = self.by_name(category_name)
         shared_tags_categories = []
         for tested_category in self.all():
-            if tested_category['id'] == category_name:
+            if tested_category['name'] == category_name:
                 continue
             num_shared_tags = len(set(category['tags']) & set(tested_category['tags']))
             if num_shared_tags > 0:
@@ -162,11 +162,11 @@ class ArticleModel:
         return articles_list
 
     def by_name(self, article_name):
-        """Return the active guide article data retrieved by its id"""
+        """Return the active guide article data retrieved by its name"""
         articles_list = self.all()
         if len(articles_list) == 0:
             return None
-        article = next(list_item for list_item in articles_list if list_item['id'] == article_name)
+        article = next(list_item for list_item in articles_list if list_item['name'] == article_name)
         article_content_filename = os.path.join(guides.active_guide_path, 'content', f'{article_name}.json')
         with open(article_content_filename, 'r') as article_content_file:
             article_content = json.load(article_content_file)
@@ -188,7 +188,7 @@ class ArticleModel:
         article = self.by_name(article_name)
         shared_tags_articles = []
         for tested_article in self.all():
-            if tested_article['id'] == article_name:
+            if tested_article['name'] == article_name:
                 continue
             num_shared_tags = len(set(article['tags']) & set(tested_article['tags']))
             if num_shared_tags > 0:
