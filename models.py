@@ -115,20 +115,20 @@ class CategoryModel:
             categories_list = json.load(categories_list_file)
         return categories_list
 
-    def by_id(self, category_id):
+    def by_name(self, category_name):
         """Return the active guide category data retrieved by its id"""
         categories_list = self.all()
         if len(categories_list) == 0:
             return None
-        category = next(list_item for list_item in categories_list if list_item['id'] == category_id)
+        category = next(list_item for list_item in categories_list if list_item['name'] == category_name)
         return category
 
-    def related_categories(self, category_id):
+    def related_categories(self, category_name):
         """Return a list of the active guide categories related to the active guide category"""
-        category = self.by_id(category_id)
+        category = self.by_name(category_name)
         shared_tags_categories = []
         for tested_category in self.all():
-            if tested_category['id'] == category_id:
+            if tested_category['id'] == category_name:
                 continue
             num_shared_tags = len(set(category['tags']) & set(tested_category['tags']))
             if num_shared_tags > 0:
@@ -136,9 +136,9 @@ class CategoryModel:
         related_categories = [tags_category[2] for tags_category in sorted(shared_tags_categories)]
         return related_categories
 
-    def related_articles(self, category_id):
+    def related_articles(self, category_name):
         """Return a list of the active guide articles related to the active guide category"""
-        category = self.by_id(category_id)
+        category = self.by_name(category_name)
         related_articles = []
         for tested_article in articles.all():
             if set(tested_article['tags']) > set(category['tags']):
@@ -161,21 +161,21 @@ class ArticleModel:
             articles_list = json.load(articles_list_file)
         return articles_list
 
-    def by_id(self, article_id):
+    def by_name(self, article_name):
         """Return the active guide article data retrieved by its id"""
         articles_list = self.all()
         if len(articles_list) == 0:
             return None
-        article = next(list_item for list_item in articles_list if list_item['id'] == article_id)
-        article_content_filename = os.path.join(guides.active_guide_path, 'content', f'{article_id}.json')
+        article = next(list_item for list_item in articles_list if list_item['id'] == article_name)
+        article_content_filename = os.path.join(guides.active_guide_path, 'content', f'{article_name}.json')
         with open(article_content_filename, 'r') as article_content_file:
             article_content = json.load(article_content_file)
         article['content'] = article_content
         return article
 
-    def related_categories(self, article_id):
+    def related_categories(self, article_name):
         """Return a list of the active guide categories related to the active guide article"""
-        article = self.by_id(article_id)
+        article = self.by_name(article_name)
         related_categories = []
         for tested_category in categories.all():
             if set(tested_category['tags']) < set(article['tags']):
@@ -183,12 +183,12 @@ class ArticleModel:
         related_categories.sort(key=lambda c: c['name'])
         return related_categories
 
-    def related_articles(self, article_id):
+    def related_articles(self, article_name):
         """Return a list of the active guide articles related to the active guide article"""
-        article = self.by_id(article_id)
+        article = self.by_name(article_name)
         shared_tags_articles = []
         for tested_article in self.all():
-            if tested_article['id'] == article_id:
+            if tested_article['id'] == article_name:
                 continue
             num_shared_tags = len(set(article['tags']) & set(tested_article['tags']))
             if num_shared_tags > 0:
@@ -211,24 +211,24 @@ class BookmarkModel:
             bookmarks_list = json.load(bookmark_file)
         return bookmarks_list
 
-    def is_article_bookmarked(self, article_id):
+    def is_article_bookmarked(self, article_name):
         """Return whether is the active guide article bookmarked"""
-        return reduce(lambda x, y: x or (y['article_id'] == article_id), self.all(), False)
+        return reduce(lambda x, y: x or (y['article_name'] == article_name), self.all(), False)
 
-    def add(self, article_id):
+    def add(self, article_name):
         """Add the active guide article to the active guide bookmarks"""
         bookmarks_list = self.all()
-        new_bookmark = {'article_id': article_id, 'created_at': str(datetime.now())}
+        new_bookmark = {'article_name': article_name, 'created_at': str(datetime.now())}
         bookmarks_list.append(new_bookmark)
         bookmark_filename = os.path.join(guides.active_guide_path, 'bookmarks.json')
         with open(bookmark_filename, 'w') as bookmark_file:
             json.dump(bookmarks_list, bookmark_file, indent=4)
 
-    def remove(self, article_id):
+    def remove(self, article_name):
         """Remove the active guide article from the active guide bookmarks"""
         bookmarks_list = self.all()
         for bookmark_idx, bookmark in enumerate(bookmarks_list):
-            if bookmark['article_id'] == article_id:
+            if bookmark['article_name'] == article_name:
                 del bookmarks_list[bookmark_idx]
         bookmark_filename = os.path.join(guides.active_guide_path, 'bookmarks.json')
         with open(bookmark_filename, 'w') as bookmark_file:
