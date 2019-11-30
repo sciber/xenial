@@ -6,7 +6,7 @@ from kivy.config import Config
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.clock import Clock
-from kivy.properties import ObjectProperty, NumericProperty
+from kivy.properties import ListProperty, ObjectProperty, NumericProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.label import Label
 from kivy.uix.button import Button
@@ -33,45 +33,50 @@ Builder.load_file('search.kv')
 
 # Views components
 Builder.load_file('views/components/categories_menu.kv')
+Builder.load_file('views/components/articles_menu.kv')
 
 # Screens views
+Builder.load_file('views/screens/guides_screen.kv')
 Builder.load_file('views/screens/tags_screen.kv')
 Builder.load_file('views/screens/categories_screen.kv')
+Builder.load_file('views/screens/articles_screen.kv')
 
 Builder.load_file('category.kv')
 Builder.load_file('tag.kv')
-Builder.load_file('articles.kv')
 Builder.load_file('article.kv')
 Builder.load_file('bookmarks.kv')
 Builder.load_file('settings.kv')
-Builder.load_file('guides.kv')
 Builder.load_file('guide.kv')
-Builder.load_file('filechooser.kv')
 
 kivy.require('1.11.1')
 
 
-# class TagsMenuItem(Button):
-#     def __init__(self, tag, **kwargs):
-#         super(TagsMenuItem, self).__init__(**kwargs)
-#         self.tag_name = tag
-#         self.num_tagged_articles = len(tags.related_articles(tag))
-#         self.num_tagged_categories = len(tags.related_categories(tag))
+class GuidesScreen(Screen):
+    guides_menu_items = ListProperty()
+
+    def __init__(self, **kwargs):
+        super(GuidesScreen, self).__init__(**kwargs)
+        self.update_guides_menu_items()
+
+    def update_guides_menu_items(self):
+        item_keys = ('icon', 'name', 'title', 'lang', 'from_place', 'to_place', 'is_active')
+        self.guides_menu_items = [
+            {('guide_' + key): item[key] for key in item_keys} for item in guides.all()
+        ]
 
 
 class TagsScreen(Screen):
     from_guide_name = ''
-    tags_screen_menu_items = []
+    tags_screen_menu_items = ListProperty()
 
     def __init__(self, **kwargs):
         super(TagsScreen, self).__init__(**kwargs)
-        self.set_tags_screen_menu_items()
+        self.update_tags_screen_menu_items()
 
-    def set_tags_screen_menu_items(self):
+    def update_tags_screen_menu_items(self):
         if guides.active_guide is None or self.from_guide_name == guides.active_guide['name']:
             return
         self.from_guide_name = guides.active_guide['name']
-        print(tags.all())
         self.tags_screen_menu_items = [{
             'tag_name': tag_name,
             'num_tagged_categories': len(tags.tagged_categories(tag_name)),
@@ -81,13 +86,13 @@ class TagsScreen(Screen):
 
 class CategoriesScreen(Screen):
     from_guide_name = ''
-    categories_menu_items = []
+    categories_menu_items = ListProperty()
 
     def __init__(self, **kwargs):
         super(CategoriesScreen, self).__init__(**kwargs)
-        self.set_categories_menu_items()
+        self.update_categories_menu_items()
 
-    def set_categories_menu_items(self):
+    def update_categories_menu_items(self):
         if guides.active_guide is None or self.from_guide_name == guides.active_guide['name']:
             return
         self.from_guide_name = guides.active_guide['name']
@@ -96,6 +101,56 @@ class CategoriesScreen(Screen):
             {('category_' + key): item[key] for key in item_keys} for item in categories.all()
         ]
 
+
+class ArticlesScreen(Screen):
+    from_guide_name = ''
+    articles_menu_items = ListProperty()
+
+    def __init__(self, **kwargs):
+        super(ArticlesScreen, self).__init__(**kwargs)
+        self.update_articles_menu_items()
+
+    def update_articles_menu_items(self):
+        if guides.active_guide is None or self.from_guide_name == guides.active_guide['name']:
+            return
+        self.from_guide_name = guides.active_guide['name']
+        item_keys = ('icon', 'name', 'title', 'synopsis')
+        self.articles_menu_items = [
+            {('article_' + key): item[key] for key in item_keys} for item in articles.all()
+        ]
+
+
+# class BookmarksMenuItem(BoxLayout):
+#     def __init__(self, bookmark, **kwargs):
+#         super(BookmarksMenuItem, self).__init__(**kwargs)
+#         article = articles.by_name(bookmark['article_name'])
+#         self.article_name = article['name']
+#         self.icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
+#         self.title = article['title']
+#         self.synopsis = article['synopsis']
+#         self.bookmark = bookmark
+
+
+class BookmarksScreen(Screen):
+    from_guide_name = ''
+    bookmarks_menu_items = ListProperty()
+
+    def __init__(self, **kwargs):
+        super(BookmarksScreen, self).__init__(**kwargs)
+        self.update_bookmarks_menu_items()
+
+    def update_bookmarks_menu_items(self):
+        if guides.active_guide is None:
+            return
+        self.from_guide_name = guides.active_guide['name']
+        bookmarked_articles_names = [bookmark['article_name'] for bookmark in bookmarks.all()]
+        bookmarked_articles = [article for article in articles.all() if article['name'] in bookmarked_articles_names]
+        item_keys = ('name', 'icon', 'synopsis')
+        self.bookmarks_menu_items = [
+            {('article_' + key): item[key] for key in item_keys} for item in bookmarked_articles
+        ]
+
+#################################################################################
 
 class CategoryAssignedTag(Button):
     pass
@@ -227,28 +282,6 @@ class TagScreen(Screen):
         if len(self.tagged_articles) > 0:
             tagged_articles_menu = TaggedArticlesMenu(articles=self.tagged_articles)
             tag_container.add_widget(tagged_articles_menu)
-
-
-class ArticlesMenuItem(Button):
-    def __init__(self, article, **kwargs):
-        super(ArticlesMenuItem, self).__init__(**kwargs)
-        self.name = article['name']
-        self.icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
-        self.title = article['title']
-        self.synopsis = article['synopsis']
-
-
-class ArticlesMenuScreen(Screen):
-    items_container = ObjectProperty()
-
-    def _post_init(self, dt):
-        for article in articles.all():
-            articles_menu_item = ArticlesMenuItem(article=article)
-            self.items_container.add_widget(articles_menu_item)
-
-    def __init__(self, **kwargs):
-        super(ArticlesMenuScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._post_init)
 
 
 class ArticleAssignedTag(Button):
@@ -502,61 +535,6 @@ class ArticleScreen(Screen):
         self.is_bookmarked = not self.is_bookmarked
 
 
-class BookmarksMenuItem(BoxLayout):
-    def __init__(self, bookmark, **kwargs):
-        super(BookmarksMenuItem, self).__init__(**kwargs)
-        article = articles.by_name(bookmark['article_name'])
-        self.article_name = article['name']
-        self.icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
-        self.title = article['title']
-        self.synopsis = article['synopsis']
-        self.bookmark = bookmark
-
-    def delete_bookmark(self):
-        bookmarks.remove(self.bookmark['article_name'])
-        self.parent.remove_widget(self)
-
-
-class BookmarksMenuScreen(Screen):
-    items_container = ObjectProperty()
-
-    def _post_init(self, dt):
-        for bookmark in bookmarks.all():
-            bookmarks_menu_item = BookmarksMenuItem(bookmark=bookmark)
-            self.items_container.add_widget(bookmarks_menu_item)
-
-    def __init__(self, **kwargs):
-        super(BookmarksMenuScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._post_init)
-
-
-class GuidesMenuItem(BoxLayout):
-    def __init__(self, name, title, icon, from_place, to_place, **kwargs):
-        super(GuidesMenuItem, self).__init__(**kwargs)
-        self.name = name
-        self.title = title
-        self.icon = icon
-        self.from_place = from_place
-        self.to_place = to_place
-
-
-class GuidesMenuScreen(Screen):
-    def _post_init(self, dt):
-        container = self.ids.container
-        for guide in guides.all():
-            icon = os.path.join(guides.GUIDES_DIR, guide['name'], 'icons', 'guide', guide['icon'])
-            guides_menu_item = GuidesMenuItem(name=guide['name'],
-                                              title=guide['title'],
-                                              icon=icon,
-                                              from_place=guide['from_place'],
-                                              to_place=guide['to_place'])
-            container.add_widget(guides_menu_item)
-
-    def __init__(self, **kwargs):
-        super(GuidesMenuScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._post_init)
-
-
 class GuideAssignedTag(Button):
     pass
 
@@ -586,15 +564,6 @@ class GuideScreen(Screen):
         guide_container.add_widget(guide_assigned_tags_list)
 
 
-class FileChooserScreen(Screen):
-    def _post_init(self, dt):
-        self.ids.filechooser.path = guides.GUIDES_DIR
-
-    def __init__(self, **kwargs):
-        super(FileChooserScreen, self).__init__(**kwargs)
-        Clock.schedule_once(self._post_init)
-
-
 class GuideLoadFailedWarning(Popup):
     def __init__(self, message, **kwargs):
         super(GuideLoadFailedWarning, self).__init__(**kwargs)
@@ -612,6 +581,51 @@ class ApplicationRoot(NavigationDrawer):
     def __init__(self, **kwargs):
         super(ApplicationRoot, self).__init__(**kwargs)
         self.sm = self.ids.manager
+
+        self.categories_screen = CategoriesScreen()
+        self.sm.add_widget(self.categories_screen)
+
+        self.guides_screen = GuidesScreen()
+        self.sm.add_widget(self.guides_screen)
+
+        self.tags_screen = TagsScreen()
+        self.sm.add_widget(self.tags_screen)
+
+        self.articles_screen = ArticlesScreen()
+        self.sm.add_widget(self.articles_screen)
+
+        self.bookmarks_screen = BookmarksScreen()
+        self.sm.add_widget(self.bookmarks_screen)
+
+        self.sm.current = 'articles'
+
+    def show_guides_screen(self):
+        self.sm.current = 'guides'
+
+    @staticmethod
+    def change_active_guide(guide_name):
+        guides.activate(guide_name)
+
+    def show_tags_screen(self):
+        self.tags_screen.update_tags_screen_menu_items()
+        self.sm.current = 'tags'
+
+    def show_categories_screen(self):
+        self.categories_screen.update_categories_menu_items()
+        self.sm.current = 'categories'
+
+    def show_articles_screen(self):
+        self.articles_screen.update_articles_menu_items()
+        self.sm.current = 'articles'
+
+    def show_bookmarks_screen(self):
+        self.sm.current = 'bookmarks'
+
+    def show_search_screen(self):
+        self.sm.current = 'search'
+
+    def show_settings_screen(self):
+        self.sm.current = 'settings'
 
     def show_tag_screen(self, tag_name):
         screens_names = [screen.name for screen in self.sm.screens]
@@ -653,10 +667,17 @@ class ApplicationRoot(NavigationDrawer):
 
         screen_manager.current = screen_name
 
-    def load_guide(self, guide_archive_paths):
-        try:
-            guides.load(guide_archive_paths[0])
-        except:
+    def bookmark_article(self, article_name):
+        if not bookmarks.is_article_bookmarked(article_name):
+            bookmarks.add(article_name)
+            self.bookmarks_screen.update_bookmarks_menu_items()
+
+    def unbookmark_article(self, article_name):
+        pass
+
+    @staticmethod
+    def load_guide(guide_archive_paths):
+        if not guides.load(guide_archive_paths[0]):
             guide_archive_name = os.path.basename(guide_archive_paths[0])
             GuideLoadFailedWarning('"[b]{}[/b]"\n guide load failed!'.format(guide_archive_name)).open()
 

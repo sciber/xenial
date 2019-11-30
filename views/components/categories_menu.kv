@@ -1,9 +1,10 @@
 #:kivy 1.11.1
+
 #:import join_path os.path.join
 #:import guides models.guides
 
 #:set categories_menu_item_width dp(120)
-#:set categories_menu_item_height dp(120)
+#:set categories_menu_item_height dp(140)
 
 <CategoriesMenuItem@Button>:
     category_icon: ''
@@ -26,7 +27,7 @@
         Label:
             text: root.category_name
             color: .2, .2, .2, 1
-            font_size: '14dp'
+            font_size: '16dp'
             size_hint_y: .4
             text_size: self.size[0] - dp(8), self.size[1]
             padding: '4dp', 0

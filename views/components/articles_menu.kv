@@ -1,0 +1,62 @@
+#: kivy 1.11.1
+
+#:import join_path os.path.join
+#:import guides models.guides
+
+<ArticlesMenuItem@Button>:
+    article_icon: ''
+    article_name: ''
+    article_title: ''
+    article_synopsis: ''
+    background_normal: ''
+    on_release: app.root.show_article_screen(self.article_name)
+    BoxLayout:
+        orientation: 'horizontal'
+        pos: self.parent.pos
+        size_hint: None, None
+        size: self.parent.size
+        AnchorLayout:
+            anchor_x: 'center'
+            anchor_y: 'center'
+            size_hint_x: None
+            width: '80dp'
+            padding: '8dp', 0
+            Image:
+                source:
+                    join_path(
+                    guides.active_guide_path,
+                    'icons',
+                    'articles',
+                    root.article_icon) if root.article_icon else None
+        BoxLayout:
+            orientation: 'vertical'
+            padding: '8dp', 0
+            Label:
+                text: root.article_title
+                color: .2, .2, .2, 1
+                font_size: '16dp'
+                size_hint_y: .4
+                text_size: self.size
+                halign: 'left'
+                valign: 'top'
+            Label:
+                text: root.article_synopsis
+                color: .4, .4, .4, 1
+                font_size: '14dp'
+                size_hint_y: .6
+                text_size: self.size
+                halign: 'left'
+                valign: 'top'
+
+
+<ArticlesMenu@RecycleView>:
+    viewclass: 'ArticlesMenuItem'
+    RecycleBoxLayout:
+        orientation: 'vertical'
+        default_size: None, dp(100)
+        default_size_hint: 1, None
+        size_hint_y: None
+        height: self.minimum_height
+        spacing: '4dp'
+
+

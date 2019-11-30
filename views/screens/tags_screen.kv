@@ -94,14 +94,13 @@
                 size: self.size
         TitleBar:
             title: 'Tags'
-        ScrollView:
-            RecycleView:
-                data: root.tags_screen_menu_items
-                viewclass: 'TagsMenuItem'
-                RecycleBoxLayout:
-                    orientation: 'vertical'
-                    default_size: None, dp(60)
-                    default_size_hint: 1, None
-                    size_hint_y: None
-                    height: self.minimum_height
-                    spacing: '4dp'
+        RecycleView:
+            data: root.tags_screen_menu_items
+            viewclass: 'TagsMenuItem'
+            RecycleBoxLayout:
+                orientation: 'vertical'
+                default_size: None, dp(60)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '4dp'

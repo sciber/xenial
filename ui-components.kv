@@ -82,45 +82,45 @@
             image: 'assets/img/search.png'
             disabled: not app.is_active_guide
             on_release:
-                app.root.ids.manager.current = 'search'
+                app.root.show_search_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Categories'
             image: 'assets/img/category.png'
             disabled: not app.is_active_guide
             on_release:
-                app.root.ids.manager.current = 'categories'
+                app.root.show_categories_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Tags'
             image: 'assets/img/tag.png'
             disabled:  not app.is_active_guide
             on_release:
-                app.root.ids.manager.current = 'tags'
+                app.root.show_tags_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Articles'
             image: 'assets/img/article.png'
             disabled: not app.is_active_guide
             on_release:
-                app.root.ids.manager.current = 'articles'
+                app.root.show_articles_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Bookmarks'
             image: 'assets/img/bookmark.png'
             disabled: not app.is_active_guide
             on_release:
-                app.root.ids.manager.current = 'bookmarks'
+                app.root.show_bookmarks_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Guides'
             image: 'assets/img/guide.png'
             on_release:
-                app.root.ids.manager.current = 'guides'
+                app.root.show_guides_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Settings'
             image: 'assets/img/settings.png'
             on_release:
-                app.root.ids.manager.current = 'settings'
+                app.root.show_settings_screen()
                 app.root.toggle_state()

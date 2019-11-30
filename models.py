@@ -41,19 +41,34 @@ class GuideModel:
 
     def load(self, guide_archive_path):
         """Load a guide from a corresponding archive"""
+        guides_json = os.path.join(self.GUIDES_DIR, 'guides.json')
+        guides_json_backup = os.path.join(self.GUIDES_DIR, 'guides.backup')
+        shutil.copyfile(guides_json, guides_json_backup)
         guide_name = os.path.basename(guide_archive_path).split('.')[0]
-        guide_path = os.path.join(self.GUIDES_DIR, guide_name)
-        if os.path.exists(guide_path):
-            self.unload(guide_name)
-        os.mkdir(guide_path)
-        with tarfile.open(guide_archive_path, 'r:gz') as tar:
-            tar.extractall(guide_path)
-        with open(os.path.join(guide_path, 'guide.json'), 'r') as guide_file:
-            guide = json.load(guide_file)
-        guide['is_active'] = len(self.guides_list) == 0
-        self.guides_list.append(guide)
-        with open(os.path.join(self.GUIDES_DIR, 'guides.json'), 'w') as guides_list_file:
-            json.dump(self.guides_list, guides_list_file, indent=4)
+        guide_dir = os.path.join(self.GUIDES_DIR, guide_name)
+        try:
+            if os.path.exists(guide_dir):
+                self.unload(guide_name)
+            os.mkdir(guide_dir)
+            with tarfile.open(guide_archive_path, 'r:gz') as tar:
+                tar.extractall(guide_dir)
+            with open(os.path.join(guide_dir, 'guide.json'), 'r') as guide_file:
+                guide = json.load(guide_file)
+            guide['is_active'] = len(self.guides_list) == 0
+            self.guides_list.append(guide)
+            with open(guides_json, 'w') as guides_list_file:
+                json.dump(self.guides_list, guides_list_file, indent=4)
+        except:
+            if os.path.exists(guide_dir):
+                shutil.rmtree(guide_dir)
+            os.remove(guides_json)
+            shutil.copyfile(guides_json_backup, guides_json)
+            result = False
+        else:
+            result = True
+        finally:
+            os.remove(guides_json_backup)
+        return result
 
     def unload(self, guide_name):
         """Remove the guide and all its content"""
