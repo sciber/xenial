@@ -31,6 +31,7 @@
         BoxLayout:
             orientation: 'vertical'
             padding: '8dp', 0
+            spacing: '4dp'
             Label:
                 text: root.article_title
                 color: .2, .2, .2, 1
@@ -38,9 +39,10 @@
                 size_hint_y: .4
                 text_size: self.size
                 halign: 'left'
-                valign: 'top'
+                valign: 'bottom'
             Label:
                 text: root.article_synopsis
+                markup: True
                 color: .4, .4, .4, 1
                 font_size: '14dp'
                 size_hint_y: .6

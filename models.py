@@ -230,6 +230,11 @@ class BookmarkModel:
         """Return whether is the active guide article bookmarked"""
         return reduce(lambda x, y: x or (y['article_name'] == article_name), self.all(), False)
 
+    def bookmarked_articles(self):
+        """Return a list of all bookmarked articles in the active guided"""
+        bookmarked_articles_names = [bookmark['article_name'] for bookmark in self.all()]
+        return (article for article in articles.all() if article['name'] in bookmarked_articles_names)
+
     def add(self, article_name):
         """Add the active guide article to the active guide bookmarks"""
         bookmarks_list = self.all()

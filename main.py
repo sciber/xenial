@@ -40,11 +40,11 @@ Builder.load_file('views/screens/guides_screen.kv')
 Builder.load_file('views/screens/tags_screen.kv')
 Builder.load_file('views/screens/categories_screen.kv')
 Builder.load_file('views/screens/articles_screen.kv')
+Builder.load_file('views/screens/bookmarks_screen.kv')
 
 Builder.load_file('category.kv')
 Builder.load_file('tag.kv')
 Builder.load_file('article.kv')
-Builder.load_file('bookmarks.kv')
 Builder.load_file('settings.kv')
 Builder.load_file('guide.kv')
 
@@ -74,8 +74,6 @@ class TagsScreen(Screen):
         self.update_tags_screen_menu_items()
 
     def update_tags_screen_menu_items(self):
-        if guides.active_guide is None or self.from_guide_name == guides.active_guide['name']:
-            return
         self.from_guide_name = guides.active_guide['name']
         self.tags_screen_menu_items = [{
             'tag_name': tag_name,
@@ -93,8 +91,6 @@ class CategoriesScreen(Screen):
         self.update_categories_menu_items()
 
     def update_categories_menu_items(self):
-        if guides.active_guide is None or self.from_guide_name == guides.active_guide['name']:
-            return
         self.from_guide_name = guides.active_guide['name']
         item_keys = ('icon', 'name')
         self.categories_menu_items = [
@@ -111,8 +107,6 @@ class ArticlesScreen(Screen):
         self.update_articles_menu_items()
 
     def update_articles_menu_items(self):
-        if guides.active_guide is None or self.from_guide_name == guides.active_guide['name']:
-            return
         self.from_guide_name = guides.active_guide['name']
         item_keys = ('icon', 'name', 'title', 'synopsis')
         self.articles_menu_items = [
@@ -120,34 +114,20 @@ class ArticlesScreen(Screen):
         ]
 
 
-# class BookmarksMenuItem(BoxLayout):
-#     def __init__(self, bookmark, **kwargs):
-#         super(BookmarksMenuItem, self).__init__(**kwargs)
-#         article = articles.by_name(bookmark['article_name'])
-#         self.article_name = article['name']
-#         self.icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
-#         self.title = article['title']
-#         self.synopsis = article['synopsis']
-#         self.bookmark = bookmark
-
-
 class BookmarksScreen(Screen):
     from_guide_name = ''
     bookmarks_menu_items = ListProperty()
+    is_model_modified = False
 
     def __init__(self, **kwargs):
         super(BookmarksScreen, self).__init__(**kwargs)
         self.update_bookmarks_menu_items()
 
     def update_bookmarks_menu_items(self):
-        if guides.active_guide is None:
-            return
         self.from_guide_name = guides.active_guide['name']
-        bookmarked_articles_names = [bookmark['article_name'] for bookmark in bookmarks.all()]
-        bookmarked_articles = [article for article in articles.all() if article['name'] in bookmarked_articles_names]
-        item_keys = ('name', 'icon', 'synopsis')
+        item_keys = ('icon', 'name', 'title', 'synopsis')
         self.bookmarks_menu_items = [
-            {('article_' + key): item[key] for key in item_keys} for item in bookmarked_articles
+            {('article_' + key): item[key] for key in item_keys} for item in bookmarks.bookmarked_articles()
         ]
 
 #################################################################################
@@ -597,7 +577,7 @@ class ApplicationRoot(NavigationDrawer):
         self.bookmarks_screen = BookmarksScreen()
         self.sm.add_widget(self.bookmarks_screen)
 
-        self.sm.current = 'articles'
+        self.sm.current = 'categories'
 
     def show_guides_screen(self):
         self.sm.current = 'guides'
@@ -607,19 +587,32 @@ class ApplicationRoot(NavigationDrawer):
         guides.activate(guide_name)
 
     def show_tags_screen(self):
-        self.tags_screen.update_tags_screen_menu_items()
+        if guides.active_guide and self.tags_screen.from_guide_name != guides.active_guide['name']:
+            self.tags_screen.update_tags_screen_menu_items()
         self.sm.current = 'tags'
 
     def show_categories_screen(self):
-        self.categories_screen.update_categories_menu_items()
+        if guides.active_guide and self.categories_screen.from_guide_name != guides.active_guide['name']:
+            self.categories_screen.update_categories_menu_items()
         self.sm.current = 'categories'
 
     def show_articles_screen(self):
-        self.articles_screen.update_articles_menu_items()
+        if guides.active_guide and self.articles_screen.from_guide_name != guides.active_guide['name']:
+            self.articles_screen.update_articles_menu_items()
         self.sm.current = 'articles'
 
     def show_bookmarks_screen(self):
+        if guides.active_guide and self.bookmarks_screen.from_guide_name != guides.active_guide['name']:
+            self.bookmarks_screen.update_bookmarks_menu_items()
         self.sm.current = 'bookmarks'
+
+    def add_bookmark(self, article_name):
+        bookmarks.add(article_name)
+        self.bookmarks_screen.update_bookmarks_menu_items()
+
+    def remove_bookmark(self, article_name):
+        bookmarks.remove(article_name)
+        self.bookmarks_screen.update_bookmarks_menu_items()
 
     def show_search_screen(self):
         self.sm.current = 'search'
@@ -675,9 +668,10 @@ class ApplicationRoot(NavigationDrawer):
     def unbookmark_article(self, article_name):
         pass
 
-    @staticmethod
-    def load_guide(guide_archive_paths):
-        if not guides.load(guide_archive_paths[0]):
+    def load_guide(self, guide_archive_paths):
+        if guides.load(guide_archive_paths[0]):
+            self.guides_screen.update_guides_menu_items()
+        else:
             guide_archive_name = os.path.basename(guide_archive_paths[0])
             GuideLoadFailedWarning('"[b]{}[/b]"\n guide load failed!'.format(guide_archive_name)).open()
 

@@ -1,13 +1,11 @@
 #:kivy 1.11.1
 
-<BookmarksMenuItem>:
-    article_name: None
-    icon: None
-    title: ''
-    synopsis: ''
+<BookmarksMenuItem@BoxLayout>:
+    article_icon: ''
+    article_name: ''
+    article_title: ''
+    article_synopsis: ''
     orientation: 'horizontal'
-    size_hint_y: None
-    height: '80dp'
     Button:
         background_normal: ''
         on_release: app.root.show_article_screen(root.article_name)
@@ -20,23 +18,31 @@
                 anchor_x: 'center'
                 anchor_y: 'center'
                 size_hint_x: None
-                width: self.height
+                width: '80dp'
+                padding: '8dp', 0
                 Image:
-                    source: root.icon
+                    source:
+                        join_path(
+                        guides.active_guide_path,
+                        'icons',
+                        'articles',
+                        root.article_icon) if root.article_icon else None
                     size_hint: None, None
                     size: '60dp', '60dp'
             BoxLayout:
                 orientation: 'vertical'
+                padding: '8dp', 0
+                spacing: '4dp'
                 Label:
-                    text: root.title
+                    text: root.article_title
                     color: .2, .2, .2, 1
                     font_size: '16dp'
                     size_hint_y: .4
                     text_size: self.size
                     halign: 'left'
-                    valign: 'middle'
+                    valign: 'bottom'
                 Label:
-                    text: root.synopsis
+                    text: root.article_synopsis
                     markup: True
                     color: .4, .4, .4, 1
                     font_size: '14dp'
@@ -46,19 +52,23 @@
                     valign: 'top'
     Button:
         size_hint_x: None
-        width: self.height
+        width: '60dp'
         background_normal: ''
-        on_release: root.delete_bookmark()
+        on_release:
+            app.root.remove_bookmark(root.article_name)
         AnchorLayout:
+            id: anchor_layout
             anchor_x: 'center'
             anchor_y: 'center'
             pos: self.parent.pos
             size: self.parent.size
             Image:
                 source: 'assets/img/delete.png'
-                size_hint: .5, .5
+                size_hint: None, None
+                size: '50dp', '50dp'
 
-<BookmarksMenuScreen>:
+<BookmarksScreen>:
+    name: 'bookmarks'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -71,8 +81,13 @@
         TitleBar:
             title: 'Bookmarks'
         ScrollView:
-            BoxLayout:
-                id: container
-                orientation: 'vertical'
-                size_hint_y: None
-                height: self.minimum_height
+            RecycleView:
+                data: root.bookmarks_menu_items
+                viewclass: 'BookmarksMenuItem'
+                RecycleBoxLayout:
+                    orientation: 'vertical'
+                    default_size: None, dp(120)
+                    default_size_hint: 1, None
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: '4dp'
