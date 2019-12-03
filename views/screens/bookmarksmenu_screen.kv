@@ -78,16 +78,16 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
-        TitleBar:
+        ScreenTitleBar:
             title: 'Bookmarks'
-        ScrollView:
-            RecycleView:
-                data: root.bookmarks_menu_items
-                viewclass: 'BookmarksMenuItem'
-                RecycleBoxLayout:
-                    orientation: 'vertical'
-                    default_size: None, dp(120)
-                    default_size_hint: 1, None
-                    size_hint_y: None
-                    height: self.minimum_height
-                    spacing: '4dp'
+        RecycleView:
+            id: recycleview
+            data: root.bookmarks_menu_items
+            viewclass: 'BookmarksMenuItem'
+            RecycleBoxLayout:
+                orientation: 'vertical'
+                default_size: None, dp(120)
+                default_size_hint: 1, None
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '4dp'

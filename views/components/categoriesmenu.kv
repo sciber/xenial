@@ -3,18 +3,19 @@
 #:import join_path os.path.join
 #:import guides models.guides
 
-#:set categories_menu_item_width dp(120)
-#:set categories_menu_item_height dp(140)
+#:set categoriesmenu_item_width dp(120)
+#:set categoriesmenu_item_height dp(140)
 
-<CategoriesMenuItem@Button>:
+<CategoriesMenuItem>:
     category_icon: ''
     category_name: ''
+    size_hint: None, None
+    size: categoriesmenu_item_width, categoriesmenu_item_height
     background_normal: ''
     on_release: app.root.show_category_screen(self.category_name)
     BoxLayout:
         orientation: 'vertical'
         pos: self.parent.pos
-        size_hint: None, None
         size: self.parent.size
         AnchorLayout:
             anchor_x: 'center'
@@ -34,11 +35,6 @@
             halign: 'center'
             valign: 'top'
 
-<CategoriesMenu@RecycleView>:
-    viewclass: 'CategoriesMenuItem'
-    RecycleGridLayout:
-        cols: int(root.width // categories_menu_item_width) or 1
-        default_size: categories_menu_item_width, categories_menu_item_height
-        default_size_hint: None, None
-        size_hint: 1, None
-        height: self.minimum_height
+<CategoriesMenu>:
+    cols: int(self.width // categoriesmenu_item_width) or 1
+    spacing: '4dp'

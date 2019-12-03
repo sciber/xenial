@@ -1,6 +1,7 @@
 #:kivy 1.11.1
 
-<SearchScreen@Screen>:
+<SearchScreen>:
+    name: 'search'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -10,7 +11,7 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
-        TitleBar:
+        ScreenTitleBar:
             title: 'Search'
         ScrollView:
             BoxLayout:

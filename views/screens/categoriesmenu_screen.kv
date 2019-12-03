@@ -1,6 +1,6 @@
 #:kivy 1.11.1
 
-<CategoriesScreen>:
+<CategoriesMenuScreen>:
     name: 'categories'
     BoxLayout:
         orientation: 'vertical'
@@ -11,14 +11,14 @@
             Rectangle:
                 size: self.size
                 pos: self.pos
-        TitleBar:
+        ScreenTitleBar:
             title: 'Categories'
         AnchorLayout:
             anchor_x: 'center'
             anchor_y: 'top'
             size: self.parent.size
             pos: self.parent.pos
-            CategoriesMenu:
+            ScrollView:
+                id: categoriesmenu_container
                 size_hint_x: None
-                width: int(root.width // categories_menu_item_width * categories_menu_item_width)
-                data: root.categories_menu_items
+                width: int(root.width // categoriesmenu_item_width * categoriesmenu_item_width)

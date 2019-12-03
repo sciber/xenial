@@ -3,11 +3,13 @@
 #:import join_path os.path.join
 #:import guides models.guides
 
-<ArticlesMenuItem@Button>:
+<ArticlesMenuItem>:
     article_icon: ''
     article_name: ''
     article_title: ''
     article_synopsis: ''
+    size_hint_y: None
+    height: '100dp'
     background_normal: ''
     on_release: app.root.show_article_screen(self.article_name)
     BoxLayout:
@@ -39,7 +41,7 @@
                 size_hint_y: .4
                 text_size: self.size
                 halign: 'left'
-                valign: 'bottom'
+                valign: 'middle'
             Label:
                 text: root.article_synopsis
                 markup: True
@@ -48,17 +50,10 @@
                 size_hint_y: .6
                 text_size: self.size
                 halign: 'left'
-                valign: 'top'
+                valign: 'middle'
 
-
-<ArticlesMenu@RecycleView>:
-    viewclass: 'ArticlesMenuItem'
-    RecycleBoxLayout:
-        orientation: 'vertical'
-        default_size: None, dp(100)
-        default_size_hint: 1, None
-        size_hint_y: None
-        height: self.minimum_height
-        spacing: '4dp'
-
-
+<ArticlesMenu>:
+    orientation: 'vertical'
+    size_hint_y: None
+    height: self.minimum_height
+    spacing: '4dp'

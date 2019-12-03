@@ -1,4 +1,5 @@
 #:kivy 1.11.1
+
 #:import Factory kivy.factory.Factory
 
 <UnloadGuideWarningPopup>:
@@ -14,10 +15,10 @@
         orientation: 'vertical'
         Label:
             text: 'Delete guide\n"[b]{}[/b]"?'.format(root.guide_title)
+            markup: True
             text_size: self.size
             valign: 'middle'
             halign: 'center'
-            markup: True
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
@@ -31,29 +32,15 @@
                     root.dismiss()
                     app.root.unload_guide(root.guide_name)
 
-<GuideAssignedTag>:
-    text: ''
-    size_hint: None, None
-    size: self.texture_size
-    padding: '8dp', '4dp'
-    background_normal: ''
-    color: 1, 1, 1, 1
-    background_color: 0, .7, .7, 1
-    on_release: app.root.show_tag_screen(self.text)
-
-<GuideAssignedTagsList>:
-    size_hint_y: None
-    height: self.minimum_height
-    spacing: '2dp'
-
 <GuideScreen>:
     guide_name: ''
-    guide_icon: None
+    guide_icon: ''
     guide_title: ''
     guide_description: ''
-    guide_lang: None
+    guide_lang: ('', '')
     guide_from_place: ''
     guide_to_place: ''
+    guide_tags: []
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -64,14 +51,14 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
-        TitleBar:
+        ScreenTitleBar:
             title: 'Guide'
         ScrollView:
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                spacing: '8dp'
+                spacing: '16dp'
                 padding: '4dp'
                 BoxLayout:
                     orientation: 'horizontal'
@@ -92,46 +79,57 @@
                         text_size: self.size
                         valign: 'middle'
                         color: .2, .2, .2, 1
-                BoxLayout:
-                    orientation: 'horizontal'
+                Label:
+                    text: 'Language: [b]{}[/b]'.format(root.guide_lang[0])
+                    markup: True
+                    text_size: self.size
+                    font_size: '18dp'
+                    halign: 'left'
+                    valign: 'middle'
                     size_hint_y: None
-                    height: '40dp'
-                    Label:
-                        text: 'From: ' + root.guide_from_place
-                        font_size: '20dp'
-                        color: .2, .2, .2, 1
-                    Label:
-                        text: 'To: ' + root.guide_to_place
-                        font_size: '20dp'
-                        color: .2, .2, .2, 1
+                    height: '20dp'
+                    color: .4, .4, .4, 1
+                Label:
+                    text: 'From: [b]{}[/b]'.format(root.guide_from_place)
+                    markup: True
+                    text_size: self.size
+                    font_size: '18dp'
+                    halign: 'left'
+                    valign: 'middle'
+                    size_hint_y: None
+                    height: '20dp'
+                    color: .4, .4, .4, 1
+                Label:
+                    text: 'To: [b]{}[/b]'.format(root.guide_to_place)
+                    markup: True
+                    text_size: self.size
+                    font_size: '18dp'
+                    halign: 'left'
+                    valign: 'middle'
+                    size_hint_y: None
+                    height: '20dp'
+                    color: .4, .4, .4, 1
+                BoxLayout:
+                    id: tagslist_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+#                TagsList:
+#                    tags_list_items: root.guide_tags
                 Label:
                     text: root.guide_description
                     size_hint_y: None
                     text_size: self.width, None
                     height: self.texture_size[1]
                     font_size: '18dp'
-                    color: .4, .4, .4, 1
-                BoxLayout:
-                    id: container
-                    orientation: 'vertical'
-                    size_hint_y: None
-                    height: self.minimum_height
-                AnchorLayout:
-                    anchor_x: 'center'
-                    anchor_y: 'center'
-                    size_hint_y: None
-                    height: '80dp'
-                    padding: '8dp'
-                    Button:
-                        text: 'Delete the guide'
-                        font_size: '18dp'
-                        color: 1, .4, .4, 1
-                        background_normal: ''
-                        on_release:
-                            Factory.UnloadGuideWarningPopup(guide_name=root.guide_name, guide_title=root.guide_title).open()
-                        canvas:
-                            Color:
-                                rgba: 1, .4, .4, 1
-                            Line:
-                                width: 1
-                                rectangle: self.x, self.y, self.width, self.height
+                    color: .2, .2, .2, 1
+        Button:
+            text: 'Delete the guide'
+            font_size: '18dp'
+            color: 0, 0, 0, 1
+            background_normal: ''
+            background_color: .8, .2, .2, 1
+            size_hint_y: None
+            height: '60dp'
+            on_release:
+                Factory.UnloadGuideWarningPopup(guide_name=root.guide_name, guide_title=root.guide_title).open()

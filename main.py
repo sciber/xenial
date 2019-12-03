@@ -6,19 +6,25 @@ from kivy.config import Config
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.clock import Clock
-from kivy.properties import ListProperty, ObjectProperty, NumericProperty
+from kivy.properties import ListProperty, ObjectProperty, NumericProperty, BooleanProperty
 from kivy.uix.screenmanager import Screen
+
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.stacklayout import StackLayout
-from kivy.uix.popup import Popup
 from kivy.core.audio import SoundLoader
 
 from kivy.garden.navigationdrawer import NavigationDrawer
 
 from models import guides, tags, categories, articles, bookmarks
 
+from controllers.guide_controller import GuidesMenuScreen, GuideScreen, GuideLoadFailedWarning
+from controllers.tag_controller import TagsMenuScreen
+from controllers.category_controller import CategoriesMenuScreen
+from controllers.article_controller import ArticlesMenuScreen
+
+kivy.require('1.11.1')
 
 Config.set('kivy', 'default_font',
            '''["Noto Sans", 
@@ -28,90 +34,48 @@ Config.set('kivy', 'default_font',
                "assets/fonts/NotoSans-BoldItalic.ttf"
               ]''')
 
-Builder.load_file('ui-components.kv')
-Builder.load_file('search.kv')
-
 # Views components
-Builder.load_file('views/components/categories_menu.kv')
-Builder.load_file('views/components/articles_menu.kv')
+Builder.load_file('views/components/navigationpanel.kv')
+Builder.load_file('views/components/screentitlebar.kv')
+Builder.load_file('views/components/tagslist.kv')
+Builder.load_file('views/components/articlesmenu.kv')
+Builder.load_file('views/components/categoriesmenu.kv')
 
 # Screens views
-Builder.load_file('views/screens/guides_screen.kv')
-Builder.load_file('views/screens/tags_screen.kv')
-Builder.load_file('views/screens/categories_screen.kv')
-Builder.load_file('views/screens/articles_screen.kv')
-Builder.load_file('views/screens/bookmarks_screen.kv')
+Builder.load_file('views/screens/guidesmenu_screen.kv')
+Builder.load_file('views/screens/guide_screen.kv')
+Builder.load_file('views/screens/tagsmenu_screen.kv')
+Builder.load_file('views/screens/articlesmenu_screen.kv')
+Builder.load_file('views/screens/categoriesmenu_screen.kv')
+Builder.load_file('views/screens/bookmarksmenu_screen.kv')
 
-Builder.load_file('category.kv')
-Builder.load_file('tag.kv')
-Builder.load_file('article.kv')
-Builder.load_file('settings.kv')
-Builder.load_file('guide.kv')
+Builder.load_file('views/screens/tag_screen.kv')
+Builder.load_file('views/screens/category_screen.kv')
+Builder.load_file('views/screens/article_screen.kv')
+Builder.load_file('views/screens/search_screen.kv')
+Builder.load_file('views/screens/settings_screen.kv')
 
-kivy.require('1.11.1')
-
-
-class GuidesScreen(Screen):
-    guides_menu_items = ListProperty()
-
-    def __init__(self, **kwargs):
-        super(GuidesScreen, self).__init__(**kwargs)
-        self.update_guides_menu_items()
-
-    def update_guides_menu_items(self):
-        item_keys = ('icon', 'name', 'title', 'lang', 'from_place', 'to_place', 'is_active')
-        self.guides_menu_items = [
-            {('guide_' + key): item[key] for key in item_keys} for item in guides.all()
-        ]
+# Application root view
+Builder.load_string('''
+<ApplicationRoot>:
+    anim_type: 'slide_above_simple'
+    NavigationPanel:
+        is_active_guide: root.is_active_guide
+    ScreenManager:
+        id: manager
+''')
 
 
-class TagsScreen(Screen):
-    from_guide_name = ''
-    tags_screen_menu_items = ListProperty()
-
-    def __init__(self, **kwargs):
-        super(TagsScreen, self).__init__(**kwargs)
-        self.update_tags_screen_menu_items()
-
-    def update_tags_screen_menu_items(self):
-        self.from_guide_name = guides.active_guide['name']
-        self.tags_screen_menu_items = [{
-            'tag_name': tag_name,
-            'num_tagged_categories': len(tags.tagged_categories(tag_name)),
-            'num_tagged_articles': len(tags.tagged_articles(tag_name))
-        } for tag_name in tags.all()]
-
-
-class CategoriesScreen(Screen):
-    from_guide_name = ''
-    categories_menu_items = ListProperty()
-
-    def __init__(self, **kwargs):
-        super(CategoriesScreen, self).__init__(**kwargs)
-        self.update_categories_menu_items()
-
-    def update_categories_menu_items(self):
-        self.from_guide_name = guides.active_guide['name']
-        item_keys = ('icon', 'name')
-        self.categories_menu_items = [
-            {('category_' + key): item[key] for key in item_keys} for item in categories.all()
-        ]
-
-
-class ArticlesScreen(Screen):
-    from_guide_name = ''
-    articles_menu_items = ListProperty()
-
-    def __init__(self, **kwargs):
-        super(ArticlesScreen, self).__init__(**kwargs)
-        self.update_articles_menu_items()
-
-    def update_articles_menu_items(self):
-        self.from_guide_name = guides.active_guide['name']
-        item_keys = ('icon', 'name', 'title', 'synopsis')
-        self.articles_menu_items = [
-            {('article_' + key): item[key] for key in item_keys} for item in articles.all()
-        ]
+# class ArticlesScreen(Screen):
+#     from_guide_name = ''
+#     articles_menu_items = ListProperty()
+#
+#     def update_articles_menu_items(self):
+#         self.from_guide_name = guides.active_guide_name
+#         item_keys = ('icon', 'name', 'title', 'synopsis')
+#         self.articles_menu_items = [
+#             {('article_' + key): item[key] for key in item_keys} for item in articles.all()
+#         ]
 
 
 class BookmarksScreen(Screen):
@@ -119,16 +83,21 @@ class BookmarksScreen(Screen):
     bookmarks_menu_items = ListProperty()
     is_model_modified = False
 
-    def __init__(self, **kwargs):
-        super(BookmarksScreen, self).__init__(**kwargs)
-        self.update_bookmarks_menu_items()
-
     def update_bookmarks_menu_items(self):
-        self.from_guide_name = guides.active_guide['name']
+        self.from_guide_name = guides.active_guide_name
         item_keys = ('icon', 'name', 'title', 'synopsis')
         self.bookmarks_menu_items = [
             {('article_' + key): item[key] for key in item_keys} for item in bookmarks.bookmarked_articles()
         ]
+
+
+class SearchScreen(Screen):
+    pass
+
+
+class SettingsScreen(Screen):
+    pass
+
 
 #################################################################################
 
@@ -515,95 +484,80 @@ class ArticleScreen(Screen):
         self.is_bookmarked = not self.is_bookmarked
 
 
-class GuideAssignedTag(Button):
-    pass
-
-
-class GuideAssignedTagsList(StackLayout):
-    def __init__(self, tags, **kwargs):
-        super(GuideAssignedTagsList, self).__init__(**kwargs)
-        for tag in tags:
-            tag_button = GuideAssignedTag(text=tag)
-            self.add_widget(tag_button)
-
-
-class GuideScreen(Screen):
-    def __init__(self, guide_name, **kwargs):
-        super(GuideScreen, self).__init__(**kwargs)
-        guide = guides.by_name(guide_name)
-        self.guide_name = guide_name
-        self.guide_icon = os.path.join(guides.GUIDES_DIR, guide['name'], 'icons', 'guide', guide['icon'])
-        self.guide_title = guide['title']
-        self.guide_assigned_tags = guide['tags']
-        self.guide_description = guide['description']
-        self.guide_lang = guide['lang']
-        self.guide_from_place = guide['from_place']
-        self.guide_to_place = guide['to_place']
-        guide_container = self.ids.container
-        guide_assigned_tags_list = GuideAssignedTagsList(tags=guide['tags'])
-        guide_container.add_widget(guide_assigned_tags_list)
-
-
-class GuideLoadFailedWarning(Popup):
-    def __init__(self, message, **kwargs):
-        super(GuideLoadFailedWarning, self).__init__(**kwargs)
-        self.message = message
-
-
-class UnloadGuideWarningPopup(Popup):
-    def __init__(self, guide_name, guide_title, **kwargs):
-        super(UnloadGuideWarningPopup, self).__init__(**kwargs)
-        self.guide_name = guide_name
-        self.guide_title = guide_title
-
-
 class ApplicationRoot(NavigationDrawer):
+    is_active_guide = BooleanProperty()
+
     def __init__(self, **kwargs):
         super(ApplicationRoot, self).__init__(**kwargs)
         self.sm = self.ids.manager
 
-        self.categories_screen = CategoriesScreen()
-        self.sm.add_widget(self.categories_screen)
+        self.categoriesmenu_screen = CategoriesMenuScreen()
+        self.sm.add_widget(self.categoriesmenu_screen)
 
-        self.guides_screen = GuidesScreen()
-        self.sm.add_widget(self.guides_screen)
+        self.guidesmenu_screen = GuidesMenuScreen()
+        self.sm.add_widget(self.guidesmenu_screen)
 
-        self.tags_screen = TagsScreen()
-        self.sm.add_widget(self.tags_screen)
+        self.tagsmenu_screen = TagsMenuScreen()
+        self.sm.add_widget(self.tagsmenu_screen)
 
-        self.articles_screen = ArticlesScreen()
-        self.sm.add_widget(self.articles_screen)
+        self.articlesmenu_screen = ArticlesMenuScreen()
+        self.sm.add_widget(self.articlesmenu_screen)
 
         self.bookmarks_screen = BookmarksScreen()
         self.sm.add_widget(self.bookmarks_screen)
 
-        self.sm.current = 'categories'
+        self.search_screen = SearchScreen()
+        self.sm.add_widget(self.search_screen)
 
-    def show_guides_screen(self):
+        self.settings_screen = SettingsScreen()
+        self.sm.add_widget(self.settings_screen)
+
+        if guides.active_guide_name:
+            self.show_categoriesmenu_screen()
+        else:
+            self.show_guidesmenu_screen()
+
+        self.is_active_guide = bool(guides.active_guide_name)
+
+    def show_guidesmenu_screen(self):
         self.sm.current = 'guides'
 
-    @staticmethod
-    def change_active_guide(guide_name):
-        guides.activate(guide_name)
+    def load_guide(self, guide_archive_paths):
+        if guides.load(guide_archive_paths[0]):
+            self.guidesmenu_screen.update_guidesmenu_items()
+        else:
+            guide_archive_name = os.path.basename(guide_archive_paths[0])
+            GuideLoadFailedWarning('"[b]{}[/b]"\n guide load failed!'.format(guide_archive_name)).open()
+        self.is_active_guide = bool(guides.active_guide_name)
 
-    def show_tags_screen(self):
-        if guides.active_guide and self.tags_screen.from_guide_name != guides.active_guide['name']:
-            self.tags_screen.update_tags_screen_menu_items()
+    def unload_guide(self, guide_name):
+        guides.unload(guide_name)
+        self.guidesmenu_screen.update_guidesmenu_items()
+        self.show_guidesmenu_screen()
+        self.is_active_guide = bool(guides.active_guide_name)
+
+    def show_tagsmenu_screen(self):
+        if guides.active_guide_name and self.tagsmenu_screen.from_guide_name != guides.active_guide_name:
+            self.tagsmenu_screen.update_tagsmenu_items()
+            self.tagsmenu_screen.tagsmenu_widget.parent.scroll_y = 1
         self.sm.current = 'tags'
 
-    def show_categories_screen(self):
-        if guides.active_guide and self.categories_screen.from_guide_name != guides.active_guide['name']:
-            self.categories_screen.update_categories_menu_items()
+    def show_categoriesmenu_screen(self):
+        if guides.active_guide_name and self.categoriesmenu_screen.from_guide_name != guides.active_guide_name:
+            self.categoriesmenu_screen.update_categoriesmenu_items()
+            self.categoriesmenu_screen.ids.categoriesmenu_container.scroll_y = 1
         self.sm.current = 'categories'
 
-    def show_articles_screen(self):
-        if guides.active_guide and self.articles_screen.from_guide_name != guides.active_guide['name']:
-            self.articles_screen.update_articles_menu_items()
+    def show_articlesmenu_screen(self):
+        if guides.active_guide_name and self.articlesmenu_screen.from_guide_name != guides.active_guide_name:
+            self.articlesmenu_screen.update_articlesmenu_items()
+            self.articlesmenu_screen.ids.articlesmenu_container.scroll_y = 1
         self.sm.current = 'articles'
 
     def show_bookmarks_screen(self):
-        if guides.active_guide and self.bookmarks_screen.from_guide_name != guides.active_guide['name']:
+        if guides.active_guide_name and self.bookmarks_screen.from_guide_name != guides.active_guide_name:
             self.bookmarks_screen.update_bookmarks_menu_items()
+            self.bookmarks_screen.ids.recycleview.scroll_y = 1
         self.sm.current = 'bookmarks'
 
     def add_bookmark(self, article_name):
@@ -620,9 +574,11 @@ class ApplicationRoot(NavigationDrawer):
     def show_settings_screen(self):
         self.sm.current = 'settings'
 
+########################################
+
     def show_tag_screen(self, tag_name):
         screens_names = [screen.name for screen in self.sm.screens]
-        screen_name = '{{"{0}":{{"tag": "{1}"}}}}'.format(guides.active_guide['name'], tag_name)
+        screen_name = '{{"{0}":{{"tag": "{1}"}}}}'.format(guides.active_guide_name, tag_name)
         if screen_name not in screens_names:
             tag_screen = TagScreen(name=screen_name,
                                    tag_name=tag_name)
@@ -631,7 +587,7 @@ class ApplicationRoot(NavigationDrawer):
 
     def show_category_screen(self, category_name):
         screens_names = [screen.name for screen in self.sm.screens]
-        screen_name = '{{"{0}":{{"category": "{1}"}}}}'.format(guides.active_guide['name'], category_name)
+        screen_name = '{{"{0}":{{"category": "{1}"}}}}'.format(guides.active_guide_name, category_name)
         if screen_name not in screens_names:
             category_screen = CategoryScreen(name=screen_name,
                                              category_name=category_name)
@@ -668,35 +624,9 @@ class ApplicationRoot(NavigationDrawer):
     def unbookmark_article(self, article_name):
         pass
 
-    def load_guide(self, guide_archive_paths):
-        if guides.load(guide_archive_paths[0]):
-            self.guides_screen.update_guides_menu_items()
-        else:
-            guide_archive_name = os.path.basename(guide_archive_paths[0])
-            GuideLoadFailedWarning('"[b]{}[/b]"\n guide load failed!'.format(guide_archive_name)).open()
-
-    def unload_guide(self, guide_name):
-        guides.unload(guide_name)
-        if guides.active_guide is None:
-            app.is_active_guide = False
-        screen_manager = self.ids.manager
-        screen_manager.current = 'guides'
-
 
 class XenialApp(App):
     GUIDES_DIR = guides.GUIDES_DIR
-
-    def _switch_to_guides(self, dt):
-        self.root.ids.manager.current = 'guides'
-
-    def __init__(self, **kwargs):
-        super(XenialApp, self).__init__(**kwargs)
-
-        if guides.active_guide is None:
-            Clock.schedule_once(self._switch_to_guides)  # Temporary hack
-            self.is_active_guide = False
-        else:
-            self.is_active_guide = True
 
     def build(self):
         self.root = ApplicationRoot()

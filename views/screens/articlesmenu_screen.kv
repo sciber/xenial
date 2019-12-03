@@ -1,6 +1,6 @@
 #:kivy 1.11.1
 
-<ArticlesScreen>:
+<ArticlesMenuScreen>:
     name: 'articles'
     BoxLayout:
         orientation: 'vertical'
@@ -11,8 +11,7 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
-        TitleBar:
+        ScreenTitleBar:
             title: 'Articles'
         ScrollView:
-            ArticlesMenu:
-                data: root.articles_menu_items
+            id: articlesmenu_container

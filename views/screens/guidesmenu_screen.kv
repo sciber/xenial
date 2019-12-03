@@ -1,8 +1,10 @@
 #:kivy 1.11.1
 
 #:import join_path os.path.join
-#:import Factory kivy.factory.Factory
 #:import getcwd os.getcwd
+#:import Factory kivy.factory.Factory
+
+#:import guides models.guides
 
 <LoadGuidePopup@Popup>
     auto_dismiss: False
@@ -53,7 +55,7 @@
             height: '40dp'
             on_release: root.dismiss()
 
-<GuidesMenuItem@BoxLayout>:
+<GuidesMenuItem>:
     guide_icon: ''
     guide_name: ''
     guide_title: ''
@@ -62,6 +64,8 @@
     guide_to_place: ''
     guide_is_active: False
     orientation: 'horizontal'
+    size_hint_y: None
+    height: '120dp'
     Button:
         background_normal: ''
         on_release: app.root.show_guide_screen(root.guide_name)
@@ -119,28 +123,22 @@
                     orientation: 'horizontal'
                     size_hint_y: .4
                     spacing: '4dp'
-                    Image:
-                        source: 'assets/img/from_place.png'
-                        size_hint_x: None
-                        width: self.height
                     Label:
-                        text: root.guide_from_place
+                        text: 'From: [b]{}[/b]'.format(root.guide_from_place)
+                        markup: True
                         color: .4, .4, .4, 1
                         font_size: '14dp'
                         text_size: self.size
                         halign: 'left'
-                        valign: 'middle'
-                    Image:
-                        source: 'assets/img/to_place.png'
-                        size_hint_x: None
-                        width: self.height
+                        valign: 'top'
                     Label:
-                        text: root.guide_to_place
-                        color: .2, .2, .2, 1
+                        text: 'To: [b]{}[/b]'.format(root.guide_to_place)
+                        markup: True
+                        color: .4, .4, .4, 1
                         font_size: '14dp'
                         text_size: self.size
                         halign: 'left'
-                        valign: 'middle'
+                        valign: 'top'
     CheckBox:
         active: root.guide_is_active
         group: 'guides'
@@ -148,10 +146,9 @@
         size_hint_x: None
         width: '60dp'
         color: 0, .6, .4, 1
-        on_state:
-            app.root.change_active_guide(root.guide_name) if self.active else None
+        on_state: guides.activate(root.guide_name) if self.active else None
 
-<GuidesScreen>:
+<GuidesMenuScreen>:
     name: 'guides'
     BoxLayout:
         orientation: 'vertical'
@@ -162,15 +159,12 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
-        TitleBar:
+        ScreenTitleBar:
             title: 'Guides'
-        RecycleView:
-            data: root.guides_menu_items
-            viewclass: 'GuidesMenuItem'
-            RecycleBoxLayout:
+        ScrollView:
+            BoxLayout:
+                id: guidesmenu
                 orientation: 'vertical'
-                default_size: None, dp(100)
-                default_size_hint: 1, None
                 size_hint_y: None
                 height: self.minimum_height
                 spacing: '4dp'

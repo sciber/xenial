@@ -134,38 +134,6 @@
         orientation: 'vertical'
         size_hint_y: None
         height: self.minimum_height
-#        TaggedArticlesMenuItem:
-#            icon: 'assets/img/article-color.png'
-#            title: 'Article 1 title'
-#            synopsis: 'Article 1 synopsis can span over two rows'
-#        TaggedArticlesMenuItem:
-#            icon: 'assets/img/article-color.png'
-#            title: 'Article 2 title'
-#            synopsis: 'Article 2 synopsis can span over two rows'
-#        TaggedArticlesMenuItem:
-#            icon: 'assets/img/article-color.png'
-#            title: 'Article 3 title'
-#            synopsis: 'Article 3 synopsis can span over two rows'
-#        TaggedArticlesMenuItem:
-#            icon: 'assets/img/article-color.png'
-#            title: 'Article 4 title'
-#            synopsis: 'Article 4 synopsis can span over two rows'
-#        TaggedArticlesMenuItem:
-#            icon: 'assets/img/article-color.png'
-#            title: 'Article 5 title'
-#            synopsis: 'Article 5 synopsis can span over two rows'
-#        TaggedArticlesMenuItem:
-#            icon: 'assets/img/article-color.png'
-#            title: 'Article 6 title'
-#            synopsis: 'Article 6 synopsis can span over two rows'
-#        TaggedArticlesMenuItem:
-#            icon: 'assets/img/article-color.png'
-#            title: 'Article 7 title'
-#            synopsis: 'Article 7 synopsis can span over two rows'
-#        TaggedArticlesMenuItem:
-#            icon: 'assets/img/article-color.png'
-#            title: 'Article 8 title'
-#            synopsis: 'Article 8 synopsis can span over two rows'
 
 <TagScreen>:
     tag_name: ''
@@ -178,7 +146,7 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
-        TitleBar:
+        ScreenTitleBar:
             title: 'Tag'
         ScrollView:
             BoxLayout:
@@ -205,5 +173,3 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
-#                TaggedCategoriesMenu
-#                TaggedArticlesMenu

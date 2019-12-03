@@ -1,9 +1,11 @@
 #:kivy 1.11.1
 
-<TagsMenuItem@Button>:
+<TagsMenuItem>:
     tag_name: ''
     num_tagged_categories: 0
     num_tagged_articles: 0
+    size_hint_y: None
+    height: '60dp'
     background_normal: ''
     background_color: 0, .7, .7, 1
     padding: '20dp', '20dp'
@@ -81,7 +83,7 @@
                         width: 1
                         ellipse:  self.x, self.y, self.width, self.height
 
-<TagsScreen>:
+<TagsMenuScreen>:
     name: 'tags'
     BoxLayout:
         orientation: 'vertical'
@@ -92,15 +94,12 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
-        TitleBar:
+        ScreenTitleBar:
             title: 'Tags'
-        RecycleView:
-            data: root.tags_screen_menu_items
-            viewclass: 'TagsMenuItem'
-            RecycleBoxLayout:
+        ScrollView:
+            BoxLayout:
+                id: tagsmenu_widget
                 orientation: 'vertical'
-                default_size: None, dp(60)
-                default_size_hint: 1, None
                 size_hint_y: None
                 height: self.minimum_height
                 spacing: '4dp'

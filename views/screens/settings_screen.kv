@@ -1,6 +1,7 @@
 #:kivy 1.11.1
 
-<SettingsScreen@Screen>:
+<SettingsScreen>:
+    name: 'settings'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -10,7 +11,7 @@
             Rectangle:
                 pos: self.pos
                 size: self.size
-        TitleBar:
+        ScreenTitleBar:
             title: 'Settings'
         ScrollView:
             BoxLayout:

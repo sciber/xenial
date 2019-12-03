@@ -1,0 +1,37 @@
+#:kivy 1.11.1
+
+<ScreenTitleBar@BoxLayout>:
+    title: '<untitled>'
+    action_disabled: True
+    action_image: None
+    action_callback: lambda: None
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '50dp'
+    Button:
+        size_hint_x: None
+        width: self.height
+        background_normal: ''
+        on_release: app.root.toggle_state()
+        Image:
+            source: 'assets/img/hamburger_menu.png'
+            pos: self.parent.pos
+            size: self.parent.size
+            allow_stretch: True
+    Label:
+        text: root.title
+        color: .2, .2, .2, 1
+        font_size: '20dp'
+    Button:
+        disabled: root.action_disabled
+        size_hint_x: None
+        width: self.height
+        background_normal: ''
+        background_disabled_normal: ''
+        on_release: root.action_callback()
+        Image:
+            source: root.action_image
+            pos: self.parent.pos
+            size: self.parent.size
+            allow_stretch: True
+

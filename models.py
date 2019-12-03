@@ -9,16 +9,16 @@ from functools import reduce
 class GuideModel:
     GUIDES_DIR = 'guides'
     guides_list = []
-    active_guide = None
-    active_guide_path = None
+    active_guide_name = ''
+    active_guide_path = ''
 
     def __init__(self):
         guides_list_filename = os.path.join(self.GUIDES_DIR, 'guides.json')
         with open(guides_list_filename, 'r') as guides_list_file:
             self.guides_list = json.load(guides_list_file)
         if len(self.guides_list) > 0:
-            self.active_guide = next(list_item for list_item in self.guides_list if list_item['is_active'])
-            self.active_guide_path = os.path.join(self.GUIDES_DIR, self.active_guide['name'])
+            self.active_guide_name = next(list_item for list_item in self.guides_list if list_item['is_active'])['name']
+            self.active_guide_path = os.path.join(self.GUIDES_DIR, self.active_guide_name)
 
     def all(self):
         """Return a list of all guides"""
@@ -34,8 +34,8 @@ class GuideModel:
         for list_item in self.guides_list:
             list_item['is_active'] = list_item['name'] == guide_name
             if list_item['is_active']:
-                self.active_guide = list_item
-                self.active_guide_path = os.path.join(self.GUIDES_DIR, self.active_guide['name'])
+                self.active_guide_name = list_item['name']
+                self.active_guide_path = os.path.join(self.GUIDES_DIR, self.active_guide_name)
         with open(os.path.join(self.GUIDES_DIR, 'guides.json'), 'w') as guides_list_file:
             json.dump(self.guides_list, guides_list_file, indent=4)
 
@@ -58,6 +58,8 @@ class GuideModel:
             self.guides_list.append(guide)
             with open(guides_json, 'w') as guides_list_file:
                 json.dump(self.guides_list, guides_list_file, indent=4)
+            if guide['is_active']:
+                self.activate(guide['name'])
         except:
             if os.path.exists(guide_dir):
                 shutil.rmtree(guide_dir)
@@ -74,7 +76,7 @@ class GuideModel:
         """Remove the guide and all its content"""
         guide_dir = os.path.join(self.GUIDES_DIR, guide_name)
         shutil.rmtree(guide_dir)
-        was_active_guide = self.active_guide['name'] == guide_name
+        was_active_guide = self.active_guide_name == guide_name
         for idx, list_item in enumerate(self.guides_list):
             if list_item['name'] == guide_name:
                 del self.guides_list[idx]
@@ -82,7 +84,8 @@ class GuideModel:
             if len(self.guides_list) > 0:
                 self.activate(self.guides_list[0]['name'])
             else:
-                self.active_guide = None
+                self.active_guide_name = ''
+                self.active_guide_path = ''
         with open(os.path.join(self.GUIDES_DIR, 'guides.json'), 'w') as guides_list_file:
             json.dump(self.guides_list, guides_list_file, indent=4)
 
@@ -94,9 +97,10 @@ class TagModel:
     @staticmethod
     def all():
         """Return all tags for the active guide"""
-        if guides.active_guide is None:
+        if not guides.active_guide_name:
             return []
-        guide_tags = guides.active_guide['tags']
+        active_guide = guides.by_name(guides.active_guide_name)
+        guide_tags = active_guide['tags']
         return guide_tags
 
     def tagged_categories(self, tag_name):
@@ -123,7 +127,7 @@ class CategoryModel:
     @staticmethod
     def all():
         """Return a list of all categories in the active guide"""
-        if guides.active_guide is None:
+        if not guides.active_guide_name:
             return []
         categories_list_filename = os.path.join(guides.active_guide_path, 'categories.json')
         with open(categories_list_filename, 'r') as categories_list_file:
@@ -169,7 +173,7 @@ class ArticleModel:
     @staticmethod
     def all():
         """Return a list of all articles in the active guide"""
-        if guides.active_guide is None:
+        if not guides.active_guide_name:
             return []
         articles_list_filename = os.path.join(guides.active_guide_path, 'articles.json')
         with open(articles_list_filename, 'r') as articles_list_file:
@@ -219,7 +223,7 @@ class BookmarkModel:
     @staticmethod
     def all():
         """Return a list of the active guide bookmarks"""
-        if guides.active_guide is None:
+        if not guides.active_guide_name:
             return []
         bookmark_filename = os.path.join(guides.active_guide_path, 'bookmarks.json')
         with open(bookmark_filename, 'r') as bookmark_file:
