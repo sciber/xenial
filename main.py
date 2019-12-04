@@ -23,6 +23,9 @@ from controllers.guide_controller import GuidesMenuScreen, GuideScreen, GuideLoa
 from controllers.tag_controller import TagsMenuScreen
 from controllers.category_controller import CategoriesMenuScreen
 from controllers.article_controller import ArticlesMenuScreen
+from controllers.bookmark_controller import BookmarksMenuScreen
+from controllers.search_controller import SearchScreen
+from controllers.settings_controller import SettingsScreen
 
 kivy.require('1.11.1')
 
@@ -65,41 +68,6 @@ Builder.load_string('''
         id: manager
 ''')
 
-
-# class ArticlesScreen(Screen):
-#     from_guide_name = ''
-#     articles_menu_items = ListProperty()
-#
-#     def update_articles_menu_items(self):
-#         self.from_guide_name = guides.active_guide_name
-#         item_keys = ('icon', 'name', 'title', 'synopsis')
-#         self.articles_menu_items = [
-#             {('article_' + key): item[key] for key in item_keys} for item in articles.all()
-#         ]
-
-
-class BookmarksScreen(Screen):
-    from_guide_name = ''
-    bookmarks_menu_items = ListProperty()
-    is_model_modified = False
-
-    def update_bookmarks_menu_items(self):
-        self.from_guide_name = guides.active_guide_name
-        item_keys = ('icon', 'name', 'title', 'synopsis')
-        self.bookmarks_menu_items = [
-            {('article_' + key): item[key] for key in item_keys} for item in bookmarks.bookmarked_articles()
-        ]
-
-
-class SearchScreen(Screen):
-    pass
-
-
-class SettingsScreen(Screen):
-    pass
-
-
-#################################################################################
 
 class CategoryAssignedTag(Button):
     pass
@@ -215,22 +183,6 @@ class TaggedArticlesMenu(BoxLayout):
                                                title=article['title'],
                                                synopsis=article['synopsis'])
             self.items_container.add_widget(menu_item)
-
-
-class TagScreen(Screen):
-    def __init__(self, tag_name, **kwargs):
-        super(TagScreen, self).__init__(**kwargs)
-        self.tag_name = tag_name
-        self.tagged_categories = tags.tagged_categories(tag_name)
-        self.tagged_articles = tags.tagged_articles(tag_name)
-
-        tag_container = self.ids.container
-        if len(self.tagged_categories) > 0:
-            tagged_categories_menu = TaggedCategoriesMenu(categories=self.tagged_categories)
-            tag_container.add_widget(tagged_categories_menu)
-        if len(self.tagged_articles) > 0:
-            tagged_articles_menu = TaggedArticlesMenu(articles=self.tagged_articles)
-            tag_container.add_widget(tagged_articles_menu)
 
 
 class ArticleAssignedTag(Button):
@@ -503,8 +455,8 @@ class ApplicationRoot(NavigationDrawer):
         self.articlesmenu_screen = ArticlesMenuScreen()
         self.sm.add_widget(self.articlesmenu_screen)
 
-        self.bookmarks_screen = BookmarksScreen()
-        self.sm.add_widget(self.bookmarks_screen)
+        self.bookmarksmenu_screen = BookmarksMenuScreen()
+        self.sm.add_widget(self.bookmarksmenu_screen)
 
         self.search_screen = SearchScreen()
         self.sm.add_widget(self.search_screen)
@@ -554,19 +506,19 @@ class ApplicationRoot(NavigationDrawer):
             self.articlesmenu_screen.ids.articlesmenu_container.scroll_y = 1
         self.sm.current = 'articles'
 
-    def show_bookmarks_screen(self):
-        if guides.active_guide_name and self.bookmarks_screen.from_guide_name != guides.active_guide_name:
-            self.bookmarks_screen.update_bookmarks_menu_items()
-            self.bookmarks_screen.ids.recycleview.scroll_y = 1
+    def show_bookmarksmenu_screen(self):
+        if guides.active_guide_name and self.bookmarksmenu_screen.from_guide_name != guides.active_guide_name:
+            self.bookmarksmenu_screen.update_bookmarksmenu_items()
+            self.bookmarksmenu_screen.ids.bookmarksmenu_widget.parent.scroll_y = 1
         self.sm.current = 'bookmarks'
 
     def add_bookmark(self, article_name):
         bookmarks.add(article_name)
-        self.bookmarks_screen.update_bookmarks_menu_items()
+        self.bookmarksmenu_screen.updatebookmarks_menu_items()
 
     def remove_bookmark(self, article_name):
         bookmarks.remove(article_name)
-        self.bookmarks_screen.update_bookmarks_menu_items()
+        self.bookmarksmenu_screen.update_bookmarksmenu_items()
 
     def show_search_screen(self):
         self.sm.current = 'search'

@@ -1,11 +1,13 @@
 #:kivy 1.11.1
 
-<BookmarksMenuItem@BoxLayout>:
+<BookmarksMenuItem>:
     article_icon: ''
     article_name: ''
     article_title: ''
     article_synopsis: ''
     orientation: 'horizontal'
+    size_hint_y: None
+    height: '120dp'
     Button:
         background_normal: ''
         on_release: app.root.show_article_screen(root.article_name)
@@ -67,7 +69,7 @@
                 size_hint: None, None
                 size: '50dp', '50dp'
 
-<BookmarksScreen>:
+<BookmarksMenuScreen>:
     name: 'bookmarks'
     BoxLayout:
         orientation: 'vertical'
@@ -80,14 +82,10 @@
                 size: self.size
         ScreenTitleBar:
             title: 'Bookmarks'
-        RecycleView:
-            id: recycleview
-            data: root.bookmarks_menu_items
-            viewclass: 'BookmarksMenuItem'
-            RecycleBoxLayout:
+        ScrollView:
+            BoxLayout:
+                id: bookmarksmenu_widget
                 orientation: 'vertical'
-                default_size: None, dp(120)
-                default_size_hint: 1, None
                 size_hint_y: None
                 height: self.minimum_height
                 spacing: '4dp'

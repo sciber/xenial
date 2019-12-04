@@ -57,3 +57,20 @@ class TagsMenuScreen(Screen):
             'num_tagged_categories': len(tags.tagged_categories(tag_name)),
             'num_tagged_articles': len(tags.tagged_articles(tag_name))
         } for tag_name in tags.all()]
+
+
+class TagScreen(Screen):
+    def __init__(self, tag_name, **kwargs):
+        super(TagScreen, self).__init__(**kwargs)
+        self.tag_name = tag_name
+        self.tagged_categories = tags.tagged_categories(tag_name)
+        self.tagged_articles = tags.tagged_articles(tag_name)
+
+        tag_container = self.ids.container
+        if len(self.tagged_categories) > 0:
+            tagged_categories_menu = TaggedCategoriesMenu(categories=self.tagged_categories)
+            tag_container.add_widget(tagged_categories_menu)
+        if len(self.tagged_articles) > 0:
+            tagged_articles_menu = TaggedArticlesMenu(articles=self.tagged_articles)
+            tag_container.add_widget(tagged_articles_menu)
+
