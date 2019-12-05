@@ -9,7 +9,7 @@ from kivy.uix.popup import Popup
 
 from models import guides
 
-from controllers.tag_controller import TagsList
+from controllers.components.tagslist_controller import TagsList
 
 kivy.require('1.11.1')
 
@@ -50,8 +50,20 @@ class GuideLoadFailedWarning(Popup):
 
 
 class GuideScreen(Screen):
-    def __init__(self, guide_name, **kwargs):
+    def __init__(self, **kwargs):
         super(GuideScreen, self).__init__(**kwargs)
+        self.guide_name = ''
+        self.guide_icon = ''
+        self.guide_title = ''
+        self.guide_assigned_tags = []
+        self.guide_description = ''
+        self.guide_lang = ('', '')
+        self.guide_from_place = ''
+        self.guide_to_place = ''
+        self.tagslist_widget = TagsList(self.guide_tags)
+        self.ids.tagslist_container.add_widget(self.tagslist_widget)
+
+    def update_guide_screen_items(self, guide_name):
         guide = guides.by_name(guide_name)
         self.guide_name = guide_name
         self.guide_icon = os.path.join(guides.GUIDES_DIR, guide['name'], 'icons', 'guide', guide['icon'])
@@ -61,9 +73,7 @@ class GuideScreen(Screen):
         self.guide_lang = guide['lang']
         self.guide_from_place = guide['from_place']
         self.guide_to_place = guide['to_place']
-        self.guide_tags = guide['tags']
-        self.tagslist_widget = TagsList(self.guide_tags)
-        self.ids.tagslist_container.add_widget(self.tagslist_widget)
+        self.tagslist_widget.tagslist_items = self.guide_assigned_tags
 
 
 class UnloadGuideWarningPopup(Popup):

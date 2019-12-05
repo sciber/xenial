@@ -33,6 +33,7 @@
                     app.root.unload_guide(root.guide_name)
 
 <GuideScreen>:
+    name: 'guide'
     guide_name: ''
     guide_icon: ''
     guide_title: ''
@@ -58,7 +59,7 @@
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                spacing: '16dp'
+                spacing: '8dp'
                 padding: '4dp'
                 BoxLayout:
                     orientation: 'horizontal'
@@ -114,10 +115,9 @@
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
-#                TagsList:
-#                    tags_list_items: root.guide_tags
                 Label:
                     text: root.guide_description
+                    markup: True
                     size_hint_y: None
                     text_size: self.width, None
                     height: self.texture_size[1]

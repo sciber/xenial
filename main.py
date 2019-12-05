@@ -6,7 +6,7 @@ from kivy.config import Config
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.clock import Clock
-from kivy.properties import ListProperty, ObjectProperty, NumericProperty, BooleanProperty
+from kivy.properties import ObjectProperty, NumericProperty, BooleanProperty
 from kivy.uix.screenmanager import Screen
 
 from kivy.uix.label import Label
@@ -17,11 +17,11 @@ from kivy.core.audio import SoundLoader
 
 from kivy.garden.navigationdrawer import NavigationDrawer
 
-from models import guides, tags, categories, articles, bookmarks
+from models import guides, articles, bookmarks
 
 from controllers.guide_controller import GuidesMenuScreen, GuideScreen, GuideLoadFailedWarning
-from controllers.tag_controller import TagsMenuScreen
-from controllers.category_controller import CategoriesMenuScreen
+from controllers.tag_controller import TagsMenuScreen, TagScreen
+from controllers.category_controller import CategoriesMenuScreen, CategoryScreen
 from controllers.article_controller import ArticlesMenuScreen
 from controllers.bookmark_controller import BookmarksMenuScreen
 from controllers.search_controller import SearchScreen
@@ -41,19 +41,19 @@ Config.set('kivy', 'default_font',
 Builder.load_file('views/components/navigationpanel.kv')
 Builder.load_file('views/components/screentitlebar.kv')
 Builder.load_file('views/components/tagslist.kv')
-Builder.load_file('views/components/articlesmenu.kv')
 Builder.load_file('views/components/categoriesmenu.kv')
+Builder.load_file('views/components/articlesmenu.kv')
 
 # Screens views
 Builder.load_file('views/screens/guidesmenu_screen.kv')
 Builder.load_file('views/screens/guide_screen.kv')
 Builder.load_file('views/screens/tagsmenu_screen.kv')
+Builder.load_file('views/screens/tag_screen.kv')
 Builder.load_file('views/screens/articlesmenu_screen.kv')
 Builder.load_file('views/screens/categoriesmenu_screen.kv')
+Builder.load_file('views/screens/category_screen.kv')
 Builder.load_file('views/screens/bookmarksmenu_screen.kv')
 
-Builder.load_file('views/screens/tag_screen.kv')
-Builder.load_file('views/screens/category_screen.kv')
 Builder.load_file('views/screens/article_screen.kv')
 Builder.load_file('views/screens/search_screen.kv')
 Builder.load_file('views/screens/settings_screen.kv')
@@ -67,122 +67,6 @@ Builder.load_string('''
     ScreenManager:
         id: manager
 ''')
-
-
-class CategoryAssignedTag(Button):
-    pass
-
-
-class CategoryAssignedTagsList(StackLayout):
-    def __init__(self, tags, **kwargs):
-        super(CategoryAssignedTagsList, self).__init__(**kwargs)
-        for tag in tags:
-            tag_button = CategoryAssignedTag(text=tag)
-            self.add_widget(tag_button)
-
-
-class CategoryRelatedCategoriesMenuItem(Button):
-    def __init__(self, icon, name, **kwargs):
-        super(CategoryRelatedCategoriesMenuItem, self).__init__(**kwargs)
-        self.icon = icon
-        self.name = name
-
-
-class CategoryRelatedCategoriesMenu(BoxLayout):
-    items_container = ObjectProperty()
-
-    def __init__(self, categories, **kwargs):
-        super(CategoryRelatedCategoriesMenu, self).__init__(**kwargs)
-
-        for category in categories:
-            icon = os.path.join(guides.active_guide_path, 'icons', 'categories', category['icon'])
-            menu_item = CategoryRelatedCategoriesMenuItem(icon=icon,
-                                                          name=category['name'])
-            self.items_container.add_widget(menu_item)
-
-
-class CategoryArticlesMenuItem(Button):
-    def __init__(self, icon, title, synopsis, **kwargs):
-        super(CategoryArticlesMenuItem, self).__init__(**kwargs)
-        self.icon = icon
-        self.title = title
-        self.synopsis = synopsis
-
-
-class CategoryArticlesMenu(BoxLayout):
-    items_container = ObjectProperty()
-
-    def __init__(self, articles, **kwargs):
-        super(CategoryArticlesMenu, self).__init__(**kwargs)
-        self.items_container = self
-        for article in articles:
-            icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
-            menu_item = CategoryArticlesMenuItem(icon=icon,
-                                                 title=article['title'],
-                                                 synopsis=article['synopsis'])
-            self.items_container.add_widget(menu_item)
-
-
-class CategoryScreen(Screen):
-    def __init__(self, category_name, **kwargs):
-        super(CategoryScreen, self).__init__(**kwargs)
-        category = categories.by_name(category_name)
-        self.category_icon = os.path.join(guides.active_guide_path, 'icons', 'categories', category['icon'])
-        self.category_name = category_name
-        self.category_assigned_tags = category['tags']
-        self.category_related_categories = categories.related_categories(category_name)
-        self.category_articles = categories.related_articles(category_name)
-        category_container = self.ids.container
-        category_assigned_tags_list = CategoryAssignedTagsList(tags=self.category_assigned_tags)
-        category_container.add_widget(category_assigned_tags_list)
-        if len(self.category_related_categories) > 0:
-            category_related_categories_menu = CategoryRelatedCategoriesMenu(categories=self.category_related_categories)
-            category_container.add_widget(category_related_categories_menu)
-        if len(self.category_articles) > 0:
-            category_articles_menu = CategoryArticlesMenu(articles=self.category_articles)
-            category_container.add_widget(category_articles_menu)
-
-
-class TaggedCategoriesMenuItem(Button):
-    def __init__(self, icon, name, **kwargs):
-        super(TaggedCategoriesMenuItem, self).__init__(**kwargs)
-        self.icon = icon
-        self.name = name
-
-
-class TaggedCategoriesMenu(BoxLayout):
-    items_container = ObjectProperty()
-
-    def __init__(self, categories, **kwargs):
-        super(TaggedCategoriesMenu, self).__init__(**kwargs)
-        for category in categories:
-            icon = os.path.join(guides.active_guide_path, 'icons', 'categories', category['icon'])
-            menu_item = TaggedCategoriesMenuItem(icon=icon,
-                                                 name=category['name'])
-            self.items_container.add_widget(menu_item)
-
-
-class TaggedArticlesMenuItem(Button):
-    def __init__(self, icon, name, title, synopsis, **kwargs):
-        super(TaggedArticlesMenuItem, self).__init__(**kwargs)
-        self.icon = icon
-        self.name = name
-        self.title = title
-        self.synopsis = synopsis
-
-
-class TaggedArticlesMenu(BoxLayout):
-    items_container = ObjectProperty()
-
-    def __init__(self, articles, **kwargs):
-        super(TaggedArticlesMenu, self).__init__(**kwargs)
-        for article in articles:
-            icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
-            menu_item = TaggedArticlesMenuItem(icon=icon,
-                                               name=article['name'],
-                                               title=article['title'],
-                                               synopsis=article['synopsis'])
-            self.items_container.add_widget(menu_item)
 
 
 class ArticleAssignedTag(Button):
@@ -343,15 +227,21 @@ class ArticleContent(BoxLayout):
                 continue
 
             if content_item['type'] == 'audio':
-                audio_source = os.path.join(guides.active_guide_path, 'content', 'media', 'audio', content_item['source'])
+                audio_source = os.path.join(guides.active_guide_path,
+                                            'content', 'media', 'audio',
+                                            content_item['source'])
                 item_widget = ArticleAudio(audio_source=audio_source,
                                            caption=content_item['caption'])
                 self.add_widget(item_widget)
                 continue
 
             if content_item['type'] == 'video':
-                video_source = os.path.join(guides.active_guide_path, 'content', 'media', 'video', content_item['source'])
-                cover_image_source = os.path.join(guides.active_guide_path, 'content', 'media', 'video', content_item['screenshot'])
+                video_source = os.path.join(guides.active_guide_path,
+                                            'content', 'media', 'video',
+                                            content_item['source'])
+                cover_image_source = os.path.join(guides.active_guide_path,
+                                                  'content', 'media', 'video',
+                                                  content_item['screenshot'])
                 item_widget = ArticleVideo(video_source=video_source,
                                            cover_image_source=cover_image_source,
                                            caption=content_item['caption'])
@@ -446,11 +336,20 @@ class ApplicationRoot(NavigationDrawer):
         self.categoriesmenu_screen = CategoriesMenuScreen()
         self.sm.add_widget(self.categoriesmenu_screen)
 
+        self.category_screen = CategoryScreen()
+        self.sm.add_widget(self.category_screen)
+
         self.guidesmenu_screen = GuidesMenuScreen()
         self.sm.add_widget(self.guidesmenu_screen)
 
+        self.guide_screen = GuideScreen()
+        self.sm.add_widget(self.guide_screen)
+
         self.tagsmenu_screen = TagsMenuScreen()
         self.sm.add_widget(self.tagsmenu_screen)
+
+        self.tag_screen = TagScreen()
+        self.sm.add_widget(self.tag_screen)
 
         self.articlesmenu_screen = ArticlesMenuScreen()
         self.sm.add_widget(self.articlesmenu_screen)
@@ -472,7 +371,7 @@ class ApplicationRoot(NavigationDrawer):
         self.is_active_guide = bool(guides.active_guide_name)
 
     def show_guidesmenu_screen(self):
-        self.sm.current = 'guides'
+        self.sm.current = 'guidesmenu'
 
     def load_guide(self, guide_archive_paths):
         if guides.load(guide_archive_paths[0]):
@@ -481,6 +380,17 @@ class ApplicationRoot(NavigationDrawer):
             guide_archive_name = os.path.basename(guide_archive_paths[0])
             GuideLoadFailedWarning('"[b]{}[/b]"\n guide load failed!'.format(guide_archive_name)).open()
         self.is_active_guide = bool(guides.active_guide_name)
+
+    def show_guide_screen(self, guide_name):
+        if self.guide_screen.guide_name != guide_name:
+            prev_guide_screen = self.guide_screen
+            prev_guide_screen.name = 'prev_guide'
+            new_guide_screen = GuideScreen(name='guide')
+            new_guide_screen.update_guide_screen_items(guide_name)
+            self.sm.add_widget(new_guide_screen)
+            self.guide_screen = new_guide_screen
+            self.sm.remove_widget(prev_guide_screen)
+        self.sm.current = 'guide'
 
     def unload_guide(self, guide_name):
         guides.unload(guide_name)
@@ -492,25 +402,50 @@ class ApplicationRoot(NavigationDrawer):
         if guides.active_guide_name and self.tagsmenu_screen.from_guide_name != guides.active_guide_name:
             self.tagsmenu_screen.update_tagsmenu_items()
             self.tagsmenu_screen.tagsmenu_widget.parent.scroll_y = 1
-        self.sm.current = 'tags'
+        self.sm.current = 'tagsmenu'
+
+    def show_tag_screen(self, tag_name):
+        if self.tag_screen.from_guide_name != guides.active_guide_name or self.tag_screen.tag_name != tag_name:
+            prev_tag_screen = self.tag_screen
+            prev_tag_screen.name = 'prev_tag'
+            new_tag_screen = TagScreen(name='tag')
+            new_tag_screen.update_tag_screen_items(tag_name)
+            self.sm.add_widget(new_tag_screen)
+            self.tag_screen = new_tag_screen
+            self.sm.remove_widget(prev_tag_screen)
+        self.sm.current = 'tag'
 
     def show_categoriesmenu_screen(self):
         if guides.active_guide_name and self.categoriesmenu_screen.from_guide_name != guides.active_guide_name:
             self.categoriesmenu_screen.update_categoriesmenu_items()
             self.categoriesmenu_screen.ids.categoriesmenu_container.scroll_y = 1
-        self.sm.current = 'categories'
+        self.sm.current = 'categoriesmenu'
+
+    def show_category_screen(self, category_name):
+        print(category_name)
+        if (self.category_screen.from_guide_name != guides.active_guide_name
+                or self.category_screen.category_name != category_name):
+            print('is either not from this guide or it si new category')
+            prev_category_screen = self.category_screen
+            prev_category_screen.name = 'prev_category'
+            new_category_screen = CategoryScreen(name='category')
+            new_category_screen.update_category_screen_items(category_name)
+            self.sm.add_widget(new_category_screen)
+            self.category_screen = new_category_screen
+            self.sm.remove_widget(prev_category_screen)
+        self.sm.current = 'category'
 
     def show_articlesmenu_screen(self):
         if guides.active_guide_name and self.articlesmenu_screen.from_guide_name != guides.active_guide_name:
             self.articlesmenu_screen.update_articlesmenu_items()
             self.articlesmenu_screen.ids.articlesmenu_container.scroll_y = 1
-        self.sm.current = 'articles'
+        self.sm.current = 'articlesmenu'
 
     def show_bookmarksmenu_screen(self):
         if guides.active_guide_name and self.bookmarksmenu_screen.from_guide_name != guides.active_guide_name:
             self.bookmarksmenu_screen.update_bookmarksmenu_items()
             self.bookmarksmenu_screen.ids.bookmarksmenu_widget.parent.scroll_y = 1
-        self.sm.current = 'bookmarks'
+        self.sm.current = 'bookmarksmenu'
 
     def add_bookmark(self, article_name):
         bookmarks.add(article_name)
@@ -528,24 +463,6 @@ class ApplicationRoot(NavigationDrawer):
 
 ########################################
 
-    def show_tag_screen(self, tag_name):
-        screens_names = [screen.name for screen in self.sm.screens]
-        screen_name = '{{"{0}":{{"tag": "{1}"}}}}'.format(guides.active_guide_name, tag_name)
-        if screen_name not in screens_names:
-            tag_screen = TagScreen(name=screen_name,
-                                   tag_name=tag_name)
-            self.sm.add_widget(tag_screen)
-        self.sm.current = screen_name
-
-    def show_category_screen(self, category_name):
-        screens_names = [screen.name for screen in self.sm.screens]
-        screen_name = '{{"{0}":{{"category": "{1}"}}}}'.format(guides.active_guide_name, category_name)
-        if screen_name not in screens_names:
-            category_screen = CategoryScreen(name=screen_name,
-                                             category_name=category_name)
-            self.sm.add_widget(category_screen)
-        self.sm.current = screen_name
-
     def show_article_screen(self, article_name):
         screen_manager = self.ids.manager
         screen_names = [screen.name for screen in screen_manager.screens]
@@ -554,17 +471,6 @@ class ApplicationRoot(NavigationDrawer):
             article_screen = ArticleScreen(name=screen_name,
                                            article_name=article_name)
             screen_manager.add_widget(article_screen)
-
-        screen_manager.current = screen_name
-
-    def show_guide_screen(self, guide_name):
-        screen_manager = self.ids.manager
-        screen_names = [screen.name for screen in screen_manager.screens]
-        screen_name = 'Guide: ' + guide_name
-        if screen_name not in screen_names:
-            guide_screen = GuideScreen(name=screen_name,
-                                       guide_name=guide_name)
-            screen_manager.add_widget(guide_screen)
 
         screen_manager.current = screen_name
 

@@ -2,30 +2,14 @@ import kivy
 
 from kivy.properties import ListProperty
 from kivy.uix.screenmanager import Screen
-from kivy.uix.stacklayout import StackLayout
 from kivy.uix.button import Button
 
 from models import guides, tags
 
+from controllers.components.categoriesmenu_controller import CategoriesMenu
+from controllers.components.articlesmenu_controller import ArticlesMenu
+
 kivy.require('1.11.1')
-
-
-class TagsListItem(Button):
-    pass
-
-
-class TagsList(StackLayout):
-    tagslist_items = ListProperty()
-
-    def __init__(self, tagslist_items, **kwargs):
-        super(TagsList, self).__init__(**kwargs)
-        self.tagslist_items = tagslist_items
-
-    def on_tagslist_items(self, instance, value):
-        self.clear_widgets()
-        for item in self.tagslist_items:
-            item_widget = TagsListItem(text=item)
-            self.add_widget(item_widget)
 
 
 class TagsMenuItem(Button):
@@ -60,17 +44,28 @@ class TagsMenuScreen(Screen):
 
 
 class TagScreen(Screen):
-    def __init__(self, tag_name, **kwargs):
+    from_guide_name = ''
+
+    def __init__(self, **kwargs):
         super(TagScreen, self).__init__(**kwargs)
+        self.tag_name = ''
+        self.tagged_categories = []
+        self.categoriesmenu_widget = CategoriesMenu()
+        self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
+        self.tagged_articles = []
+        self.articlesmenu_widget = ArticlesMenu()
+        self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
+
+    def update_tag_screen_items(self, tag_name):
+        self.from_guide_name = guides.active_guide_name
         self.tag_name = tag_name
         self.tagged_categories = tags.tagged_categories(tag_name)
+        category_item_keys = ('icon', 'name')
+        self.categoriesmenu_widget.menu_items = [
+            {'category_' + key: item[key] for key in category_item_keys} for item in self.tagged_categories
+        ]
         self.tagged_articles = tags.tagged_articles(tag_name)
-
-        tag_container = self.ids.container
-        if len(self.tagged_categories) > 0:
-            tagged_categories_menu = TaggedCategoriesMenu(categories=self.tagged_categories)
-            tag_container.add_widget(tagged_categories_menu)
-        if len(self.tagged_articles) > 0:
-            tagged_articles_menu = TaggedArticlesMenu(articles=self.tagged_articles)
-            tag_container.add_widget(tagged_articles_menu)
-
+        article_item_keys = ('icon', 'name', 'title', 'synopsis')
+        self.articlesmenu_widget.menu_items = [
+            {'article_' + key: item[key] for key in article_item_keys} for item in self.tagged_articles
+        ]

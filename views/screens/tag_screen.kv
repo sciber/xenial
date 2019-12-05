@@ -1,145 +1,14 @@
 #:kivy 1.11.1
 
-<TaggedCategoriesMenuItem>:
-    icon: None
-    name: ''
-    background_normal: ''
-    size_hint: None, None
-    size: '80dp', '100dp'
-    on_release: app.root.show_category_screen(self.name)
-    BoxLayout:
-        orientation: 'vertical'
-        pos: self.parent.pos
-        size_hint: None, None
-        size: self.parent.size
-        AnchorLayout:
-            anchor_x: 'center'
-            anchor_y: 'center'
-            size_hint_y: .6
-            padding: '8dp'
-            Image:
-                source: root.icon
-        Label:
-            text: root.name
-            color: .2, .2, .2, 1
-            font_size: '16dp'
-            size_hint_y: .4
-            text_size: self.size
-            halign: 'center'
-            valign: 'top'
-
-<TaggedCategoriesMenu>:
-    items_container: container
-    orientation: 'vertical'
-    size_hint_y: None
-    height: self.minimum_height
-    BoxLayout:
-        orientation: 'horizontal'
-        size_hint_y: None
-        height: '40dp'
-        Image:
-            pos: self.parent.pos
-            source: 'assets/img/category.png'
-            size_hint_x: None
-            width: self.height
-            color: 1, 1, 1, .5
-        Label:
-            text: 'Tagged categories'
-            font_size: '18dp'
-            bold: True
-            padding: '8dp', '8dp'
-            text_size: self.width, self.height
-            halign: 'left'
-            valign: 'middle'
-            color: .6, .6, .6, 1
-    GridLayout:
-        id: container
-        cols: round(root.width // 130) + 1
-        size_hint_y: None
-        height: self.minimum_height
-
-<TaggedArticlesMenuItem@Button>:
-    icon: None
-    name: ''
-    title: ''
-    synopsis: ''
-    size_hint_y: None
-    height: '80dp'
-    background_normal: ''
-    on_release: app.root.show_article_screen(root.name)
-    BoxLayout:
-        orientation: 'horizontal'
-        pos: self.parent.pos
-        size_hint: None, None
-        size: self.parent.size
-        AnchorLayout:
-            anchor_x: 'center'
-            anchor_y: 'center'
-            size_hint_x: None
-            width: self.height
-            Image:
-                source: root.icon
-                size_hint: None, None
-                size: '60dp', '60dp'
-        BoxLayout:
-            orientation: 'vertical'
-            Label:
-                text: root.title
-                color: .2, .2, .2, 1
-                font_size: '16dp'
-                size_hint_y: .4
-                text_size: self.size
-                halign: 'left'
-                valign: 'middle'
-            Label:
-                text: root.synopsis
-                markup: True
-                color: .4, .4, .4, 1
-                font_size: '14dp'
-                size_hint_y: .6
-                text_size: self.size
-                halign: 'left'
-                valign: 'top'
-
-<TaggedArticlesMenu>:
-    items_container: container
-    orientation: 'vertical'
-    size_hint_y: None
-    height: self.minimum_height
-    padding: 0, '8dp'
-    spacing: '8dp'
-    BoxLayout:
-        orientation: 'horizontal'
-        size_hint_y: None
-        height: '40dp'
-        Image:
-            pos: self.parent.pos
-            source: 'assets/img/article.png'
-            size_hint_x: None
-            width: self.height
-            color: 1, 1, 1, .5
-        Label:
-            text: 'Tagged articles'
-            font_size: '18dp'
-            bold: True
-            padding: '8dp', '8dp'
-            size_hint_y: None
-            height: '40dp'
-            text_size: self.width, self.height
-            halign: 'left'
-            valign: 'middle'
-            color: .6, .6, .6, 1
-    BoxLayout:
-        id: container
-        orientation: 'vertical'
-        size_hint_y: None
-        height: self.minimum_height
-
 <TagScreen>:
+    name: 'tag'
     tag_name: ''
+    tagged_categories: []
+    tagged_articles: []
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
+        spacing: '4dp'
         canvas:
             Color:
                 rgba: 1, 1, 1, 1
@@ -150,7 +19,6 @@
             title: 'Tag'
         ScrollView:
             BoxLayout:
-                id: container
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
@@ -173,3 +41,55 @@
                             Rectangle:
                                 pos: self.pos
                                 size: self.size
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '40dp' if root.tagged_categories else 0
+                    opacity: 1 if root.tagged_categories else 0
+                    Image:
+                        pos: self.parent.pos
+                        source: 'assets/img/category.png'
+                        size_hint_x: None
+                        width: self.height
+                        color: 1, 1, 1, .5
+                    Label:
+                        text: 'Tagged categories'
+                        font_size: '18dp'
+                        bold: True
+                        padding: '8dp', '8dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .6, .6, .6, 1
+                BoxLayout:
+                    id: categoriesmenu_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '40dp' if root.tagged_articles else 0
+                    opacity: 1 if root.tagged_articles else 0
+                    Image:
+                        pos: self.parent.pos
+                        source: 'assets/img/article.png'
+                        size_hint_x: None
+                        width: self.height
+                        color: 1, 1, 1, .5
+                    Label:
+                        text: 'Tagged articles'
+                        font_size: '18dp'
+                        bold: True
+                        padding: '8dp', '8dp'
+                        size_hint_y: None
+                        height: '40dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .6, .6, .6, 1
+                BoxLayout:
+                    id: articlesmenu_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height

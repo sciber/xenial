@@ -1,7 +1,7 @@
 #:kivy 1.11.1
 
 <CategoriesMenuScreen>:
-    name: 'categories'
+    name: 'categoriesmenu'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -20,5 +20,3 @@
             pos: self.parent.pos
             ScrollView:
                 id: categoriesmenu_container
-                size_hint_x: None
-                width: int(root.width // categoriesmenu_item_width * categoriesmenu_item_width)
