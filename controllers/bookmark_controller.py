@@ -21,7 +21,6 @@ class BookmarksMenuItem(BoxLayout):
 class BookmarksMenuScreen(Screen):
     from_guide_name = ''
     bookmarksmenu_items = ListProperty()
-    is_model_modified = False
 
     def __init__(self, **kwargs):
         super(BookmarksMenuScreen, self).__init__(**kwargs)

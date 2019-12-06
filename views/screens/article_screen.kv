@@ -1,383 +1,20 @@
 #:kivy 1.11.1
 
-<ArticleAssignedTag>:
-    text: ''
-    size_hint: None, None
-    size: self.texture_size
-    padding: '8dp', '4dp'
-    background_normal: ''
-    color: 1, 1, 1, 1
-    background_color: 0, .7, .7, 1
-    on_release: app.root.show_tag_screen(self.text)
-
-<ArticleAssignedTagsList>:
-    size_hint_y: None
-    height: self.minimum_height
-    spacing: '2dp'
-
-<ArticleTitle@BoxLayout>:
-    icon: None
-    title: ''
-    orientation: 'horizontal'
-    size_hint_y: None
-    height: '80dp'
-    AnchorLayout:
-        anchor_x: 'center'
-        anchor_y: 'center'
-        size_hint_x: None
-        width: self.height
-        padding: '8dp'
-        Image:
-            source: root.icon
-    Label:
-        text: root.title
-        font_size: '24dp'
-        bold: True
-        text_size: self.size
-        valign: 'middle'
-        color: .2, .2, .2, 1
-
-<ArticleSubtitle>:
-    text: ''
-    font_size: '20dp'
-    bold: True
-    size_hint_y: None
-    height: '50dp'
-    text_size: self.size
-    halign: 'left'
-    valign: 'middle'
-    color: .2, .2, .2, 1
-
-<ArticleParagraph>:
-    text: ''
-    font_size: '16dp'
-    text_size: self.width, None
-    size_hint_y: None
-    height: self.texture_size[1]
-    color: .2, .2, .2, 1
-    markup: True
-
-<ArticleImage>:
-    image: None
-    caption: ''
-    orientation: 'vertical'
-    size_hint_y: None
-    height: self.minimum_height
-    spacing: '8dp'
-    Image:
-        source: root.image
-        size_hint: None, None
-        width: self.parent.width - (2 * self.parent.padding[0])
-        height: self.parent.width/self.image_ratio
-        keep_ratio: True
-        allow_stretch: True
-    Label:
-        text: root.caption
-        font_size: '14dp'
-        text_size: self.width, None
-        size_hint_y: None
-        height: self.texture_size[1]
-        color: .4, .4, .4, 1
-        markup: True
-
-<ArticleAudio>:
-    caption: ''
-    slider_value: 0
-    sound_track_length: 0
-    orientation: 'vertical'
-    size_hint_y: None
-    height: self.minimum_height
-    spacing: '8dp'
-    BoxLayout:
-        orientation: 'horizontal'
-        size_hint_y: None
-        height: '80dp'
-        padding: '4dp'
-        canvas:
-            Color:
-                rgba: .2, .2, .2, 1
-            Line:
-                width: 1
-                rectangle: self.x, self.y, self.width, self.height
-        ToggleButton:
-            id: toggle_button
-            size_hint_x: None
-            width: '80dp'
-            background_normal: ''
-            background_down: ''
-            on_state: root.toggle_audio_play(self.state)
-            Image:
-                source: 'assets/img/play-darkgray.png' if self.parent.state == 'normal' else 'assets/img/pause-darkgray.png'
-                pos: self.parent.pos
-                size: self.parent.size
-        BoxLayout:
-            orientation: 'vertical'
-            padding: '8dp'
-            Slider:
-                orientation: 'horizontal'
-                min: 0
-                max: 100
-                step: 1
-                value: root.slider_value
-                value_track: True
-                value_track_color: 0, .6, .7, 1
-                on_value: root.on_slider_value_change(self.value)
-            Label:
-                text: '{:>02}:{:02} / {:>02}:{:02}'.format(round((root.slider_value / 100) * (root.sound_track_length // 60)), round((root.slider_value / 100) * (root.sound_track_length % 60)), round(root.sound_track_length // 60), round(root.sound_track_length % 60))
-                text_size: self.size
-                halign: 'right'
-                color: .2, .2, .2, 1
-    Label:
-        text: root.caption
-        font_size: '14dp'
-        text_size: self.width, None
-        size_hint_y: None
-        height: self.texture_size[1]
-        color: .4, .4, .4, 1
-        markup: True
-
-<ArticleVideo>:
-    video_player: video_player
-    video_source: None
-    cover_image_source: None
-    caption: ''
-    slider_value: 0
-    video_track_length: 0
-    orientation: 'vertical'
-    size_hint_y: None
-    height: self.minimum_height
-    spacing: '8dp'
-    BoxLayout:
-        orientation: 'vertical'
-        size_hint_y: None
-        height: self.minimum_height
-        AnchorLayout:
-            id: anchor_content_center
-            anchor_x: 'center'
-            anchor_y: 'center'
-            size_hint: None, None
-            size: video_cover_image.size
-            Video:
-                id: video_player
-                canvas:
-                    Color:
-                        rgba: .2, .2, .2, 1
-                    Line:
-                        width: 1
-                        rectangle: self.x, self.y, self.width, self.height
-            Image:
-                id: video_cover_image
-                source: root.cover_image_source
-                size_hint: None, None
-                width: root.width - (2 * root.padding[0])
-                height: root.width / self.image_ratio
-                keep_ratio: True
-                allow_stretch: True
-                opacity: 1 if video_player.state == 'stop' else 0
-                canvas:
-                    Color:
-                        rgba: .2, .2, .2, 1
-                    Line:
-                        width: 1
-                        rectangle: self.x, self.y, self.width, self.height
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint_y: None
-            height: '80dp'
-            padding: '4dp'
-            canvas:
-                Color:
-                    rgba: .2, .2, .2, 1
-                Line:
-                    width: 1
-                    rectangle: self.x, self.y, self.width, self.height
-            ToggleButton:
-                id: toggle_button
-                size_hint_x: None
-                width: '80dp'
-                background_normal: ''
-                background_down: ''
-                on_state: root.toggle_video_play(self.state)
-                Image:
-                    source: 'assets/img/play-darkgray.png' if self.parent.state == 'normal' else 'assets/img/pause-darkgray.png'
-                    pos: self.parent.pos
-                    size: self.parent.size
-            BoxLayout:
-                orientation: 'vertical'
-                padding: '8dp'
-                Slider:
-                    orientation: 'horizontal'
-                    min: 0
-                    max: 100
-                    step: 1
-                    value: root.slider_value
-                    value_track: True
-                    value_track_color: 0, .6, .7, 1
-                    on_value: root.on_slider_value_change(self.value)
-                Label:
-                    text: '{:>02}:{:02} / {:>02}:{:02}'.format(round((root.slider_value / 100) * (root.video_track_length // 60)), round((root.slider_value / 100) * (root.video_track_length % 60)), round(root.video_track_length // 60), round(root.video_track_length % 60))
-                    text_size: self.size
-                    halign: 'right'
-                    color: .2, .2, .2, 1
-    Label:
-        text: root.caption
-        font_size: '14dp'
-        text_size: self.width, None
-        size_hint_y: None
-        height: self.texture_size[1]
-        color: .4, .4, .4, 1
-        markup: True
-
-<ArticleContent>:
-    orientation: 'vertical'
-    size_hint_y: None
-    height: self.minimum_height
-    padding: 0, 0, 0, '10dp'
-    spacing: '20dp'
-
-<ArticleRelatedArticlesMenuItem>:
-    icon: None
-    name: ''
-    title: ''
-    synopsis: ''
-    size_hint_y: None
-    height: '80dp'
-    background_normal: ''
-    on_release: app.root.show_article_screen(self.name)
-    BoxLayout:
-        orientation: 'horizontal'
-        pos: self.parent.pos
-        size_hint: None, None
-        size: self.parent.size
-        AnchorLayout:
-            anchor_x: 'center'
-            anchor_y: 'center'
-            size_hint_x: None
-            width: self.height
-            Image:
-                source: root.icon
-                size_hint: None, None
-                size: '50dp', '50dp'
-        BoxLayout:
-            orientation: 'vertical'
-            Label:
-                text: root.title
-                color: .2, .2, .2, 1
-                font_size: '14dp'
-                size_hint_y: .4
-                text_size: self.size
-                halign: 'left'
-                valign: 'middle'
-            Label:
-                text: root.synopsis
-                markup: True
-                color: .4, .4, .4, 1
-                font_size: '12dp'
-                size_hint_y: .6
-                text_size: self.size
-                halign: 'left'
-                valign: 'top'
-
-<ArticleRelatedArticlesMenu>:
-    items_container: container
-    orientation: 'vertical'
-    size_hint_y: None
-    height: self.minimum_height
-    padding: 0, '8dp'
-    spacing: '8dp'
-    BoxLayout:
-        orientation: 'horizontal'
-        size_hint_y: None
-        height: '40dp'
-        Image:
-            pos: self.parent.pos
-            source: 'assets/img/article.png'
-            size_hint_x: None
-            width: self.height
-            color: 1, 1, 1, .5
-        Label:
-            text: 'Related articles'
-            font_size: '18dp'
-            bold: True
-            padding: '8dp', '8dp'
-            size_hint_y: None
-            height: '40dp'
-            text_size: self.width, self.height
-            halign: 'left'
-            valign: 'middle'
-            color: .6, .6, .6, 1
-    GridLayout:
-        id: container
-        cols: round(root.width // 640) + 1
-        size_hint_y: None
-        height: self.minimum_height
-
-<ArticleRelatedCategoriesMenuItem>:
-    icon: None
-    name: ''
-    background_normal: ''
-    size_hint: None, None
-    size: '80dp', '100dp'
-    on_release: app.root.show_category_screen(self.name)
-    BoxLayout:
-        orientation: 'vertical'
-        pos: self.parent.pos
-        size_hint: None, None
-        size: self.parent.size
-        AnchorLayout:
-            anchor_x: 'center'
-            anchor_y: 'center'
-            size_hint_y: .6
-            padding: '8dp'
-            Image:
-                source: root.icon
-        Label:
-            text: root.name
-            color: .2, .2, .2, 1
-            font_size: '12dp'
-            size_hint_y: .4
-            text_size: self.size
-            halign: 'center'
-            valign: 'top'
-
-<ArticleRelatedCategoriesMenu>:
-    items_container: container
-    orientation: 'vertical'
-    size_hint_y: None
-    height: self.minimum_height
-    BoxLayout:
-        orientation: 'horizontal'
-        size_hint_y: None
-        height: '40dp'
-        Image:
-            pos: self.parent.pos
-            source: 'assets/img/category.png'
-            size_hint_x: None
-            width: self.height
-            color: 1, 1, 1, .5
-        Label:
-            text: 'Related categories'
-            font_size: '18dp'
-            bold: True
-            padding: '8dp', '8dp'
-            text_size: self.width, self.height
-            halign: 'left'
-            valign: 'middle'
-            color: .6, .6, .6, 1
-    StackLayout:
-        id: container
-        size_hint_y: None
-        height: self.minimum_height
-        spacing: '2dp'
-        padding: '6dp'
+#:import partial functools.partial
 
 <ArticleScreen>:
-    article_icon: None
+    name: 'article'
+    article_icon: ''
+    article_name: ''
     article_title: ''
-    is_bookmarked: False
+    article_synopsis: ''
+    article_related_categories: []
+    article_related_articles: []
+    article_is_bookmarked: False
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
+        spacing: '4dp'
         canvas:
             Color:
                 rgba: 1, 1, 1, 1
@@ -387,16 +24,115 @@
         ScreenTitleBar:
             title: 'Article'
             action_disabled: False
-            action_image: 'assets/img/bookmark-color.png' if root.is_bookmarked else 'assets/img/bookmark.png'
-            action_callback: root.toggle_bookmark
+            action_image: 'assets/img/bookmark-color.png' if root.article_is_bookmarked else 'assets/img/bookmark.png'
+            action_callback: root.toggle_article_bookmark
         ScrollView:
             BoxLayout:
-                id: container
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
                 spacing: '8dp'
                 padding: '4dp'
-                ArticleTitle:
-                    icon: root.article_icon
-                    title: root.article_title
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '80dp'
+                    AnchorLayout:
+                        anchor_x: 'center'
+                        anchor_y: 'center'
+                        size_hint_x: None
+                        width: self.height
+                        padding: '8dp'
+                        Image:
+                            source: root.article_icon
+                    Label:
+                        text: root.article_title
+                        font_size: '24dp'
+                        bold: True
+                        text_size: self.size
+                        valign: 'middle'
+                        color: .2, .2, .2, 1
+                BoxLayout:
+                    id: tagslist_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                Label:
+                    text: root.article_synopsis
+                    markup: True
+                    text_size: self.width, None
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    font_size: '18dp'
+                    color: .2, .2, .2, 1
+                BoxLayout:
+                    id: articlecontent_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                    canvas:
+                        Color:
+                            rgba: .2, .7, 1, .7
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    Label:
+                        text: 'Article content!'.upper()
+                        markup: True
+                        text_size: self.width, None
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        font_size: '18dp'
+                        color: .2, .2, .1, 1
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '40dp' if root.article_related_categories else 0
+                    opacity: 1 if root.article_related_categories else 0
+                    Image:
+                        pos: self.parent.pos
+                        source: 'assets/img/category.png'
+                        size_hint_x: None
+                        width: self.height
+                        color: 1, 1, 1, .5
+                    Label:
+                        text: 'Related categories'
+                        font_size: '18dp'
+                        bold: True
+                        padding: '8dp', '8dp'
+                        text_size: self.size
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .6, .6, .6, 1
+                BoxLayout:
+                    id: categoriesmenu_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                BoxLayout:
+                    orientation: 'horizontal'
+                    size_hint_y: None
+                    height: '40dp' if root.article_related_articles else 0
+                    opacity: 1 if root.article_related_articles else 0
+                    Image:
+                        pos: self.parent.pos
+                        source: 'assets/img/article.png'
+                        size_hint_x: None
+                        width: self.height
+                        color: 1, 1, 1, .5
+                    Label:
+                        text: 'Related articles'
+                        font_size: '18dp'
+                        bold: True
+                        padding: '8dp', '8dp'
+                        size_hint_y: None
+                        height: '40dp'
+                        text_size: self.width, self.height
+                        halign: 'left'
+                        valign: 'middle'
+                        color: .6, .6, .6, 1
+                BoxLayout:
+                    id: articlesmenu_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height

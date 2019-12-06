@@ -53,8 +53,8 @@
                 Label:
                     text: root.category_description
                     markup: True
-                    size_hint_y: None
                     text_size: self.width, None
+                    size_hint_y: None
                     height: self.texture_size[1]
                     font_size: '18dp'
                     color: .2, .2, .2, 1
@@ -70,11 +70,11 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Tagged categories'
+                        text: 'Related categories'
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'
-                        text_size: self.width, self.height
+                        text_size: self.size
                         halign: 'left'
                         valign: 'middle'
                         color: .6, .6, .6, 1
@@ -95,7 +95,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Tagged articles'
+                        text: 'Related articles'
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'

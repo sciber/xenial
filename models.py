@@ -186,11 +186,17 @@ class ArticleModel:
         if len(articles_list) == 0:
             return None
         article = next(list_item for list_item in articles_list if list_item['name'] == article_name)
+        return article
+
+    def content(self, article_name):
+        """Return the active guide article content"""
+        articles_list = self.all()
+        if len(articles_list) == 0:
+            return None
         article_content_filename = os.path.join(guides.active_guide_path, 'content', f'{article_name}.json')
         with open(article_content_filename, 'r') as article_content_file:
             article_content = json.load(article_content_file)
-        article['content'] = article_content
-        return article
+        return article_content
 
     def related_categories(self, article_name):
         """Return a list of the active guide categories related to the active guide article"""

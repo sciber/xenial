@@ -2,10 +2,7 @@ import os
 
 import kivy
 
-from kivy.properties import ListProperty
 from kivy.uix.screenmanager import Screen
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.button import Button
 
 from models import guides, categories
 
@@ -31,6 +28,7 @@ class CategoriesMenuScreen(Screen):
             {('category_' + key): item[key] for key in item_keys} for item in categories.all()
         ]
         self.categoriesmenu_widget.menu_items = categoriesmenu_items
+
 
 class CategoryScreen(Screen):
     from_guide_name = ''
