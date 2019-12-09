@@ -22,7 +22,7 @@ from controllers.settings_controller import SettingsScreen
 kivy.require('1.11.1')
 
 Config.set('kivy', 'default_font',
-           '''["Noto Sans", 
+           '''["Noto Sans",
                "assets/fonts/NotoSans-Regular.ttf",
                "assets/fonts/NotoSans-Italic.ttf",
                "assets/fonts/NotoSans-Bold.ttf",

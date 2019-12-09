@@ -70,20 +70,6 @@
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
-                    canvas:
-                        Color:
-                            rgba: .2, .7, 1, .7
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    Label:
-                        text: 'Article content!'.upper()
-                        markup: True
-                        text_size: self.width, None
-                        size_hint_y: None
-                        height: self.texture_size[1]
-                        font_size: '18dp'
-                        color: .2, .2, .1, 1
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None

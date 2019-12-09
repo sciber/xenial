@@ -3,32 +3,32 @@
 <ArticleSubtitle>:
     text: ''
     font_size: '20dp'
-    bold: True
-    size_hint_y: None
-    height: '50dp'
     text_size: self.size
+    bold: True
     halign: 'left'
     valign: 'middle'
     color: .2, .2, .2, 1
+    size_hint_y: None
+    height: '50dp'
 
 <ArticleParagraph>:
     text: ''
+    markup: True
     font_size: '16dp'
     text_size: self.width, None
+    color: .2, .2, .2, 1
     size_hint_y: None
     height: self.texture_size[1]
-    color: .2, .2, .2, 1
-    markup: True
 
 <ArticleImage>:
-    image: None
+    source: ''
     caption: ''
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
     spacing: '8dp'
-    Image:
-        source: root.image
+    AsyncImage:
+        source: root.source
         size_hint: None, None
         width: self.parent.width - (2 * self.parent.padding[0])
         height: self.parent.width/self.image_ratio
@@ -195,5 +195,5 @@
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
-    padding: 0, 0, 0, '10dp'
+    padding: 0, '20dp'
     spacing: '20dp'

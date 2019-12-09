@@ -23,9 +23,9 @@ class ArticleParagraph(Label):
 
 
 class ArticleImage(BoxLayout):
-    def __init__(self, image, caption, **kwargs):
+    def __init__(self, source, caption, **kwargs):
         super(ArticleImage, self).__init__(**kwargs)
-        self.image = image
+        self.source = os.path.join(guides.active_guide_path, 'content', 'media', 'image', source)
         self.caption = caption
 
 
@@ -45,12 +45,11 @@ class ArticleAudio(BoxLayout):
             self.ids.toggle_button.state = 'normal'
         self.manual_sound_stop = False
 
-    def __init__(self, audio_source, caption, **kwargs):
+    def __init__(self, source, caption, **kwargs):
         super(ArticleAudio, self).__init__(**kwargs)
-        self.audio_source = audio_source
+        self.source = os.path.join(guides.active_guide_path, 'content', 'media', 'audio', source)
         self.caption = caption
-
-        self.sound = SoundLoader.load(audio_source)
+        self.sound = SoundLoader.load(self.source)
         self.sound.on_stop = self._on_sound_stop
 
         self.sound_track_length = self.sound.length
@@ -136,49 +135,19 @@ class ArticleVideo(BoxLayout):
 class ArticleContent(BoxLayout):
     content_items = ListProperty([])
 
-    items_container = ObjectProperty()
-
-    def __init__(self, **kwargs):
-        super(ArticleContent, self).__init__(**kwargs)
-        self.items_container = self
-
+    def on_content_items(self, instance, value):
+        self.clear_widgets()
         for content_item in self.content_items:
-
             if content_item['type'] == 'subtitle':
                 item_widget = ArticleSubtitle(text=content_item['text'])
-                self.add_widget(item_widget)
-                continue
-
-            if content_item['type'] == 'paragraph':
+            elif content_item['type'] == 'paragraph':
                 item_widget = ArticleParagraph(text=content_item['text'])
-                self.add_widget(item_widget)
-                continue
-
-            if content_item['type'] == 'image':
-                image = os.path.join(guides.active_guide_path, 'content', 'media', 'image', content_item['source'])
-                item_widget = ArticleImage(image=image,
+            elif content_item['type'] == 'image':
+                item_widget = ArticleImage(source=content_item['source'],
                                            caption=content_item['caption'])
-                self.add_widget(item_widget)
-                continue
-
-            if content_item['type'] == 'audio':
-                audio_source = os.path.join(guides.active_guide_path,
-                                            'content', 'media', 'audio',
-                                            content_item['source'])
-                item_widget = ArticleAudio(audio_source=audio_source,
+            elif content_item['type'] == 'audio':
+                item_widget = ArticleAudio(source=content_item['source'],
                                            caption=content_item['caption'])
-                self.add_widget(item_widget)
+            else:
                 continue
-
-            if content_item['type'] == 'video':
-                video_source = os.path.join(guides.active_guide_path,
-                                            'content', 'media', 'video',
-                                            content_item['source'])
-                cover_image_source = os.path.join(guides.active_guide_path,
-                                                  'content', 'media', 'video',
-                                                  content_item['screenshot'])
-                item_widget = ArticleVideo(video_source=video_source,
-                                           cover_image_source=cover_image_source,
-                                           caption=content_item['caption'])
-                self.add_widget(item_widget)
-                continue
+            self.add_widget(item_widget)

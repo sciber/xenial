@@ -69,7 +69,7 @@ I installed kivy from sources into virtualenv environment.
 python3 -m virtualenv venv
 source ven/bin/activate
 pip install Cython==0.29.10
-pip install --no-binay :all: kivy
+pip install --no-binary :all: kivy
 ```
 
 ### Android
