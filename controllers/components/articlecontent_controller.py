@@ -2,14 +2,13 @@ import os
 
 import kivy
 
-from kivy.properties import NumericProperty, ObjectProperty, ListProperty
+from kivy.properties import ListProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
-from kivy.core.audio import SoundLoader
-from kivy.clock import Clock
 
 from models import guides
 
+from connector import audio_meter, audio, video_meter, video
 
 kivy.require('1.11.1')
 
@@ -30,106 +29,43 @@ class ArticleImage(BoxLayout):
 
 
 class ArticleAudio(BoxLayout):
-    slider_value = NumericProperty()
-    manual_sound_stop = False
-
-    def _update_sound_track_pos(self, dt):
-        self.sound_track_pos = self.sound.get_pos()
-        self.slider_value = round(self.sound_track_pos / self.sound.length * 100)
-
-    def _on_sound_stop(self):
-        self.sound_track_timer.cancel()
-        if not self.manual_sound_stop:
-            self.sound_track_pos = 0
-            self.slider_value = 0
-            self.ids.toggle_button.state = 'normal'
-        self.manual_sound_stop = False
-
     def __init__(self, source, caption, **kwargs):
         super(ArticleAudio, self).__init__(**kwargs)
         self.source = os.path.join(guides.active_guide_path, 'content', 'media', 'audio', source)
         self.caption = caption
-        self.sound = SoundLoader.load(self.source)
-        self.sound.on_stop = self._on_sound_stop
+        self.audio_state = 'stop'
+        self.audio_pos = 0
+        self.audio_length = 0
+        self.slider_value = 0
+        audio_meter.set_audio_length(self)
 
-        self.sound_track_length = self.sound.length
-        self.sound_track_timer = None
-        self.sound_track_pos = 0
+    def toggle_audio_play(self):
+        audio.toggle_play(self)
 
-    def toggle_audio_play(self, state):
-        if state == 'down':
-            if self.sound is not None and self.sound.state == 'play':
-                return
-
-            if self.sound is not None and self.sound.state == 'stop':
-                self.sound.play()
-                self.sound_track_timer = Clock.schedule_interval(self._update_sound_track_pos, .1)
-                self.sound.seek(self.sound_track_pos)
-
-            if self.sound is None:
-                self.sound.play()
-                self.sound_track_timer = Clock.schedule_interval(self._update_sound_track_pos, .1)
-        else:
-            if self.sound is None or self.sound.state == 'stop':
-                return
-            self.manual_sound_stop = True
-            self.sound.stop()
-
-    def on_slider_value_change(self, slider_value):
+    def slider_changed(self, slider_value):
         if self.slider_value != slider_value:
-            self.slider_value = slider_value
-            self.sound_track_pos = (slider_value / 100) * self.sound.length
-            if self.sound.state == 'play':
-                self.sound.seek(self.sound_track_pos)
+            audio.change_pos(self, slider_value)
 
 
 class ArticleVideo(BoxLayout):
-    video_player = ObjectProperty()
-    slider_value = NumericProperty()
-
-    def _on_position_change(self, instance, value):
-        self.slider_value = round(value / self.video_player.duration * 100)
-
-    def _on_duration_change(self, instance, value):
-        self.video_track_length = value
-
-    def _on_state_change(self, instance, value):
-        if value == 'stop':
-            self.video_player.position = 0
-            self.video_track_pos = 0
-            self.slider_value = 0
-            instance.state = 'pause'
-            self.ids.toggle_button.state = 'normal'
-
-    def __init__(self, video_source, cover_image_source, caption, **kwargs):
+    def __init__(self, source, caption, **kwargs):
         super(ArticleVideo, self).__init__(**kwargs)
-        self.video_source = video_source
-        self.cover_image_source = cover_image_source
+        self.source = os.path.join(guides.active_guide_path, 'content', 'media', 'video', source)
         self.caption = caption
-        self.video_player.source = video_source
-        self.video_player.bind(position=self._on_position_change,
-                               duration=self._on_duration_change,
-                               state=self._on_state_change)
+        self.video_state = 'stop'
+        self.video_pos = 0
+        self.video_length = 0
+        self.slider_value = 0
+        self.video_aspect_ratio = (16, 1)
         self.video_track_timer = None
-        self.video_track_length = 0
+        video_meter.set_video_attrs(self)
 
-    def toggle_video_play(self, state):
-        if state == 'down':
-            self.video_player.state = 'play'
-        else:
-            self.video_player.state = 'pause'
+    def toggle_video_play(self):
+        video.toggle_play(self)
 
-    def _on_unloaded_video_slider_value_change(self, dt):
-        self.video_player.state = 'pause'
-
-    def on_slider_value_change(self, slider_value):
-        if not self.video_player.loaded:
-            self.video_player.state = 'play'
-            Clock.schedule_once(self._on_unloaded_video_slider_value_change)
-
+    def slider_changed(self, slider_value):
         if self.slider_value != slider_value:
-            self.video_player.seek(slider_value / 100, True)
-            self.slider_value = self.video_player.position / self.video_track_length * 100
+            video.change_pos(self, slider_value)
 
 
 class ArticleContent(BoxLayout):
@@ -147,6 +83,9 @@ class ArticleContent(BoxLayout):
                                            caption=content_item['caption'])
             elif content_item['type'] == 'audio':
                 item_widget = ArticleAudio(source=content_item['source'],
+                                           caption=content_item['caption'])
+            elif content_item['type'] == 'video':
+                item_widget = ArticleVideo(source=content_item['source'],
                                            caption=content_item['caption'])
             else:
                 continue

@@ -2,7 +2,6 @@ import os
 
 import kivy
 
-from kivy.properties import BooleanProperty
 from kivy.uix.screenmanager import Screen
 
 from models import guides, articles, bookmarks
@@ -11,6 +10,8 @@ from controllers.components.tagslist_controller import TagsList
 from controllers.components.categoriesmenu_controller import CategoriesMenu
 from controllers.components.articlesmenu_controller import ArticlesMenu
 from controllers.components.articlecontent_controller import ArticleContent
+
+from connector import audio, video
 
 kivy.require('1.11.1')
 
@@ -54,6 +55,13 @@ class ArticleScreen(Screen):
         self.article_related_articles = []
         self.articlesmenu_widget = ArticlesMenu()
         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
+
+        self.on_pre_leave = self._on_pre_leave
+
+    @staticmethod
+    def _on_pre_leave():
+        audio.stop()
+        video.stop()
 
     def update_article_screen_items(self, article_name):
         self.from_guide_name = guides.active_guide_name

@@ -6,10 +6,10 @@
     text_size: self.size
     bold: True
     halign: 'left'
-    valign: 'middle'
+    valign: 'bottom'
     color: .2, .2, .2, 1
     size_hint_y: None
-    height: '50dp'
+    height: '60dp'
 
 <ArticleParagraph>:
     text: ''
@@ -45,8 +45,10 @@
 
 <ArticleAudio>:
     caption: ''
+    audio_state: 'stop'
+    audio_pos: 0
+    audio_length: 0
     slider_value: 0
-    sound_track_length: 0
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -62,15 +64,14 @@
             Line:
                 width: 1
                 rectangle: self.x, self.y, self.width, self.height
-        ToggleButton:
-            id: toggle_button
+        Button:
             size_hint_x: None
             width: '80dp'
             background_normal: ''
             background_down: ''
-            on_state: root.toggle_audio_play(self.state)
+            on_release: root.toggle_audio_play()
             Image:
-                source: 'assets/img/play-darkgray.png' if self.parent.state == 'normal' else 'assets/img/pause-darkgray.png'
+                source: 'assets/img/play-darkgray.png' if root.audio_state == 'stop' else 'assets/img/pause-darkgray.png'
                 pos: self.parent.pos
                 size: self.parent.size
         BoxLayout:
@@ -84,112 +85,98 @@
                 value: root.slider_value
                 value_track: True
                 value_track_color: 0, .6, .7, 1
-                on_value: root.on_slider_value_change(self.value)
+                on_value: root.slider_changed(self.value)
             Label:
-                text: '{:>02}:{:02} / {:>02}:{:02}'.format(round((root.slider_value / 100) * (root.sound_track_length // 60)), round((root.slider_value / 100) * (root.sound_track_length % 60)), round(root.sound_track_length // 60), round(root.sound_track_length % 60))
+                text:
+                    '{:>02}:{:02} / {:>02}:{:02}'.format(
+                    round(root.audio_pos) // 60,
+                    round(root.audio_pos) % 60,
+                    round(root.audio_length) // 60,
+                    round(root.audio_length) % 60)
                 text_size: self.size
                 halign: 'right'
                 color: .2, .2, .2, 1
     Label:
         text: root.caption
-        font_size: '14dp'
         text_size: self.width, None
+        markup: True
+        font_size: '14dp'
         size_hint_y: None
         height: self.texture_size[1]
         color: .4, .4, .4, 1
-        markup: True
 
 <ArticleVideo>:
-    video_player: video_player
-    video_source: None
-    cover_image_source: None
     caption: ''
+    video_state: 'stop'
+    video_pos: 0
+    video_length: 0
     slider_value: 0
-    video_track_length: 0
+    video_aspect_ratio: (16, 9)
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
-    spacing: '8dp'
     BoxLayout:
+        id: video_container
         orientation: 'vertical'
         size_hint_y: None
-        height: self.minimum_height
-        AnchorLayout:
-            id: anchor_content_center
-            anchor_x: 'center'
-            anchor_y: 'center'
-            size_hint: None, None
-            size: video_cover_image.size
-            Video:
-                id: video_player
-                canvas:
-                    Color:
-                        rgba: .2, .2, .2, 1
-                    Line:
-                        width: 1
-                        rectangle: self.x, self.y, self.width, self.height
+        height: round(self.width * root.video_aspect_ratio[1] / root.video_aspect_ratio[0])
+        canvas:
+            Color:
+                rgba: .2, .2, .2, 1
+            Line:
+                width: 1
+                rectangle: self.x, self.y, self.width, self.height
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: '80dp'
+        padding: '4dp'
+        canvas:
+            Color:
+                rgba: .2, .2, .2, 1
+            Line:
+                width: 1
+                rectangle: self.x, self.y, self.width, self.height
+        Button:
+            size_hint_x: None
+            width: '80dp'
+            background_normal: ''
+            background_down: ''
+            on_release: root.toggle_video_play()
             Image:
-                id: video_cover_image
-                source: root.cover_image_source
-                size_hint: None, None
-                width: root.width - (2 * root.padding[0])
-                height: root.width / self.image_ratio
-                keep_ratio: True
-                allow_stretch: True
-                opacity: 1 if video_player.state == 'stop' else 0
-                canvas:
-                    Color:
-                        rgba: .2, .2, .2, 1
-                    Line:
-                        width: 1
-                        rectangle: self.x, self.y, self.width, self.height
+                source: 'assets/img/play-darkgray.png' if root.video_state == 'stop' else 'assets/img/pause-darkgray.png'
+                pos: self.parent.pos
+                size: self.parent.size
         BoxLayout:
-            orientation: 'horizontal'
-            size_hint_y: None
-            height: '80dp'
-            padding: '4dp'
-            canvas:
-                Color:
-                    rgba: .2, .2, .2, 1
-                Line:
-                    width: 1
-                    rectangle: self.x, self.y, self.width, self.height
-            ToggleButton:
-                id: toggle_button
-                size_hint_x: None
-                width: '80dp'
-                background_normal: ''
-                background_down: ''
-                on_state: root.toggle_video_play(self.state)
-                Image:
-                    source: 'assets/img/play-darkgray.png' if self.parent.state == 'normal' else 'assets/img/pause-darkgray.png'
-                    pos: self.parent.pos
-                    size: self.parent.size
-            BoxLayout:
-                orientation: 'vertical'
-                padding: '8dp'
-                Slider:
-                    orientation: 'horizontal'
-                    min: 0
-                    max: 100
-                    step: 1
-                    value: root.slider_value
-                    value_track: True
-                    value_track_color: 0, .6, .7, 1
-                    on_value: root.on_slider_value_change(self.value)
-                Label:
-                    text: '{:>02}:{:02} / {:>02}:{:02}'.format(round((root.slider_value / 100) * (root.video_track_length // 60)), round((root.slider_value / 100) * (root.video_track_length % 60)), round(root.video_track_length // 60), round(root.video_track_length % 60))
-                    text_size: self.size
-                    halign: 'right'
-                    color: .2, .2, .2, 1
+            orientation: 'vertical'
+            padding: '8dp'
+            Slider:
+                orientation: 'horizontal'
+                min: 0
+                max: 100
+                step: 1
+                value: root.slider_value
+                value_track: True
+                value_track_color: 0, .6, .7, 1
+                on_value: root.slider_changed(self.value)
+            Label:
+                text:
+                    '{:>02}:{:02} / {:>02}:{:02}'.format(
+                    round(root.video_pos) // 60,
+                    round(root.video_pos) % 60,
+                    round(root.video_length) // 60,
+                    round(root.video_length) % 60)
+                text_size: self.size
+                halign: 'right'
+                color: .2, .2, .2, 1
     Label:
         text: root.caption
-        font_size: '14dp'
         text_size: self.width, None
+        markup: True
+        font_size: '14dp'
         size_hint_y: None
         height: self.texture_size[1]
         color: .4, .4, .4, 1
-        markup: True
 
 <ArticleContent>:
     orientation: 'vertical'

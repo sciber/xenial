@@ -209,6 +209,7 @@ class ApplicationRoot(NavigationDrawer):
 
 class XenialApp(App):
     GUIDES_DIR = guides.GUIDES_DIR
+    sound = 'global sound instance'
 
     def build(self):
         self.root = ApplicationRoot()
