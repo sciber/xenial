@@ -2,6 +2,7 @@ from io import BytesIO
 
 import kivy
 
+from kivy.properties import ListProperty
 from kivy.core.audio import SoundLoader
 from kivy.uix.image import Image
 from kivy.core.image import Image as CoreImage
@@ -76,36 +77,27 @@ class AudioConnector:
 
 
 class VideoMeter(Video):
-    video_widgets = []
+    video_widgets = ListProperty([])
     processed_widget_frame_num = 0
     processed_widget = None
     volume = 0
 
-    def set_video_attrs(self, video_widget):
-        if self.processed_widget:
-            self.video_widgets.append(video_widget)
-        else:
-            self.processed_widget = video_widget
-            self.source = video_widget.source
+    def on_video_widgets(self, instance, value):
+        if self.video_widgets:
+            self.processed_widget = self.video_widgets[0]
+            self.source = self.processed_widget.source
             self.state = 'play'
+
+    def set_video_attrs(self, video_widget):
+        self.video_widgets = self.video_widgets + [video_widget]
 
     def _on_video_frame(self, *largs):
         super(VideoMeter, self)._on_video_frame(*largs)
-        if not self.processed_widget_frame_num:
-            self.processed_widget_frame_num = 1
-            return
-        else:
-            self.processed_widget_frame_num = 0
         if self.processed_widget is not None:
             self.processed_widget.video_length = self.duration
             self.processed_widget.video_aspect_ratio = self.texture.size
         self.unload()
-        if self.video_widgets:
-            self.processed_widget = self.video_widgets.pop(0)
-            self.source = self.processed_widget.source
-            self.state = 'play'
-        else:
-            self.processed_widget = None
+        self.video_widgets = self.video_widgets[1:]
 
 
 class VideoConnector(Video):

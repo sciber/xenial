@@ -11,7 +11,7 @@ from controllers.components.categoriesmenu_controller import CategoriesMenu
 from controllers.components.articlesmenu_controller import ArticlesMenu
 from controllers.components.articlecontent_controller import ArticleContent
 
-from connector import audio, video
+from connector import audio, video, video_meter
 
 kivy.require('1.11.1')
 

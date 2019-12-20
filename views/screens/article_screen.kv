@@ -65,6 +65,7 @@
                     height: self.texture_size[1]
                     font_size: '18dp'
                     color: .2, .2, .2, 1
+                    on_ref_press: app.root.show_article_screen(args[1])
                 BoxLayout:
                     id: articlecontent_container
                     orientation: 'vertical'

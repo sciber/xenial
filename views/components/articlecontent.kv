@@ -19,6 +19,7 @@
     color: .2, .2, .2, 1
     size_hint_y: None
     height: self.texture_size[1]
+    on_ref_press: app.root.show_article_screen(args[1])
 
 <ArticleImage>:
     source: ''
@@ -42,6 +43,8 @@
         height: self.texture_size[1]
         color: .4, .4, .4, 1
         markup: True
+        on_ref_press: app.root.show_article_screen(args[1])
+
 
 <ArticleAudio>:
     caption: ''
@@ -104,6 +107,7 @@
         size_hint_y: None
         height: self.texture_size[1]
         color: .4, .4, .4, 1
+        on_ref_press: app.root.show_article_screen(args[1])
 
 <ArticleVideo>:
     caption: ''
@@ -177,6 +181,7 @@
         size_hint_y: None
         height: self.texture_size[1]
         color: .4, .4, .4, 1
+        on_ref_press: app.root.show_article_screen(args[1])
 
 <ArticleContent>:
     orientation: 'vertical'
