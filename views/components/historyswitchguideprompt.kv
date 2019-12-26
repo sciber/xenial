@@ -1,0 +1,30 @@
+#:kivy 1.11.1
+
+<HistorySwitchGuidePrompt>:
+    message: ''
+    title: 'Prompt'
+    auto_dismiss: False
+    title_color: .8, .6, .4, 1
+    separator_color: .8, .6, .4, 1
+    size_hint_y: None
+    height: '200dp'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: root.message
+            text_size: self.size
+            valign: 'middle'
+            halign: 'center'
+            markup: True
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '40dp'
+            Button:
+                text: 'Cancel'
+                on_release: root.dismiss()
+            Button:
+                text: 'Switch'
+                on_release:
+                    root.dismiss()
+                    root.switch_active_guide_for_screen()

@@ -147,7 +147,7 @@
         size_hint_x: None
         width: '60dp'
         color: 0, .6, .4, 1
-        on_state: guides.activate(root.guide_name) if self.active else None
+        on_state: root.activate_guide() if self.active else None
 
 <GuidesMenuScreen>:
     name: 'guidesmenu'

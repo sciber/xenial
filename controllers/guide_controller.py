@@ -10,6 +10,7 @@ from kivy.uix.popup import Popup
 from models import guides
 
 from controllers.components.tagslist_controller import TagsList
+from history import history
 
 kivy.require('1.11.1')
 
@@ -19,6 +20,10 @@ class GuidesMenuItem(BoxLayout):
         super(GuidesMenuItem, self).__init__(**kwargs)
         for key in item_data:
             setattr(self, key, item_data[key])
+
+    def activate_guide(self):
+        guides.activate(self.guide_name)
+        history.switch_to_active_guide_history()
 
 
 class GuidesMenuScreen(Screen):
