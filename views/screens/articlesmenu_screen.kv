@@ -1,5 +1,7 @@
 #:kivy 1.11.1
 
+#:import translator translator.translator
+
 <ArticlesMenuScreen>:
     name: 'articlesmenu'
     BoxLayout:
@@ -12,6 +14,6 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Articles'
+            title: translator.translate('Articles', translator.active_lang_code)
         ScrollView:
             id: articlesmenu_container

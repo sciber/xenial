@@ -1,5 +1,7 @@
 #:kivy 1.11.1
 
+#:import translator translator.translator
+
 <TagsMenuItem>:
     tag_name: ''
     num_tagged_categories: 0
@@ -95,7 +97,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Tags'
+            title: translator.translate('Tags', translator.active_lang_code)
         ScrollView:
             BoxLayout:
                 id: tagsmenu_widget

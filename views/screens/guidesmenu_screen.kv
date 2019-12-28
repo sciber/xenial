@@ -7,9 +7,11 @@
 
 #:import guides models.guides
 
+#:import translator translator.translator
+
 <LoadGuidePopup@Popup>
     auto_dismiss: False
-    title: 'Select a guide archive file'
+    title: translator.translate('Select guide archive file', translator.active_lang_code)
     title_color: 0, .6, .4, 1
     separator_color: 0, .6, .4, 1
     BoxLayout:
@@ -25,10 +27,10 @@
             size_hint_y: None
             height: '40dp'
             Button:
-                text: 'Cancel'
+                text: translator.translate('Cancel', translator.active_lang_code)
                 on_release: root.dismiss()
             Button:
-                text: 'Load'
+                text: translator.translate('Load', translator.active_lang_code)
                 disabled: not filechooser.selection
                 on_release:
                     root.dismiss()
@@ -36,7 +38,7 @@
 
 <GuideLoadFailedWarning>:
     message: ''
-    title: 'Error'
+    title: translator.translate('Error', translator.active_lang_code)
     auto_dismiss: True
     title_color: .8, .2, .2, 1
     separator_color: .8, .2, .2, 1
@@ -51,7 +53,7 @@
             halign: 'center'
             markup: True
         Button:
-            text: 'OK'
+            text: translator.translate('OK', translator.active_lang_code)
             size_hint_y: None
             height: '40dp'
             on_release: root.dismiss()
@@ -125,7 +127,9 @@
                     size_hint_y: .4
                     spacing: '4dp'
                     Label:
-                        text: 'From: [b]{}[/b]'.format(root.guide_from_place)
+                        text:
+                            (translator.translate('From', translator.active_lang_code) + ': [b]{}[/b]'
+                            ).format(root.guide_from_place)
                         markup: True
                         color: .4, .4, .4, 1
                         font_size: '14dp'
@@ -133,7 +137,9 @@
                         halign: 'left'
                         valign: 'top'
                     Label:
-                        text: 'To: [b]{}[/b]'.format(root.guide_to_place)
+                        text:
+                            (translator.translate('To', translator.active_lang_code) + ': [b]{}[/b]'
+                            ).format(root.guide_to_place)
                         markup: True
                         color: .4, .4, .4, 1
                         font_size: '14dp'
@@ -161,7 +167,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Guides'
+            title: translator.translate('Guides', translator.active_lang_code)
         ScrollView:
             BoxLayout:
                 id: guidesmenu
@@ -170,7 +176,7 @@
                 height: self.minimum_height
                 spacing: '4dp'
         Button:
-            text: 'Import guide'
+            text: translator.translate('Import guide', translator.active_lang_code)
             font_size: '18dp'
             background_normal: ''
             background_color: 0, .6, .4, 1

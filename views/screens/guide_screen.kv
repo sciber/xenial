@@ -2,11 +2,13 @@
 
 #:import Factory kivy.factory.Factory
 
+#:import translator translator.translator
+
 <UnloadGuideWarningPopup>:
     guide_name: ''
     guide_title: ''
     auto_dismiss: False
-    title: 'Warning'
+    title: translator.translate('Warning', translator.active_lang_code)
     title_color: 1, .4, .4, 1
     separator_color: 1, .4, .4, 1
     size_hint_y: None
@@ -14,7 +16,9 @@
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: 'Delete guide\n"[b]{}[/b]"?'.format(root.guide_title)
+            text:
+                (translator.translate('Delete guide', translator.active_lang_code
+                ) + '\n"[b]{}[/b]"?').format(root.guide_title)
             markup: True
             text_size: self.size
             valign: 'middle'
@@ -24,10 +28,10 @@
             size_hint_y: None
             height: '40dp'
             Button:
-                text: 'Cancel'
+                text: translator.translate('Cancel', translator.active_lang_code)
                 on_release: root.dismiss()
             Button:
-                text: 'Delete'
+                text: translator.translate('Delete', translator.active_lang_code)
                 on_release:
                     root.dismiss()
                     app.root.unload_guide(root.guide_name)
@@ -53,7 +57,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Guide'
+            title: translator.translate('Guide', translator.active_lang_code)
         ScrollView:
             BoxLayout:
                 orientation: 'vertical'
@@ -81,7 +85,9 @@
                         valign: 'middle'
                         color: .2, .2, .2, 1
                 Label:
-                    text: 'Language: [b]{}[/b]'.format(root.guide_lang[0])
+                    text:
+                        (translator.translate('Language', translator.active_lang_code) + ': [b]{}[/b]'
+                        ).format(root.guide_lang[0])
                     markup: True
                     text_size: self.size
                     font_size: '18dp'
@@ -91,7 +97,9 @@
                     height: '20dp'
                     color: .4, .4, .4, 1
                 Label:
-                    text: 'From: [b]{}[/b]'.format(root.guide_from_place)
+                    text:
+                        (translator.translate('From', translator.active_lang_code) + ': [b]{}[/b]'
+                        ).format(root.guide_from_place)
                     markup: True
                     text_size: self.size
                     font_size: '18dp'
@@ -101,7 +109,9 @@
                     height: '20dp'
                     color: .4, .4, .4, 1
                 Label:
-                    text: 'To: [b]{}[/b]'.format(root.guide_to_place)
+                    text:
+                        (translator.translate('To', translator.active_lang_code) + ': [b]{}[/b]'
+                        ).format(root.guide_to_place)
                     markup: True
                     text_size: self.size
                     font_size: '18dp'
@@ -124,7 +134,7 @@
                     font_size: '18dp'
                     color: .2, .2, .2, 1
         Button:
-            text: 'Delete the guide'
+            text: translator.translate('Delete guide', translator.active_lang_code)
             font_size: '18dp'
             color: 0, 0, 0, 1
             background_normal: ''

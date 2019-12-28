@@ -1,5 +1,7 @@
 #:kivy 1.11.1
 
+#:import translator translator.translator
+
 <CategoriesMenuScreen>:
     name: 'categoriesmenu'
     BoxLayout:
@@ -12,7 +14,7 @@
                 size: self.size
                 pos: self.pos
         ScreenTitleBar:
-            title: 'Categories'
+            title: translator.translate('Categories', translator.active_lang_code)
         AnchorLayout:
             anchor_x: 'center'
             anchor_y: 'top'

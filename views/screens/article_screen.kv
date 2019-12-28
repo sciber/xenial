@@ -1,6 +1,7 @@
 #:kivy 1.11.1
 
 #:import partial functools.partial
+#:import translator translator.translator
 
 <ArticleScreen>:
     name: 'article'
@@ -22,7 +23,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Article'
+            title: translator.translate('Article', translator.active_lang_code)
             action_disabled: False
             action_image: 'assets/img/bookmark-color.png' if root.article_is_bookmarked else 'assets/img/bookmark.png'
             action_callback: root.toggle_article_bookmark
@@ -83,7 +84,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Related categories'
+                        text: translator.translate('Related categories', translator.active_lang_code)
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'
@@ -108,7 +109,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Related articles'
+                        text: translator.translate('Related articles', translator.active_lang_code)
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'

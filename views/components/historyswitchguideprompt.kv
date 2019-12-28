@@ -1,8 +1,10 @@
 #:kivy 1.11.1
 
+#:import translator translator.translator
+
 <HistorySwitchGuidePrompt>:
     message: ''
-    title: 'Prompt'
+    title: translator.translate('Prompt', translator.active_lang_code)
     auto_dismiss: False
     title_color: .8, .6, .4, 1
     separator_color: .8, .6, .4, 1
@@ -21,10 +23,10 @@
             size_hint_y: None
             height: '40dp'
             Button:
-                text: 'Cancel'
+                text: translator.translate('Cancel', translator.active_lang_code)
                 on_release: root.dismiss()
             Button:
-                text: 'Switch'
+                text: translator.translate('Switch', translator.active_lang_code)
                 on_release:
                     root.dismiss()
                     root.switch_active_guide_for_screen()

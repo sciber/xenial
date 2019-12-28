@@ -2,9 +2,11 @@
 
 #:import exit sys.exit
 
+#:import translator translator.translator
+
 <LeaveAppPrompt>:
     auto_dismiss: False
-    title: 'Warning'
+    title: translator.translate('Warning', translator.active_lang_code)
     title_color: 8, .2, .2, 1
     separator_color: 8, .2, .2, 1
     size_hint_y: None
@@ -12,14 +14,14 @@
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: 'Do you want to leave the app?'
+            text: translator.translate('Do you want to leave the app?', translator.active_lang_code)
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
             height: '40dp'
             Button:
-                text: 'Cancel'
+                text: translator.translate('Cancel', translator.active_lang_code)
                 on_release: root.dismiss()
             Button:
-                text: 'Quit'
+                text: translator.translate('Quit', translator.active_lang_code)
                 on_release: exit(0)

@@ -1,7 +1,34 @@
 #:kivy 1.11.1
 
+#:import translator translator.translator
+
+<LanguageSettingsMenuItem>:
+    lang: ('', '')
+    orientation: 'horizontal'
+    size_hint_y: None
+    height: '50dp'
+    padding: '16dp', '8dp', '8dp', '8dp'
+    Label:
+        text: root.lang[0]
+        font_size: '18dp'
+        text_size: self.width, self.height
+        halign: 'left'
+        valign: 'middle'
+        color: .2, .2, .2, 1
+    CheckBox:
+        active: root.lang[1] == translator.active_lang_code
+        group: 'app_lang'
+        allow_no_selection: False
+        size_hint_x: None
+        width: '60dp'
+        color: 0, .6, .4, 1
+        on_state:
+            app.lang_code = root.lang[1]
+
+
 <SettingsScreen>:
     name: 'settings'
+    screen_title: 'Settings'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -12,14 +39,15 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Settings'
+            title: translator.translate(root.screen_title, translator.active_lang_code)
         ScrollView:
             BoxLayout:
+                id: container
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
                 Label:
-                    text: 'Application language'
+                    text: translator.translate('Application language', translator.active_lang_code)
                     font_size: '18dp'
                     bold: True
                     size_hint_y: None
@@ -29,35 +57,3 @@
                     halign: 'left'
                     valign: 'middle'
                     color: .6, .6, .6, 1
-                BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    height: '50dp'
-                    padding: '16dp', '8dp', '8dp', '8dp'
-                    Label:
-                        text: 'English'
-                        font_size: '18dp'
-                        text_size: self.width, self.height
-                        halign: 'left'
-                        valign: 'middle'
-                        color: .2, .2, .2, 1
-                    CheckBox:
-                        group: 'app_lang'
-                        color: .2, .2, .2, 1
-                        active: 'down'
-                BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    height: '50dp'
-                    padding: '16dp', '8dp', '8dp', '8dp'
-                    Label:
-                        text: 'Slovenčina'
-                        font_size: '18dp'
-                        text_size: self.width, self.height
-                        halign: 'left'
-                        valign: 'middle'
-                        color: .2, .2, .2, 1
-                    CheckBox:
-                        group: 'app_lang'
-                        color: .2, .2, .2, 1
-                        active: 'normal'

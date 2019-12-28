@@ -2,6 +2,8 @@
 
 #:import guides guides
 
+#:import translator translator.translator
+
 <NavigationPanelButton@Button>:
     title: '<undefined>'
     image: 'assets/img/picture.png'
@@ -32,7 +34,7 @@
             color: .2, .2, .2, 1
             disabled_color: .8, .8, .8, 1
 
-<NavigationPanel@ScrollView>:
+<NavigationPanel>:
     is_active_guide: True
     canvas.before:
         Color:
@@ -46,48 +48,48 @@
         height: self.minimum_height
         padding: '4dp'
         NavigationPanelButton:
-            title: 'Search'
+            title: translator.translate('Search', translator.active_lang_code)
             image: 'assets/img/search.png'
             disabled: not root.is_active_guide
             on_release:
                 app.root.show_search_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Categories'
+            title: translator.translate('Categories', translator.active_lang_code)
             image: 'assets/img/category.png'
             disabled: not root.is_active_guide
             on_release:
                 app.root.show_categoriesmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Tags'
+            title: translator.translate('Tags', translator.active_lang_code)
             image: 'assets/img/tag.png'
             disabled:  not root.is_active_guide
             on_release:
                 app.root.show_tagsmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Articles'
+            title: translator.translate('Articles', translator.active_lang_code)
             image: 'assets/img/article.png'
             disabled: not root.is_active_guide
             on_release:
                 app.root.show_articlesmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Bookmarks'
+            title: translator.translate('Bookmarks', translator.active_lang_code)
             image: 'assets/img/bookmark.png'
             disabled: not root.is_active_guide
             on_release:
                 app.root.show_bookmarksmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Guides'
+            title: translator.translate('Guides', translator.active_lang_code)
             image: 'assets/img/guide.png'
             on_release:
                 app.root.show_guidesmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Settings'
+            title: translator.translate('Settings', translator.active_lang_code)
             image: 'assets/img/settings.png'
             on_release:
                 app.root.show_settings_screen()

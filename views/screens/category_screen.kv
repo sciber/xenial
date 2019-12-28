@@ -1,5 +1,7 @@
 #:kivy 1.11.1
 
+#:import translator translator.translator
+
 <CategoryScreen>:
     name: 'category'
     category_icon: ''
@@ -18,7 +20,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Category'
+            title: translator.translate('Category', translator.active_lang_code)
         ScrollView:
             BoxLayout:
                 orientation: 'vertical'
@@ -70,7 +72,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Related categories'
+                        text: translator.translate('Related categories', translator.active_lang_code)
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'
@@ -95,7 +97,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Related articles'
+                        text: translator.translate('Related articles', translator.active_lang_code)
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'

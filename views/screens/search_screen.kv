@@ -1,5 +1,7 @@
 #:kivy 1.11.1
 
+#:import translator translator.translator
+
 <SearchScreen>:
     name: 'search'
     BoxLayout:
@@ -12,7 +14,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Search'
+            title: translator.translate('Search', translator.active_lang_code)
         ScrollView:
             BoxLayout:
                 orientation: 'vertical'
@@ -25,8 +27,9 @@
                     size_hint_y: None
                     height: '50dp'
                     TextInput:
-                        hint_text: 'Search guide articles'
-                        font_size: '20dp'
+                        hint_text:
+                            translator.translate('Search active guide articles', translator.active_lang_code)
+                        font_size: '16dp'
                         padding: '12dp', '12dp', '12dp', '12dp'
                         multiline: False
                     Button:
@@ -38,7 +41,9 @@
                             pos: self.parent.pos
                             size: self.parent.size
                 Label:
-                    text: 'Your search did not match any articles'
+                    text:
+                        translator.translate('Your search did not match any articles', translator.active_lang_code)
+                    text_size: self.size
                     size_hint_y: None
                     height: '50dp'
                     font_size: '18dp'

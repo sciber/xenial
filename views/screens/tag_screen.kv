@@ -1,5 +1,7 @@
 #:kivy 1.11.1
 
+#:import translator translator.translator
+
 <TagScreen>:
     name: 'tag'
     tag_name: ''
@@ -16,7 +18,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Tag'
+            title: translator.translate('Tag', translator.active_lang_code)
         ScrollView:
             BoxLayout:
                 orientation: 'vertical'
@@ -53,7 +55,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Tagged categories'
+                        text: translator.translate('Tagged categories', translator.active_lang_code)
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'
@@ -78,7 +80,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Tagged articles'
+                        text: translator.translate('Tagged articles', translator.active_lang_code)
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'
