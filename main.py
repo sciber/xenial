@@ -335,7 +335,7 @@ kivy.require('1.11.1')
 from kivy.uix.label import Label
 
 from models import GuidesModel
-
+from settings import app_settings
 
 class ApplicationRoot(Label):
     def __init__(self, **kwargs):
@@ -362,9 +362,30 @@ class XenialApp(App):
     def __init__(self, **kwargs):
         super(XenialApp, self).__init__(**kwargs)
         self.guides = GuidesModel()
-        print(self.guides.guides_list)
+        if app_settings.exists('active_guide_name'):
+            self.active_guide_name = app_settings.get('active_guide_name')
+        elif self.guides.guides_list:
+            self.active_guide_name = self.guides.guides_list[0]['name']
+            app_settings.set('active_guide_name', self.active_guide_name)
+        else:
+            self.active_guide_name = ''
+        if app_settings.exists('app_lang_code'):
+            self.app_lang_code = app_settings.get('app_lang_code')
+        else:
+            self.app_lang_code = 'en'
+
+        # new_guides_list_item = self.guides.import_from_archive('guides/dummy.zip')
+        # print(new_guides_list_item)
+
         for guides_list_item in self.guides.guides_list:
             print(guides_list_item)
+        # print(self.guides.guides_list)
+        # for guides_list_item in self.guides.guides_list:
+        #     print(guides_list_item)
+        guide_name = self.guides.guides_list[0]['name']
+        guide = self.guides.guide_by_name(guide_name)
+        print(guide.guide_name)
+        print(guide.categories_list())
 
     def build(self):
         self.root = ApplicationRoot()
