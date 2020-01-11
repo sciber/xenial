@@ -17,7 +17,7 @@ class SettingsManager:
     def set(self, key, value):
         self.settings_dict[key] = value
         with open(SETTINGS_FILE, 'w') as f:
-            json.dump(f, self.settings_dict)
+            json.dump(self.settings_dict, f)
 
 
 app_settings = SettingsManager()

@@ -8,8 +8,9 @@ from datetime import datetime
 
 GUIDES_DIR = 'guides'
 
-GUIDES_KEYS = ('name', 'icon', 'title', 'description', 'version', 'lang', 'from_place', 'to_place')
-TAGS_KEYS = ('tag_id', 'tag_name')
+GUIDES_KEYS = ('guide_name', 'guide_icon', 'guide_title', 'guide_description', 'guide_version',
+               'guide_lang', 'guide_from_place', 'guide_to_place', 'guide_content')
+TAGS_KEYS = ('tag_id', 'tag_name', 'tag_count_categories', 'tag_count_articles')
 CATEGORIES_KEYS = ('category_id', 'category_name', 'category_icon', 'category_description')
 RELATED_CATEGORIES_KEYS = CATEGORIES_KEYS + ('category_num_shared_tags',)
 ARTICLES_KEYS = ('article_id', 'article_name', 'article_icon', 'article_title', 'article_synopsis')
@@ -20,18 +21,31 @@ BOOKMARKS_KEYS = ('bookmark_id', 'bookmark_created_at',
 
 
 class GuidesModel:
+    guides_list = []
+    active_guide = None
+
     def __init__(self):
-        self.guides_list = []
         guides_names = [filename for filename in os.listdir(GUIDES_DIR)
                         if os.path.isdir(os.path.join(GUIDES_DIR, filename))]
         for guide_name in guides_names:
             with open(os.path.join(GUIDES_DIR, guide_name, 'guide.json'), 'r') as f:
                 guide_json = json.load(f)
             self.guides_list.append(guide_json)
+        if guides_names:
+            self.set_active_guide(guides_names[0])
 
-    @staticmethod
-    def guide_by_name(guide_name):
-        return GuideModel(guide_name)
+    def set_active_guide(self, guide_name):
+        self.active_guide = self.guide_by_name(guide_name)
+
+    def guide_by_name(self, guide_name):
+        try:
+            guides_list_item = next(item for item in self.guides_list if item['guide_name'] == guide_name)
+        except Exception as e:
+            print(e)
+            guide = None
+        else:
+            guide = GuideModel(guides_list_item['guide_name'])
+        return guide
 
     def import_from_archive(self, archive):
         """ Import guide from zip archive to sqlite database """
@@ -46,75 +60,17 @@ class GuidesModel:
         with open(os.path.join(GUIDES_DIR, guide_name, 'guide.json'), 'r') as f:
             guides_list_item = json.load(f)
 
-        self._validate_guides_list_item(guide_name, guides_list_item)
+        guides_list_item = self._validate_guides_list_item(guide_name, guides_list_item)
 
-        with open(os.path.join(GUIDES_DIR, guide_name, 'categories.json'), 'r') as f:
-            categories = json.load(f)
-        self._create_categories_table(conn)
-        self._create_tags_table(conn)
-        self._create_tags_categories_table(conn)
-        for category in categories:
-            category_id = self._insert_into_categories(
-                conn, (category['name'], category['icon'], category['description']))
-            for tag_name in set(category['tags']):
-                tag_row = self._fetchone_from_tags_where_name(conn, tag_name)
-                if tag_row is not None:
-                    tag_id = tag_row[0]
-                else:
-                    tag_id = self._insert_into_tags(conn, tag_name)
-                self._insert_into_tags_categories(conn, (tag_id, category_id))
-        os.remove(os.path.join(GUIDES_DIR, guide_name, 'categories.json'))
-
-        self._create_articles_table(conn)
-        self._create_tags_articles_table(conn)
-        self._create_articles_blocks_table(conn)
-        self._create_subtitle_blocks_table(conn)
-        self._create_paragraph_blocks_table(conn)
-        self._create_image_blocks_table(conn)
-        self._create_audio_blocks_table(conn)
-        self._create_video_blocks_table(conn)
-
-        articles_jsons = [filename for filename in os.listdir(os.path.join(GUIDES_DIR, guide_name, 'articles'))]
-        for article_json in articles_jsons:
-            with open(os.path.join(GUIDES_DIR, guide_name, 'articles', article_json), 'r') as f:
-                article = json.load(f)
-            article_id = self._insert_into_articles(
-                conn, (article['name'], article['icon'], article['title'], article['synopsis']))
-            for block in article['content']:
-                if block['type'] == 'subtitle':
-                    block_id = self._insert_into_subtitle_blocks(conn, block['text'])
-                elif block['type'] == 'paragraph':
-                    block_id = self._insert_into_paragraph_blocks(conn, block['text'])
-                elif block['type'] == 'image':
-                    block_id = self._insert_into_image_blocks(conn, (block['source'], block['caption']))
-                elif block['type'] == 'audio':
-                    block_id = self._insert_into_audio_blocks(conn, (block['source'], block['caption']))
-                elif block['type'] == 'video':
-                    block_id = self._insert_into_video_blocks(conn, (block['source'], block['caption']))
-                else:
-                    continue
-                self._insert_into_articles_blocks(conn, (article_id, block_id, block['type']))
-
-            for tag_name in set(article['tags']):
-                tag_row = self._fetchone_from_tags_where_name(conn, tag_name)
-                if tag_row is not None:
-                    tag_id = tag_row[0]
-                else:
-                    tag_id = self._insert_into_tags(conn, tag_name)
-                self._insert_into_tags_articles(conn, (tag_id, article_id))
-        shutil.rmtree(os.path.join(GUIDES_DIR, guide_name, 'articles'))
-
-        with open(os.path.join(GUIDES_DIR, guide_name, 'bookmarks.json'), 'r') as f:
-            bookmarks = json.load(f)
-        self._create_bookmarks_table(conn)
-        for bookmark in bookmarks:
-            article_id = self._fetchone_from_articles_where_name(conn, bookmark['article_name'])[0]
-            self._insert_into_bookmarks(conn, (article_id, bookmark['created_at']))
-        os.remove(os.path.join(GUIDES_DIR, guide_name, 'bookmarks.json'))
+        self._import_from_archive_guide_categories(conn, guide_name)
+        self._import_from_archive_guide_articles(conn, guide_name)
+        self._import_from_archive_guide_bookmarks(conn, guide_name)
 
         conn.commit()
         conn.close()
         self.guides_list.append(guides_list_item)
+        if len(self.guides_list) == 1:
+            self.set_active_guide(guides_list_item['guide_name'])
 
         return guides_list_item
 
@@ -126,18 +82,53 @@ class GuidesModel:
 
     @staticmethod
     def _validate_guides_list_item(guide_name, guides_list_item):
-        for key in GUIDES_KEYS:
-            value = guides_list_item[key]
-            if key == 'name' and value != guide_name:
-                raise Exception('JSON guide name is not the same as the archive name')
-            if key == 'lang' and type(value) != tuple and len(value) != 2:
-                raise Exception('Guide language has to be described by a tuple with two string elements (name, code)')
+        validated_guide_list_item = {}
+        validated_guide_list_item['guide_name'] = guides_list_item['name']
+        if validated_guide_list_item['guide_name'] != guide_name:
+            raise Exception('JSON guide name is not the same as the archive name')
+        validated_guide_list_item['guide_icon'] = os.path.join(GUIDES_DIR, guide_name, guides_list_item['icon'])
+        validated_guide_list_item['guide_title'] = guides_list_item['title']
+        validated_guide_list_item['guide_description'] = guides_list_item['description']
+        validated_guide_list_item['guide_version'] = guides_list_item['version']
+        validated_guide_list_item['guide_lang'] = guides_list_item['lang']
+        if (validated_guide_list_item['guide_lang']
+                and type(validated_guide_list_item['guide_lang']) != tuple
+                and len(validated_guide_list_item['guide_lang']) != 2):
+            raise Exception('Guide language has to be described by a tuple with two string elements (name, code)')
+        validated_guide_list_item['guide_from_place'] = guides_list_item['from_place']
+        validated_guide_list_item['guide_to_place'] = guides_list_item['to_place']
+        validated_guide_list_item['guide_content'] = guides_list_item['content']
+
+        with open(os.path.join(GUIDES_DIR, guide_name, 'guide.json'), 'w') as f:
+            json.dump(validated_guide_list_item, f)
+
+        return validated_guide_list_item
+
+    def _import_from_archive_guide_categories(self, conn, guide_name):
+        with open(os.path.join(GUIDES_DIR, guide_name, 'categories.json'), 'r') as f:
+            categories = json.load(f)
+        self._create_categories_table(conn)
+        self._create_tags_table(conn)
+        self._create_tags_categories_table(conn)
+        for category in categories:
+            category_id = self._insert_into_categories(
+                conn, (category['name'],
+                       os.path.join(GUIDES_DIR, guide_name, category['icon']),
+                       category['description']))
+            for tag_name in set(category['tags']):
+                tag_row = self._fetchone_from_tags_where_name(conn, tag_name)
+                if tag_row is not None:
+                    tag_id = tag_row[0]
+                else:
+                    tag_id = self._insert_into_tags(conn, tag_name)
+                self._insert_into_tags_categories(conn, (tag_id, category_id))
+        os.remove(os.path.join(GUIDES_DIR, guide_name, 'categories.json'))
 
     @staticmethod
     def _create_categories_table(conn):
         sql_create_categories_table = """ CREATE TABLE categories (
                                               id integer PRIMARY KEY,
-                                              name text NOT NULL,
+                                              name text UNIQUE NOT NULL,
                                               icon text,
                                               description text
                                           ); """
@@ -148,7 +139,7 @@ class GuidesModel:
     def _create_tags_table(conn):
         sql_create_tags_table = """ CREATE TABLE tags (
                                         id integer PRIMARY KEY,
-                                        name text NOT NULL
+                                        name text UNIQUE NOT NULL
                                     ); """
         cur = conn.cursor()
         cur.execute(sql_create_tags_table)
@@ -156,9 +147,9 @@ class GuidesModel:
     @staticmethod
     def _create_tags_categories_table(conn):
         sql_create_tags_categories_table = """ CREATE TABLE tags_categories (
-                                                   id integer PRIMARY KEY,
                                                    tag_id integer NOT NULL,
-                                                   category_id integer NOT NULL
+                                                   category_id integer NOT NULL,
+                                                   UNIQUE(tag_id, category_id)
                                                ); """
         cur = conn.cursor()
         cur.execute(sql_create_tags_categories_table)
@@ -193,11 +184,68 @@ class GuidesModel:
         cur.execute(sql_insert_into_tags_categories, values)
         return cur.lastrowid
 
+    def _import_from_archive_guide_articles(self, conn, guide_name):
+        self._create_articles_table(conn)
+        self._create_tags_articles_table(conn)
+        self._create_articles_blocks_table(conn)
+        self._create_subtitle_blocks_table(conn)
+        self._create_paragraph_blocks_table(conn)
+        self._create_image_blocks_table(conn)
+        self._create_audio_blocks_table(conn)
+        self._create_video_blocks_table(conn)
+
+        articles_jsons = [filename for filename in os.listdir(os.path.join(GUIDES_DIR, guide_name, 'articles'))]
+        for article_json in articles_jsons:
+            with open(os.path.join(GUIDES_DIR, guide_name, 'articles', article_json), 'r') as f:
+                article = json.load(f)
+            article_id = self._insert_into_articles(
+                conn, (article['name'],
+                       os.path.join(GUIDES_DIR, guide_name, article['icon']),
+                       article['title'],
+                       article['synopsis']))
+            block_order = 0
+            for block in article['content']:
+                if block['type'] == 'subtitle':
+                    block_id = self._insert_into_subtitle_blocks(conn, block['text'])
+                elif block['type'] == 'paragraph':
+                    block_id = self._insert_into_paragraph_blocks(conn, block['text'])
+                elif block['type'] == 'image':
+                    image_block_row = self._fetchone_from_image_blocks_where_image_source(conn, block['source'])
+                    if image_block_row is not None:
+                        block_id = image_block_row[0]
+                    else:
+                        block_id = self._insert_into_image_blocks(conn, (block['source'], block['caption']))
+                elif block['type'] == 'audio':
+                    audio_block_row = self._fetchone_from_audio_blocks_where_audio_source(conn, block['source'])
+                    if audio_block_row is not None:
+                        block_id = audio_block_row[0]
+                    else:
+                        block_id = self._insert_into_audio_blocks(conn, (block['source'], block['caption']))
+                elif block['type'] == 'video':
+                    video_block_row = self._fetchone_from_video_blocks_where_video_source(conn, block['source'])
+                    if video_block_row is not None:
+                        block_id = video_block_row[0]
+                    else:
+                        block_id = self._insert_into_video_blocks(conn, (block['source'], block['caption']))
+                else:
+                    continue
+                block_order += 1
+                self._insert_into_articles_blocks(conn, (article_id, block_id, block_order, block['type']))
+
+            for tag_name in set(article['tags']):
+                tag_row = self._fetchone_from_tags_where_name(conn, tag_name)
+                if tag_row is not None:
+                    tag_id = tag_row[0]
+                else:
+                    tag_id = self._insert_into_tags(conn, tag_name)
+                self._insert_into_tags_articles(conn, (tag_id, article_id))
+        shutil.rmtree(os.path.join(GUIDES_DIR, guide_name, 'articles'))
+
     @staticmethod
     def _create_articles_table(conn):
         sql_create_articles_table = """ CREATE TABLE articles (
                                             id integer PRIMARY KEY,
-                                            name text NOT NULL,
+                                            name text UNIQUE NOT NULL,
                                             icon text,
                                             title text,
                                             synopsis text
@@ -223,16 +271,16 @@ class GuidesModel:
     @staticmethod
     def _create_tags_articles_table(conn):
         sql_create_tags_articles_table = """ CREATE TABLE tags_articles (
-                                                  id integer PRIMARY KEY,
                                                   tag_id integer NOT NULL,
-                                                  article_id integer NOT NULL
+                                                  article_id integer NOT NULL,
+                                                  UNIQUE(tag_id, article_id)
                                               ); """
         cur = conn.cursor()
         cur.execute(sql_create_tags_articles_table)
 
     @staticmethod
     def _insert_into_tags_articles(conn, values):
-        sql_insert_into_tags_articles = """ INSERT INTO tags_categories (tag_id, category_id)
+        sql_insert_into_tags_articles = """ INSERT INTO tags_articles (tag_id, article_id)
                                             VALUES (?, ?); """
         cur = conn.cursor()
         cur.execute(sql_insert_into_tags_articles, values)
@@ -241,9 +289,9 @@ class GuidesModel:
     @staticmethod
     def _create_articles_blocks_table(conn):
         sql_create_articles_blocks_table = """ CREATE TABLE articles_blocks (
-                                                   id integer PRIMARY KEY,
                                                    article_id integer NOT NULL,
                                                    block_id integer NOT NULL,
+                                                   block_order integer NOT NULL,
                                                    block_type text NOT NULL
                                                ); """
         cur = conn.cursor()
@@ -251,8 +299,9 @@ class GuidesModel:
 
     @staticmethod
     def _insert_into_articles_blocks(conn, values):
-        sql_insert_into_articles_blocks = """ INSERT INTO articles_blocks (article_id, block_id, block_type)
-                                              VALUES (?, ?, ?); """
+        sql_insert_into_articles_blocks = """ INSERT INTO articles_blocks 
+                                                  (article_id, block_id, block_order, block_type)
+                                              VALUES (?, ?, ?, ?); """
         cur = conn.cursor()
         cur.execute(sql_insert_into_articles_blocks, values)
 
@@ -294,7 +343,7 @@ class GuidesModel:
     def _create_image_blocks_table(conn):
         sql_create_image_blocks_table = """ CREATE TABLE image_blocks (
                                                 id integer PRIMARY KEY,
-                                                image_source text NOT NULL,
+                                                image_source text UNIQUE NOT NULL,
                                                 caption_text text
                                             ); """
         cur = conn.cursor()
@@ -309,11 +358,20 @@ class GuidesModel:
         return cur.lastrowid
 
     @staticmethod
+    def _fetchone_from_image_blocks_where_image_source(conn, image_source):
+        sql_select_all_from_image_blocks_where_image_source = """ SELECT * FROM image_blocks
+                                                                  WHERE image_source=?; """
+        cur = conn.cursor()
+        cur.execute(sql_select_all_from_image_blocks_where_image_source, (image_source,))
+        return cur.fetchone()
+
+    @staticmethod
     def _create_audio_blocks_table(conn):
         sql_create_audio_blocks_table = """ CREATE TABLE audio_blocks (
                                                 id integer PRIMARY KEY,
                                                 block_type text NOT NULL DEFAULT 'audio',
-                                                audio_source text NOT NULL,
+                                                audio_source text UNIQUE NOT NULL,
+                                                audio_length real,
                                                 caption_text text
                                             ); """
         cur = conn.cursor()
@@ -328,11 +386,20 @@ class GuidesModel:
         return cur.lastrowid
 
     @staticmethod
+    def _fetchone_from_audio_blocks_where_audio_source(conn, audio_source):
+        sql_select_all_from_audio_blocks_where_audio_source = """ SELECT * FROM audio_blocks
+                                                                  WHERE audio_source=?; """
+        cur = conn.cursor()
+        cur.execute(sql_select_all_from_audio_blocks_where_audio_source, (audio_source,))
+        return cur.fetchone()
+
+    @staticmethod
     def _create_video_blocks_table(conn):
         sql_create_video_blocks_table = """ CREATE TABLE video_blocks (
                                                 id integer PRIMARY KEY,
-                                                block_type text NOT NULL DEFAULT 'video',
-                                                video_source text NOT NULL,
+                                                video_source text UNIQUE NOT NULL,
+                                                video_length real,
+                                                video_cover_source text,
                                                 caption_text text
                                             ); """
         cur = conn.cursor()
@@ -347,10 +414,27 @@ class GuidesModel:
         return cur.lastrowid
 
     @staticmethod
+    def _fetchone_from_video_blocks_where_video_source(conn, video_source):
+        sql_select_all_from_video_blocks_where_video_source = """ SELECT * FROM video_blocks
+                                                                  WHERE video_source=?; """
+        cur = conn.cursor()
+        cur.execute(sql_select_all_from_video_blocks_where_video_source, (video_source,))
+        return cur.fetchone()
+
+    def _import_from_archive_guide_bookmarks(self, conn, guide_name):
+        with open(os.path.join(GUIDES_DIR, guide_name, 'bookmarks.json'), 'r') as f:
+            bookmarks = json.load(f)
+        self._create_bookmarks_table(conn)
+        for bookmark in bookmarks:
+            article_id = self._fetchone_from_articles_where_name(conn, bookmark['article_name'])[0]
+            self._insert_into_bookmarks(conn, (article_id, bookmark['created_at']))
+        os.remove(os.path.join(GUIDES_DIR, guide_name, 'bookmarks.json'))
+
+    @staticmethod
     def _create_bookmarks_table(conn):
         sql_create_bookmarks_table = """ CREATE TABLE bookmarks (
                                              id integer PRIMARY KEY,
-                                             article_id integer NOT NULL,
+                                             article_id integer UNIQUE NOT NULL,
                                              created_at text
                                          ); """
         cur = conn.cursor()
@@ -373,19 +457,29 @@ class GuideModel:
             guide = json.load(f)
 
         self.guide_name = guide_name
-        self.guide_version = guide['version']
-        self.guide_icon = os.path.join(GUIDES_DIR, guide_name, guide['icon'])
-        self.guide_title = guide['title']
-        self.guide_description = guide['description']
-        self.guide_lang = guide['lang']
-        self.guide_from_place = guide['from_place']
-        self.guide_to_place = guide['to_place']
-        self.guide_content = guide['content']
+        self.guide_version = guide['guide_version']
+        self.guide_icon = guide['guide_icon']
+        self.guide_title = guide['guide_title']
+        self.guide_description = guide['guide_description']
+        self.guide_lang = guide['guide_lang']
+        self.guide_from_place = guide['guide_from_place']
+        self.guide_to_place = guide['guide_to_place']
+        self.guide_content = guide['guide_content']
 
     def tags_list(self):
-        sql_select_all_from_tags = """ SELECT * FROM tags; """
+        # sql_select_all_from_tags = """ SELECT * FROM tags; """
+        sql_select_joined_tags = """ SELECT t.id, t.name, IFNULL(tc.count_categories, 0), IFNULL(ta.count_articles, 0) 
+                                     FROM tags AS t
+                                     LEFT JOIN (
+                                         SELECT tag_id, COUNT(article_id) AS count_articles FROM tags_articles
+                                         GROUP BY tag_id) AS ta
+                                     ON t.id=ta.tag_id
+                                     LEFT JOIN (
+                                         SELECT tag_id, COUNT(category_id) AS count_categories FROM tags_categories
+                                         GROUP BY tag_id) AS tc
+                                     ON t.id=tc.tag_id; """
         cur = self.conn.cursor()
-        cur.execute(sql_select_all_from_tags)
+        cur.execute(sql_select_joined_tags)
         tags_rows = cur.fetchall()
         return [dict(zip(TAGS_KEYS, row)) for row in tags_rows]
 
@@ -658,6 +752,8 @@ class ArticleModel:
         cur.execute(sql_select_all_related_articles, related_articles_ids)
         return cur.fetchall
 
+
+guides = GuidesModel()
 
 #####################################################################################################################
 

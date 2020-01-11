@@ -1,11 +1,10 @@
 #:kivy 1.11.1
 
-#:import translator translator.translator
-
 <TagsMenuItem>:
+    tag_id: 0
     tag_name: ''
-    num_tagged_categories: 0
-    num_tagged_articles: 0
+    tag_count_categories: 0
+    tag_count_articles: 0
     size_hint_y: None
     height: '60dp'
     background_normal: ''
@@ -35,10 +34,10 @@
                 width: self.height
                 color: 1, 1, 1, .5
             Label:
-                visible: root.num_tagged_categories > 0
+                visible: root.tag_count_categories > 0
                 size_hint: (.5, .5) if self.visible else (0, 0)
                 opacity: 1 if self.visible else 0
-                text: str(root.num_tagged_categories)
+                text: str(root.tag_count_categories)
                 font_size: '12dp'
                 bold: True
                 color: 1, 1, 1, 1
@@ -66,10 +65,10 @@
                 width: self.height
                 color: 1, 1, 1, .5
             Label:
-                visible: root.num_tagged_articles > 0
+                visible: root.tag_count_articles > 0
                 size_hint: (.5, .5) if self.visible else (0, 0)
                 opacity: 1 if self.visible else 0
-                text: str(root.num_tagged_articles)
+                text: str(root.tag_count_articles)
                 font_size: '12dp'
                 bold: True
                 color: 1, 1, 1, 1
@@ -87,6 +86,7 @@
 
 <TagsMenuScreen>:
     name: 'tagsmenu'
+    screen_title: 'Tags'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -97,7 +97,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: translator.translate('Tags', translator.active_lang_code)
+            title: root.screen_title
         ScrollView:
             BoxLayout:
                 id: tagsmenu_widget

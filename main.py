@@ -1,11 +1,19 @@
-import os
+import time
 
 import kivy
 
-from kivy.config import Config
+from settings import app_settings
+from events import ev
+from translator import tr
+from models import guides
+
 from kivy.app import App
-from kivy.base import EventLoop
 from kivy.lang.builder import Builder
+
+import os
+
+from kivy.config import Config
+from kivy.base import EventLoop
 from kivy.properties import BooleanProperty, StringProperty
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.popup import Popup
@@ -14,14 +22,16 @@ from kivy.garden.navigationdrawer import NavigationDrawer
 
 # from models import guides, bookmarks
 
+from controllers.log_controller import LogScreen
+from controllers.category_controller import CategoriesMenuScreen  #, CategoryScreen
+from controllers.tag_controller import TagsMenuScreen  #, TagScreen
+from controllers.settings_controller import SettingsScreen
+from controllers.components.navigationpanel_controller import NavigationPanel
 # from controllers.guide_controller import GuidesMenuScreen, GuideScreen, GuideLoadFailedWarning
-# from controllers.tag_controller import TagsMenuScreen, TagScreen
-# from controllers.category_controller import CategoriesMenuScreen, CategoryScreen
 # from controllers.article_controller import ArticlesMenuScreen, ArticleScreen
 # from controllers.bookmark_controller import BookmarksMenuScreen
 # from controllers.search_controller import SearchScreen
-# from controllers.settings_controller import SettingsScreen
-#
+
 # from history import history
 #
 # from translator import translator
@@ -37,46 +47,41 @@ kivy.require('1.11.1')
 #               ]''')
 
 # # Views components
+Builder.load_file('views/components/navigationpanel.kv')
+Builder.load_file('views/components/screentitlebar.kv')
+Builder.load_file('views/components/categoriesmenu.kv')
 # Builder.load_file('views/components/historyswitchguideprompt.kv')
 # Builder.load_file('views/components/leaveappprompt.kv')
-# Builder.load_file('views/components/navigationpanel.kv')
-# Builder.load_file('views/components/screentitlebar.kv')
 # Builder.load_file('views/components/tagslist.kv')
-# Builder.load_file('views/components/categoriesmenu.kv')
 # Builder.load_file('views/components/articlesmenu.kv')
 # Builder.load_file('views/components/articlecontent.kv')
-#
-# # Screens views
+
+# Screens views
+Builder.load_file('views/screens/log_screen.kv')
+Builder.load_file('views/screens/categoriesmenu_screen.kv')
+Builder.load_file('views/screens/tagsmenu_screen.kv')
+Builder.load_file('views/screens/settings_screen.kv')
 # Builder.load_file('views/screens/guidesmenu_screen.kv')
 # Builder.load_file('views/screens/guide_screen.kv')
-# Builder.load_file('views/screens/tagsmenu_screen.kv')
 # Builder.load_file('views/screens/tag_screen.kv')
 # Builder.load_file('views/screens/articlesmenu_screen.kv')
-# Builder.load_file('views/screens/categoriesmenu_screen.kv')
 # Builder.load_file('views/screens/category_screen.kv')
 # Builder.load_file('views/screens/bookmarksmenu_screen.kv')
 #
 # Builder.load_file('views/screens/article_screen.kv')
 # Builder.load_file('views/screens/search_screen.kv')
-# Builder.load_file('views/screens/settings_screen.kv')
-#
-# # Application root view
-# Builder.load_string('''
-# <ApplicationRoot>:
-#     anim_type: 'slide_above_simple'
-#     BoxLayout:
-#         id: navigation_panel_container
-#     ScreenManager:
-#         id: manager
-# ''')
-#
-#
-# class NavigationPanel(ScrollView):
-#     def __init__(self, is_active_guide, **kwargs):
-#         super(NavigationPanel, self).__init__(**kwargs)
-#         self.is_active_guide = is_active_guide
-#
-#
+
+# Application root view
+Builder.load_string('''
+<ApplicationRoot>:
+    anim_type: 'slide_above_simple'
+    BoxLayout:
+        id: navigation_panel_container
+    ScreenManager:
+        id: manager
+''')
+
+
 # class HistorySwitchGuidePrompt(Popup):
 #     def __init__(self, guide_name, **kwargs):
 #         super(HistorySwitchGuidePrompt, self).__init__(**kwargs)
@@ -94,19 +99,50 @@ kivy.require('1.11.1')
 #
 # class LeaveAppPrompt(Popup):
 #     pass
-#
-#
-# class ApplicationRoot(NavigationDrawer):
+
+
+class ApplicationRoot(NavigationDrawer):
 #     is_active_guide = BooleanProperty()
-#
-#     def __init__(self, **kwargs):
-#         super(ApplicationRoot, self).__init__(**kwargs)
+
+    def __init__(self, **kwargs):
+        super(ApplicationRoot, self).__init__(**kwargs)
+        self.sm = self.ids.manager
+
+        self.log_screen = LogScreen()
+        self.sm.add_widget(self.log_screen)
+        self.sm.current = 'log'
+
+        start_time = time.time()
+        self.categoriesmenu_screen = CategoriesMenuScreen()
+        self.sm.add_widget(self.categoriesmenu_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Categories menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
+        self.tagsmenu_screen = TagsMenuScreen()
+        self.sm.add_widget(self.tagsmenu_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Tags menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
+        self.settings_screen = SettingsScreen()
+        self.sm.add_widget(self.settings_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Settings[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
+        self.navigation_panel_container = self.ids.navigation_panel_container
+        self.navigation_panel = NavigationPanel()
+        self.navigation_panel_container.add_widget(self.navigation_panel)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Navigation panel[/b] was built in: {dt:.2f} ms'.format(dt=dt))
+
 #         self.esc_prompt = None
-#         self.navigation_panel_container = self.ids.navigation_panel_container
-#         self.sm = self.ids.manager
 #         self.add_children_widgets()
-#         self.settings_screen = SettingsScreen()
-#         self.sm.add_widget(self.settings_screen)
 #         self.is_active_guide = bool(guides.active_guide_name)
 #         EventLoop.window.bind(on_keyboard=self.key_handler)
 #         if guides.active_guide_name:
@@ -115,18 +151,12 @@ kivy.require('1.11.1')
 #             self.show_guidesmenu_screen()
 #
 #     def remove_children_widgets(self):
-#         self.navigation_panel_container.remove_widget(self.navigation_panel)
-#         self.navigation_panel = None
-#         self.sm.remove_widget(self.categoriesmenu_screen)
-#         self.categoriesmenu_screen = None
 #         self.sm.remove_widget(self.category_screen)
 #         self.category_screen = None
 #         self.sm.remove_widget(self.guidesmenu_screen)
 #         self.guidesmenu_screen = None
 #         self.sm.remove_widget(self.guide_screen)
 #         self.guide_screen = None
-#         self.sm.remove_widget(self.tagsmenu_screen)
-#         self.tagsmenu_screen = None
 #         self.sm.remove_widget(self.tag_screen)
 #         self.tag_screen = None
 #         self.sm.remove_widget(self.articlesmenu_screen)
@@ -139,8 +169,6 @@ kivy.require('1.11.1')
 #         self.search_screen = None
 #
 #     def add_children_widgets(self):
-#         self.navigation_panel = NavigationPanel(self.is_active_guide)
-#         self.navigation_panel_container.add_widget(self.navigation_panel)
 #         self.categoriesmenu_screen = CategoriesMenuScreen()
 #         self.sm.add_widget(self.categoriesmenu_screen)
 #         self.category_screen = CategoryScreen()
@@ -149,8 +177,6 @@ kivy.require('1.11.1')
 #         self.sm.add_widget(self.guidesmenu_screen)
 #         self.guide_screen = GuideScreen()
 #         self.sm.add_widget(self.guide_screen)
-#         self.tagsmenu_screen = TagsMenuScreen()
-#         self.sm.add_widget(self.tagsmenu_screen)
 #         self.tag_screen = TagScreen()
 #         self.sm.add_widget(self.tag_screen)
 #         self.articlesmenu_screen = ArticlesMenuScreen()
@@ -332,18 +358,10 @@ kivy.require('1.11.1')
 #     def show_settings_screen(self):
 #         self.sm.current = 'settings'
 
-from kivy.uix.label import Label
-
-from models import GuidesModel
-from settings import app_settings
-
-class ApplicationRoot(Label):
-    def __init__(self, **kwargs):
-        super(ApplicationRoot, self).__init__(**kwargs)
-        self.text = 'Application started!'
 
 
 class XenialApp(App):
+
     # GUIDES_DIR = guides.GUIDES_DIR
     # lang_code = StringProperty('en')
 
@@ -361,34 +379,30 @@ class XenialApp(App):
 
     def __init__(self, **kwargs):
         super(XenialApp, self).__init__(**kwargs)
-        self.guides = GuidesModel()
+        # guides.import_from_archive('guides/dummy.zip')
         if app_settings.exists('active_guide_name'):
-            self.active_guide_name = app_settings.get('active_guide_name')
-        elif self.guides.guides_list:
-            self.active_guide_name = self.guides.guides_list[0]['name']
-            app_settings.set('active_guide_name', self.active_guide_name)
-        else:
-            self.active_guide_name = ''
-        if app_settings.exists('app_lang_code'):
-            self.app_lang_code = app_settings.get('app_lang_code')
-        else:
-            self.app_lang_code = 'en'
+            guides.set_active_guide(app_settings.get('active_guide_name'))
+        elif guides.active_guide is not None:
+            self.set_active_guide_name_settings(self, guides.active_guide.guide_name)
+        ev.bind(on_active_guide=self.set_active_guide_name_settings)
+        if app_settings.exists('ui_lang_code'):
+            tr.ui_lang_code = app_settings.get('ui_lang_code')
+        ev.bind(on_ui_lang_code=self.set_translator_ui_lang_code_settings)
 
-        # new_guides_list_item = self.guides.import_from_archive('guides/dummy.zip')
-        # print(new_guides_list_item)
+    @staticmethod
+    def set_active_guide_name_settings(instance, guide_name):
+        app_settings.set('active_guide_name', guide_name)
 
-        for guides_list_item in self.guides.guides_list:
-            print(guides_list_item)
-        # print(self.guides.guides_list)
-        # for guides_list_item in self.guides.guides_list:
-        #     print(guides_list_item)
-        guide_name = self.guides.guides_list[0]['name']
-        guide = self.guides.guide_by_name(guide_name)
-        print(guide.guide_name)
-        print(guide.categories_list())
+    @staticmethod
+    def set_translator_ui_lang_code_settings(instance, lang_code):
+        app_settings.set('ui_lang_code', lang_code)
 
     def build(self):
+        start_time = time.time()
         self.root = ApplicationRoot()
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.root.log_screen.add_log_item('[b]Total[/b] elapsed time: {dt:.2f} ms'.format(dt=dt))
         return self.root
 
     def on_pause(self):
@@ -398,3 +412,4 @@ class XenialApp(App):
 if __name__ == '__main__':
     app = XenialApp()
     app.run()
+

@@ -146,17 +146,16 @@ translations = {
 }
 
 
-class Translator:
+class UITranslator:
     LANGUAGES = [('English', 'en'),
                  ('Slovenčina', 'sk')]
 
-    active_lang_code = 'en'
+    ui_lang_code = 'en'
 
-    def translate(self, phrase, lang_code='en'):
-        if phrase not in translations or lang_code not in translations[phrase]:
+    def translate(self, phrase):
+        if phrase not in translations or self.ui_lang_code not in translations[phrase]:
             return phrase
-        return translations[phrase][lang_code]
+        return translations[phrase][self.ui_lang_code]
 
 
-translator = Translator()
-
+tr = UITranslator()

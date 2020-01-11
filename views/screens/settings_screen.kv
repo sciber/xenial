@@ -1,6 +1,6 @@
 #:kivy 1.11.1
 
-#:import translator translator.translator
+#:import tr translator.tr
 
 <LanguageSettingsMenuItem>:
     lang: ('', '')
@@ -16,19 +16,19 @@
         valign: 'middle'
         color: .2, .2, .2, 1
     CheckBox:
-        active: root.lang[1] == translator.active_lang_code
+        active: root.lang[1] == tr.ui_lang_code
         group: 'app_lang'
         allow_no_selection: False
         size_hint_x: None
         width: '60dp'
         color: 0, .6, .4, 1
         on_state:
-            app.lang_code = root.lang[1]
-
+            root.change_ui_lang_code(self.active)
 
 <SettingsScreen>:
     name: 'settings'
     screen_title: 'Settings'
+    app_lang_subtitle: 'Application language'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -39,7 +39,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: translator.translate(root.screen_title, translator.active_lang_code)
+            title: root.screen_title
         ScrollView:
             BoxLayout:
                 id: container
@@ -47,7 +47,7 @@
                 size_hint_y: None
                 height: self.minimum_height
                 Label:
-                    text: translator.translate('Application language', translator.active_lang_code)
+                    text: root.app_lang_subtitle
                     font_size: '18dp'
                     bold: True
                     size_hint_y: None

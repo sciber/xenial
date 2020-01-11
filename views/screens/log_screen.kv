@@ -1,0 +1,32 @@
+#:kivy 1.11.1
+
+<LogItem>:
+    markup: True
+    font_size: '14dp'
+    text_size: self.width, None
+    color: .2, .2, .2, 1
+    size_hint_y: None
+    height: self.texture_size[1]
+
+<LogScreen>:
+    name: 'log'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '4dp'
+        spacing: '4dp'
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        ScreenTitleBar:
+            title: 'Log'
+        ScrollView:
+            BoxLayout:
+                id: log_container
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                spacing: '8dp'
+                padding: '4dp'

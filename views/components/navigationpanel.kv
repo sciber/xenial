@@ -1,8 +1,6 @@
 #:kivy 1.11.1
 
-#:import guides guides
-
-#:import translator translator.translator
+#:import guides models.guides
 
 <NavigationPanelButton@Button>:
     title: '<undefined>'
@@ -35,7 +33,14 @@
             disabled_color: .8, .8, .8, 1
 
 <NavigationPanel>:
-    is_active_guide: True
+    has_active_guide: False
+    search_button_title: 'Search'
+    categories_button_title: 'Categories'
+    tags_button_title: 'Tags'
+    articles_button_title: 'Articles'
+    bookmarks_button_title: 'Bookmarks'
+    guides_button_title: 'Guides'
+    settings_button_title: 'Settings'
     canvas.before:
         Color:
             rgba: 1, 1, 1, 1
@@ -48,49 +53,60 @@
         height: self.minimum_height
         padding: '4dp'
         NavigationPanelButton:
-            title: translator.translate('Search', translator.active_lang_code)
+            title: root.search_button_title
             image: 'assets/img/search.png'
-            disabled: not root.is_active_guide
+            disabled: not root.has_active_guide
             on_release:
-                app.root.show_search_screen()
+#                app.root.show_search_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: translator.translate('Categories', translator.active_lang_code)
+            title: root.categories_button_title
             image: 'assets/img/category.png'
-            disabled: not root.is_active_guide
+            disabled: not root.has_active_guide
             on_release:
-                app.root.show_categoriesmenu_screen()
+#                app.root.show_categoriesmenu_screen()
+                app.root.sm.current = 'categoriesmenu'
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: translator.translate('Tags', translator.active_lang_code)
+            title: root.tags_button_title
             image: 'assets/img/tag.png'
-            disabled:  not root.is_active_guide
+            disabled:  not root.has_active_guide
             on_release:
-                app.root.show_tagsmenu_screen()
+#                app.root.show_tagsmenu_screen()
+                app.root.sm.current = 'tagsmenu'
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: translator.translate('Articles', translator.active_lang_code)
+            title: root.articles_button_title
             image: 'assets/img/article.png'
-            disabled: not root.is_active_guide
+            disabled: not root.has_active_guide
             on_release:
-                app.root.show_articlesmenu_screen()
+#                app.root.show_articlesmenu_screen()
+                app.root.sm.current = 'articlesmenu'
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: translator.translate('Bookmarks', translator.active_lang_code)
+            title: root.bookmarks_button_title
             image: 'assets/img/bookmark.png'
-            disabled: not root.is_active_guide
+            disabled: not root.has_active_guide
             on_release:
                 app.root.show_bookmarksmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: translator.translate('Guides', translator.active_lang_code)
+            title: root.guides_button_title
             image: 'assets/img/guide.png'
             on_release:
                 app.root.show_guidesmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: translator.translate('Settings', translator.active_lang_code)
+            title: root.settings_button_title
             image: 'assets/img/settings.png'
             on_release:
-                app.root.show_settings_screen()
+#                app.root.show_settings_screen()
+                app.root.sm.current = 'settings'
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Logs'
+            image: 'assets/img/log.png'
+            on_release:
+#                app.root.show_settings_screen()
+                app.root.sm.current = 'log'
                 app.root.toggle_state()
