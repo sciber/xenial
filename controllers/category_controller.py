@@ -61,7 +61,6 @@ class CategoryScreen(Screen):
     def on_category_id(self, *args):
         if self.category_id:
             category = guides.active_guide.category_by_id(self.category_id)
-            print(self.ids.categoriesmenu_container.children[0].children)
             self.category_name = category.category_name
             self.category_icon = category.category_icon
             self.category_description = category.category_description

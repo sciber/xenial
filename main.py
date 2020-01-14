@@ -108,9 +108,9 @@ class ApplicationRoot(NavigationDrawer):
         self.log_screen.add_log_item('[b]Categories menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
         start_time = time.time()
-        self.category_screen = CategoryScreen()
+        self.category_screen = CategoryScreen(name='category')
         self.sm.add_widget(self.category_screen)
-        self.other_category_screen = CategoryScreen()
+        self.other_category_screen = CategoryScreen(name='other_category')
         self.sm.add_widget(self.other_category_screen)
         stop_time = time.time()
         dt = (stop_time - start_time) * 1000
@@ -236,9 +236,9 @@ class ApplicationRoot(NavigationDrawer):
 
     def show_category_screen(self, category_id):
         if self.sm.current == 'category':
-            self.category_screen.name = 'prev_category'
-            self.other_category_screen.name = 'category'
             self.category_screen, self.other_category_screen = self.other_category_screen, self.category_screen
+            self.category_screen.name = 'category'
+            self.other_category_screen.name = 'other_category'
         self.category_screen.category_id = category_id
         self.category_screen.ids.screen_content_scrollview.scroll_y = 1
         self.sm.current = 'category'
@@ -247,9 +247,15 @@ class ApplicationRoot(NavigationDrawer):
         self.tagsmenu_screen.ids.tagsmenu_widget.parent.scroll_y = 1
         self.sm.current = 'tagsmenu'
 
+    def show_tag_screen(self, tag_id):
+        pass
+
     def show_articlesmenu_screen(self):
         self.articlesmenu_screen.ids.articlesmenu_container.scroll_y = 1
         self.sm.current = 'articlesmenu'
+
+    def show_article_screen(self, article_id):
+        pass
 
     def show_bookmarksmenu_screen(self):
         self.bookmarksmenu_screen.ids.bookmarksmenu_widget.parent.scroll_y = 1
@@ -403,4 +409,3 @@ class XenialApp(App):
 if __name__ == '__main__':
     app = XenialApp()
     app.run()
-
