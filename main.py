@@ -2,35 +2,35 @@ import time
 
 import kivy
 
+from kivy.app import App
+from kivy.lang.builder import Builder
+
+from kivy.garden.navigationdrawer import NavigationDrawer
+
 from settings import app_settings
 from events import ev
 from translator import tr
 from models import guides
 
-from kivy.app import App
-from kivy.lang.builder import Builder
-
 import os
 
-from kivy.config import Config
 from kivy.base import EventLoop
 from kivy.properties import BooleanProperty, StringProperty
 from kivy.uix.scrollview import ScrollView
 from kivy.uix.popup import Popup
 
-from kivy.garden.navigationdrawer import NavigationDrawer
 
 # from models import guides, bookmarks
 
 from controllers.log_controller import LogScreen
-from controllers.category_controller import CategoriesMenuScreen  #, CategoryScreen
+from controllers.category_controller import CategoriesMenuScreen, CategoryScreen
 from controllers.tag_controller import TagsMenuScreen  #, TagScreen
+from controllers.article_controller import ArticlesMenuScreen  #, ArticleScreen
 from controllers.settings_controller import SettingsScreen
 from controllers.components.navigationpanel_controller import NavigationPanel
-# from controllers.guide_controller import GuidesMenuScreen, GuideScreen, GuideLoadFailedWarning
-# from controllers.article_controller import ArticlesMenuScreen, ArticleScreen
-# from controllers.bookmark_controller import BookmarksMenuScreen
-# from controllers.search_controller import SearchScreen
+from controllers.guide_controller import GuidesMenuScreen  #, GuideScreen, GuideLoadFailedWarning
+from controllers.bookmark_controller import BookmarksMenuScreen
+from controllers.search_controller import SearchScreen
 
 # from history import history
 #
@@ -38,38 +38,29 @@ from controllers.components.navigationpanel_controller import NavigationPanel
 
 kivy.require('1.11.1')
 
-# Config.set('kivy', 'default_font',
-#            '''["Noto Sans",
-#                "assets/fonts/NotoSans-Regular.ttf",
-#                "assets/fonts/NotoSans-Italic.ttf",
-#                "assets/fonts/NotoSans-Bold.ttf",
-#                "assets/fonts/NotoSans-BoldItalic.ttf"
-#               ]''')
-
 # # Views components
 Builder.load_file('views/components/navigationpanel.kv')
 Builder.load_file('views/components/screentitlebar.kv')
 Builder.load_file('views/components/categoriesmenu.kv')
+Builder.load_file('views/components/articlesmenu.kv')
+Builder.load_file('views/components/tagslist.kv')
 # Builder.load_file('views/components/historyswitchguideprompt.kv')
 # Builder.load_file('views/components/leaveappprompt.kv')
-# Builder.load_file('views/components/tagslist.kv')
-# Builder.load_file('views/components/articlesmenu.kv')
 # Builder.load_file('views/components/articlecontent.kv')
 
 # Screens views
 Builder.load_file('views/screens/log_screen.kv')
+Builder.load_file('views/screens/guidesmenu_screen.kv')
 Builder.load_file('views/screens/categoriesmenu_screen.kv')
+Builder.load_file('views/screens/category_screen.kv')
 Builder.load_file('views/screens/tagsmenu_screen.kv')
+Builder.load_file('views/screens/articlesmenu_screen.kv')
+Builder.load_file('views/screens/bookmarksmenu_screen.kv')
+Builder.load_file('views/screens/search_screen.kv')
 Builder.load_file('views/screens/settings_screen.kv')
-# Builder.load_file('views/screens/guidesmenu_screen.kv')
 # Builder.load_file('views/screens/guide_screen.kv')
 # Builder.load_file('views/screens/tag_screen.kv')
-# Builder.load_file('views/screens/articlesmenu_screen.kv')
-# Builder.load_file('views/screens/category_screen.kv')
-# Builder.load_file('views/screens/bookmarksmenu_screen.kv')
-#
 # Builder.load_file('views/screens/article_screen.kv')
-# Builder.load_file('views/screens/search_screen.kv')
 
 # Application root view
 Builder.load_string('''
@@ -102,15 +93,12 @@ Builder.load_string('''
 
 
 class ApplicationRoot(NavigationDrawer):
-#     is_active_guide = BooleanProperty()
-
     def __init__(self, **kwargs):
         super(ApplicationRoot, self).__init__(**kwargs)
         self.sm = self.ids.manager
 
         self.log_screen = LogScreen()
         self.sm.add_widget(self.log_screen)
-        self.sm.current = 'log'
 
         start_time = time.time()
         self.categoriesmenu_screen = CategoriesMenuScreen()
@@ -120,11 +108,41 @@ class ApplicationRoot(NavigationDrawer):
         self.log_screen.add_log_item('[b]Categories menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
         start_time = time.time()
+        self.category_screen = CategoryScreen()
+        self.sm.add_widget(self.category_screen)
+        self.other_category_screen = CategoryScreen()
+        self.sm.add_widget(self.other_category_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Category[/b] screens stubs were built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
         self.tagsmenu_screen = TagsMenuScreen()
         self.sm.add_widget(self.tagsmenu_screen)
         stop_time = time.time()
         dt = (stop_time - start_time) * 1000
         self.log_screen.add_log_item('[b]Tags menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
+        self.articlesmenu_screen = ArticlesMenuScreen()
+        self.sm.add_widget(self.articlesmenu_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Articles menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
+        self.bookmarksmenu_screen = BookmarksMenuScreen()
+        self.sm.add_widget(self.bookmarksmenu_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Bookmarks menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
+        self.guidesmenu_screen = GuidesMenuScreen()
+        self.sm.add_widget(self.guidesmenu_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Guides menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
         start_time = time.time()
         self.settings_screen = SettingsScreen()
@@ -134,12 +152,21 @@ class ApplicationRoot(NavigationDrawer):
         self.log_screen.add_log_item('[b]Settings[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
         start_time = time.time()
+        self.search_screen = SearchScreen()
+        self.sm.add_widget(self.search_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Search[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
         self.navigation_panel_container = self.ids.navigation_panel_container
         self.navigation_panel = NavigationPanel()
         self.navigation_panel_container.add_widget(self.navigation_panel)
         stop_time = time.time()
         dt = (stop_time - start_time) * 1000
         self.log_screen.add_log_item('[b]Navigation panel[/b] was built in: {dt:.2f} ms'.format(dt=dt))
+
+        self.show_categoriesmenu_screen()
 
 #         self.esc_prompt = None
 #         self.add_children_widgets()
@@ -151,42 +178,22 @@ class ApplicationRoot(NavigationDrawer):
 #             self.show_guidesmenu_screen()
 #
 #     def remove_children_widgets(self):
-#         self.sm.remove_widget(self.category_screen)
-#         self.category_screen = None
-#         self.sm.remove_widget(self.guidesmenu_screen)
-#         self.guidesmenu_screen = None
 #         self.sm.remove_widget(self.guide_screen)
 #         self.guide_screen = None
 #         self.sm.remove_widget(self.tag_screen)
 #         self.tag_screen = None
-#         self.sm.remove_widget(self.articlesmenu_screen)
-#         self.articlesmenu_screen = None
 #         self.sm.remove_widget(self.article_screen)
 #         self.article_screen = None
-#         self.sm.remove_widget(self.bookmarksmenu_screen)
-#         self.bookmarksmenu_screen = None
-#         self.sm.remove_widget(self.search_screen)
-#         self.search_screen = None
+
 #
 #     def add_children_widgets(self):
-#         self.categoriesmenu_screen = CategoriesMenuScreen()
-#         self.sm.add_widget(self.categoriesmenu_screen)
-#         self.category_screen = CategoryScreen()
-#         self.sm.add_widget(self.category_screen)
-#         self.guidesmenu_screen = GuidesMenuScreen()
-#         self.sm.add_widget(self.guidesmenu_screen)
+
 #         self.guide_screen = GuideScreen()
 #         self.sm.add_widget(self.guide_screen)
 #         self.tag_screen = TagScreen()
 #         self.sm.add_widget(self.tag_screen)
-#         self.articlesmenu_screen = ArticlesMenuScreen()
-#         self.sm.add_widget(self.articlesmenu_screen)
 #         self.article_screen = ArticleScreen()
 #         self.sm.add_widget(self.article_screen)
-#         self.bookmarksmenu_screen = BookmarksMenuScreen()
-#         self.sm.add_widget(self.bookmarksmenu_screen)
-#         self.search_screen = SearchScreen()
-#         self.sm.add_widget(self.search_screen)
 #
 #     def key_handler(self, window, key, *largs):
 #         if key == 27:
@@ -218,10 +225,46 @@ class ApplicationRoot(NavigationDrawer):
 #                 self.esc_prompt = LeaveAppPrompt()
 #                 self.esc_prompt.open()
 #         return True
-#
-#     def show_guidesmenu_screen(self):
-#         self.sm.current = 'guidesmenu'
-#
+
+    def show_log_screen(self):
+        self.log_screen.ids.logslist_widget.parent.scroll_y = 1
+        self.sm.current = 'log'
+
+    def show_categoriesmenu_screen(self):
+        self.categoriesmenu_screen.ids.categoriesmenu_container.scroll_y = 1
+        self.sm.current = 'categoriesmenu'
+
+    def show_category_screen(self, category_id):
+        if self.sm.current == 'category':
+            self.category_screen.name = 'prev_category'
+            self.other_category_screen.name = 'category'
+            self.category_screen, self.other_category_screen = self.other_category_screen, self.category_screen
+        self.category_screen.category_id = category_id
+        self.category_screen.ids.screen_content_scrollview.scroll_y = 1
+        self.sm.current = 'category'
+
+    def show_tagsmenu_screen(self):
+        self.tagsmenu_screen.ids.tagsmenu_widget.parent.scroll_y = 1
+        self.sm.current = 'tagsmenu'
+
+    def show_articlesmenu_screen(self):
+        self.articlesmenu_screen.ids.articlesmenu_container.scroll_y = 1
+        self.sm.current = 'articlesmenu'
+
+    def show_bookmarksmenu_screen(self):
+        self.bookmarksmenu_screen.ids.bookmarksmenu_widget.parent.scroll_y = 1
+        self.sm.current = 'bookmarksmenu'
+
+    def show_guidesmenu_screen(self):
+        self.guidesmenu_screen.ids.guidesmenu_widget.parent.scroll_y = 1
+        self.sm.current = 'guidesmenu'
+
+    def show_search_screen(self):
+        self.sm.current = 'search'
+
+    def show_settings_screen(self):
+        self.sm.current = 'settings'
+
 #     def load_guide(self, guide_archive_paths):
 #         guide_archive_path = guide_archive_paths[0]
 #         guide_name = os.path.basename(guide_archive_path).split('.')[0]
@@ -262,12 +305,6 @@ class ApplicationRoot(NavigationDrawer):
 #         self.show_guidesmenu_screen()
 #         self.is_active_guide = bool(guides.active_guide_name)
 #
-#     def show_tagsmenu_screen(self):
-#         if self.tagsmenu_screen.from_guide_name != guides.active_guide_name:
-#             self.tagsmenu_screen.update_tagsmenu_items()
-#             self.tagsmenu_screen.tagsmenu_widget.parent.scroll_y = 1
-#         self.sm.current = 'tagsmenu'
-#
 #     def show_tag_screen(self, tag_name, push_in_history=True):
 #         if (self.tag_screen.from_guide_name != guides.active_guide_name
 #                 or self.tag_screen.tag_name != tag_name):
@@ -285,13 +322,7 @@ class ApplicationRoot(NavigationDrawer):
 #             else:
 #                 self.sm.transition.direction = 'right'
 #         self.sm.current = 'tag'
-#
-#     def show_categoriesmenu_screen(self):
-#         if self.categoriesmenu_screen.from_guide_name != guides.active_guide_name:
-#             self.categoriesmenu_screen.update_categoriesmenu_items()
-#             self.categoriesmenu_screen.ids.categoriesmenu_container.scroll_y = 1
-#         self.sm.current = 'categoriesmenu'
-#
+
 #     def show_category_screen(self, category_name, push_in_history=True):
 #         if (self.category_screen.from_guide_name != guides.active_guide_name
 #                 or self.category_screen.category_name != category_name):
@@ -309,12 +340,6 @@ class ApplicationRoot(NavigationDrawer):
 #             else:
 #                 self.sm.transition.direction = 'right'
 #         self.sm.current = 'category'
-#
-#     def show_articlesmenu_screen(self):
-#         if self.articlesmenu_screen.from_guide_name != guides.active_guide_name:
-#             self.articlesmenu_screen.update_articlesmenu_items()
-#             self.articlesmenu_screen.ids.articlesmenu_container.scroll_y = 1
-#         self.sm.current = 'articlesmenu'
 #
 #     def show_article_screen(self, article_name, push_in_history=True):
 #         if (self.article_screen.from_guide_name != guides.active_guide_name
@@ -341,45 +366,11 @@ class ApplicationRoot(NavigationDrawer):
 #             self.show_category_screen(screen_content_name, False)
 #         elif screen_name == 'tag':
 #             self.show_tag_screen(screen_content_name, False)
-#
-#
-#     def show_bookmarksmenu_screen(self):
-#         self.bookmarksmenu_screen.update_bookmarksmenu_items()
-#         self.bookmarksmenu_screen.ids.bookmarksmenu_widget.parent.scroll_y = 1
-#         self.sm.current = 'bookmarksmenu'
-#
-#     def remove_bookmark(self, article_name):
-#         bookmarks.remove(article_name)
-#         self.bookmarksmenu_screen.update_bookmarksmenu_items()
-#
-#     def show_search_screen(self):
-#         self.sm.current = 'search'
-#
-#     def show_settings_screen(self):
-#         self.sm.current = 'settings'
-
 
 
 class XenialApp(App):
-
-    # GUIDES_DIR = guides.GUIDES_DIR
-    # lang_code = StringProperty('en')
-
-    # def on_lang_code(self, instance, value):
-    #     translator.active_lang_code = self.lang_code
-    #     self.root.settings_screen.name = 'old_settings'
-    #     new_settings_screen = SettingsScreen()
-    #     self.root.sm.add_widget(new_settings_screen)
-    #     self.root.sm.current = 'settings'
-    #     self.root.sm.remove_widget(self.root.settings_screen)
-    #     self.root.settings_screen = new_settings_screen
-    #     self.root.remove_children_widgets()
-    #     self.root.add_children_widgets()
-    #     self.root.show_settings_screen()
-
     def __init__(self, **kwargs):
         super(XenialApp, self).__init__(**kwargs)
-        # guides.import_from_archive('guides/dummy.zip')
         if app_settings.exists('active_guide_name'):
             guides.set_active_guide(app_settings.get('active_guide_name'))
         elif guides.active_guide is not None:
@@ -390,8 +381,8 @@ class XenialApp(App):
         ev.bind(on_ui_lang_code=self.set_translator_ui_lang_code_settings)
 
     @staticmethod
-    def set_active_guide_name_settings(instance, guide_name):
-        app_settings.set('active_guide_name', guide_name)
+    def set_active_guide_name_settings(*args):
+        app_settings.set('active_guide_name', guides.active_guide.guide_name)
 
     @staticmethod
     def set_translator_ui_lang_code_settings(instance, lang_code):

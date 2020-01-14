@@ -39,18 +39,11 @@ class TagsMenuScreen(Screen):
                                        item['tag_count_categories'], item['tag_count_articles'])
             self.tagsmenu_widget.add_widget(item_widget)
 
-    def set_tagsmenu_items(self):
+    def set_tagsmenu_items(self, *args):
         if guides.active_guide is not None:
             self.tagsmenu_items = guides.active_guide.tags_list()
         else:
             self.tagsmenu_items = []
-        # print(tagsmenu_items)
-        # self.from_guide_name = guides.active_guide_name
-        # self.tagsmenu_items = [{
-        #     'tag_name': tag_name,
-        #     'num_tagged_categories': len(tags.tagged_categories(tag_name)),
-        #     'num_tagged_articles': len(tags.tagged_articles(tag_name))
-        # } for tag_name in tags.all()]
 
 
 # class TagScreen(Screen):

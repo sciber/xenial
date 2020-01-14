@@ -12,10 +12,10 @@ class CategoriesMenuItem(Button):
 
 
 class CategoriesMenu(GridLayout):
-    menu_items = ListProperty([])
+    categoriesmenu_items = ListProperty([])
 
-    def on_menu_items(self, instance, value):
+    def on_categoriesmenu_items(self, *args):
         self.clear_widgets()
-        for item in self.menu_items:
+        for item in self.categoriesmenu_items:
             item_widget = CategoriesMenuItem(item['category_id'], item['category_name'], item['category_icon'])
             self.add_widget(item_widget)

@@ -1,14 +1,15 @@
 #:kivy 1.11.1
 
-#:import translator translator.translator
-
 <CategoryScreen>:
     name: 'category'
+    screen_title: 'Category'
+    related_categories_subtitle: 'Related categories'
+    related_articles_subtitle: 'Related articles'
     category_icon: ''
     category_name: ''
     category_description: ''
-    category_related_categories: []
-    category_articles: []
+    category_has_related_categories: False
+    category_has_articles: False
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -20,8 +21,9 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: translator.translate('Category', translator.active_lang_code)
+            title: root.screen_title
         ScrollView:
+            id: screen_content_scrollview
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
@@ -63,8 +65,8 @@
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: '40dp' if root.category_related_categories else 0
-                    opacity: 1 if root.category_related_categories else 0
+                    height: '40dp' if root.category_has_related_categories else 0
+                    opacity: 1 if root.category_has_related_categories else 0
                     Image:
                         pos: self.parent.pos
                         source: 'assets/img/category.png'
@@ -72,7 +74,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: translator.translate('Related categories', translator.active_lang_code)
+                        text: root.related_categories_subtitle
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'
@@ -88,8 +90,8 @@
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: '40dp' if root.category_articles else 0
-                    opacity: 1 if root.category_articles else 0
+                    height: '40dp' if root.category_has_articles else 0
+                    opacity: 1 if root.category_has_articles else 0
                     Image:
                         pos: self.parent.pos
                         source: 'assets/img/article.png'
@@ -97,7 +99,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: translator.translate('Related articles', translator.active_lang_code)
+                        text: root.related_articles_subtitle
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'

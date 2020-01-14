@@ -1,17 +1,15 @@
 #:kivy 1.11.1
 
-#:import join_path os.path.join
 #:import getcwd os.getcwd
 
 #:import Factory kivy.factory.Factory
 
 #:import guides models.guides
 
-#:import translator translator.translator
-
-<LoadGuidePopup@Popup>
+<LoadGuidePopup>
+    cancel_button_text: 'Cancel'
+    load_button_text: 'Load'
     auto_dismiss: False
-    title: translator.translate('Select guide archive file', translator.active_lang_code)
     title_color: 0, .6, .4, 1
     separator_color: 0, .6, .4, 1
     BoxLayout:
@@ -19,7 +17,7 @@
         FileChooserListView:
             id: filechooser
             path: getcwd()
-            filters: ['*.tgz']
+            filters: ['*.zip']
             dirselect: False
             multiselect: False
         BoxLayout:
@@ -27,18 +25,18 @@
             size_hint_y: None
             height: '40dp'
             Button:
-                text: translator.translate('Cancel', translator.active_lang_code)
+                text: root.cancel_button_text
                 on_release: root.dismiss()
             Button:
-                text: translator.translate('Load', translator.active_lang_code)
+                text: root.load_button_text
                 disabled: not filechooser.selection
                 on_release:
                     root.dismiss()
-                    app.root.load_guide(filechooser.selection)
+                    root.import_guide(*filechooser.selection)
 
 <GuideLoadFailedWarning>:
     message: ''
-    title: translator.translate('Error', translator.active_lang_code)
+    ok_button_text: 'OK'
     auto_dismiss: True
     title_color: .8, .2, .2, 1
     separator_color: .8, .2, .2, 1
@@ -53,7 +51,7 @@
             halign: 'center'
             markup: True
         Button:
-            text: translator.translate('OK', translator.active_lang_code)
+            text: root.ok_button_text
             size_hint_y: None
             height: '40dp'
             on_release: root.dismiss()
@@ -63,100 +61,108 @@
     guide_name: ''
     guide_title: ''
     guide_lang: ('', '')
-    guide_from_place: ''
-    guide_to_place: ''
-    guide_is_active: False
-    orientation: 'horizontal'
+    guide_from_place_label: 'From:'
+    guide_to_place_label: 'To'
+    guide_description: ''
+    orientation: 'vertical'
     size_hint_y: None
-    height: '120dp'
-    Button:
-        background_normal: ''
-        on_release: app.root.show_guide_screen(root.guide_name)
-        BoxLayout:
-            orientation: 'horizontal'
-            pos: self.parent.pos
-            size_hint: None, None
-            size: self.parent.size
-            AnchorLayout:
-                anchor_x: 'right'
-                anchor_y: 'bottom'
-                size_hint_x: None
-                width: self.height
-                padding: '10dp'
-                Image:
-                    source:
-                        join_path(
-                        app.GUIDES_DIR,
-                        root.guide_name,
-                        'icons',
-                        'guide',
-                        root.guide_icon) if root.guide_name and root.guide_icon else None
+    height: self.minimum_height
+    BoxLayout:
+        orientation: 'horizontal'
+        size_hint_y: None
+        height: '120dp'
+        Button:
+            background_normal: ''
+            on_release: app.root.show_guide_screen(root.guide_name)
+            BoxLayout:
+                orientation: 'horizontal'
+                pos: self.parent.pos
+                size_hint: None, None
+                size: self.parent.size
+                AnchorLayout:
+                    anchor_x: 'right'
+                    anchor_y: 'bottom'
                     size_hint_x: None
                     width: self.height
-                Label:
-                    size_hint: (.5, .5)
-                    text: root.guide_lang[1].upper()
-                    font_size: '12dp'
-                    bold: True
-                    color: .4, .4, .4, 1
-                    canvas.before:
-                        Color:
-                            rgba: .9, .9, .9, 1
-                        Ellipse:
-                            pos: self.pos
-                            size: self.size
-                        Color:
-                            rgba: .8, .8, .8, .4
-                        Line:
-                            width: 2
-                            ellipse: self.x + 1, self.y + 1, self.width - 2, self.height - 2
-
-            BoxLayout:
-                orientation: 'vertical'
-                Label:
-                    text: root.guide_title
-                    color: .2, .2, .2, 1
-                    font_size: '16dp'
-                    bold: True
-                    size_hint_y: .6
-                    text_size: self.size
-                    halign: 'left'
-                    valign: 'middle'
+                    padding: '10dp'
+                    Image:
+                        source: root.guide_icon if root.guide_icon else None
+                        size_hint_x: None
+                        width: self.height
+                    Label:
+                        size_hint: (.5, .5)
+                        text: root.guide_lang[1].upper()
+                        font_size: '12dp'
+                        bold: True
+                        color: .4, .4, .4, 1
+                        canvas.before:
+                            Color:
+                                rgba: .9, .9, .9, 1
+                            Ellipse:
+                                pos: self.pos
+                                size: self.size
+                            Color:
+                                rgba: .8, .8, .8, .4
+                            Line:
+                                width: 2
+                                ellipse: self.x + 1, self.y + 1, self.width - 2, self.height - 2
                 BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: .4
-                    spacing: '4dp'
+                    orientation: 'vertical'
                     Label:
-                        text:
-                            (translator.translate('From', translator.active_lang_code) + ': [b]{}[/b]'
-                            ).format(root.guide_from_place)
-                        markup: True
-                        color: .4, .4, .4, 1
-                        font_size: '14dp'
+                        text: root.guide_title
+                        color: .2, .2, .2, 1
+                        font_size: '16dp'
+                        bold: True
+                        size_hint_y: .6
                         text_size: self.size
                         halign: 'left'
-                        valign: 'top'
-                    Label:
-                        text:
-                            (translator.translate('To', translator.active_lang_code) + ': [b]{}[/b]'
-                            ).format(root.guide_to_place)
-                        markup: True
-                        color: .4, .4, .4, 1
-                        font_size: '14dp'
-                        text_size: self.size
-                        halign: 'left'
-                        valign: 'top'
-    CheckBox:
-        active: root.guide_is_active
-        group: 'guides'
-        allow_no_selection: False
-        size_hint_x: None
-        width: '60dp'
-        color: 0, .6, .4, 1
-        on_state: root.activate_guide() if self.active else None
+                        valign: 'middle'
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: .4
+                        spacing: '4dp'
+                        Label:
+                            text: root.guide_from_place_label
+                            markup: True
+                            color: .4, .4, .4, 1
+                            font_size: '14dp'
+                            text_size: self.size
+                            halign: 'left'
+                            valign: 'top'
+                        Label:
+                            text: root.guide_to_place_label
+                            markup: True
+                            color: .4, .4, .4, 1
+                            font_size: '14dp'
+                            text_size: self.size
+                            halign: 'left'
+                            valign: 'top'
+        CheckBox:
+            active: guides.active_guide.guide_name == root.guide_name
+            group: 'guides'
+            allow_no_selection: False
+            size_hint_x: None
+            width: '60dp'
+            color: 0, .6, .4, 1
+            on_state: root.activate_guide() if self.active else None
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '18dp', '8dp'
+        size_hint_y: None
+        height: self.minimum_height
+        Label:
+            text: root.guide_description
+            markup: True
+            color: .4, .4, .4, 1
+            font_size: '14dp'
+            text_size: self.width, None
+            size_hint_y: None
+            height: self.texture_size[1]
 
 <GuidesMenuScreen>:
     name: 'guidesmenu'
+    screen_title: 'Guides'
+    import_button_text: 'Import guide'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -167,16 +173,16 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: translator.translate('Guides', translator.active_lang_code)
+            title: root.screen_title
         ScrollView:
             BoxLayout:
-                id: guidesmenu
+                id: guidesmenu_widget
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
                 spacing: '4dp'
         Button:
-            text: translator.translate('Import guide', translator.active_lang_code)
+            text: root.import_button_text
             font_size: '18dp'
             background_normal: ''
             background_color: 0, .6, .4, 1

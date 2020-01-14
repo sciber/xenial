@@ -63,9 +63,9 @@ translations = {
         'en': 'Import guide',
         'sk': 'Importovať sprievodcu'
     },
-    'Select guide archive file': {
-        'en': 'Select guide archive file',
-        'sk': 'Zvoľ súbor s archivovaným sprievodcom'
+    'Select guide (zip) archive file': {
+        'en': 'Select guide (zip) archive file',
+        'sk': 'Zvoľ súbor so zip-archivovaným sprievodcom'
     },
     '"[b]{}[/b]"\n guide load failed!': {
         'en': '"[b]{}[/b]"\n guide load failed!',

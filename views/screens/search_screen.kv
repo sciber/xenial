@@ -1,9 +1,10 @@
 #:kivy 1.11.1
 
-#:import translator translator.translator
-
 <SearchScreen>:
     name: 'search'
+    screen_title: 'Search'
+    search_input_hint_text: 'Search active guide articles'
+    no_results_text: 'Your search did not match any articles'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -14,7 +15,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: translator.translate('Search', translator.active_lang_code)
+            title: root.screen_title
         ScrollView:
             BoxLayout:
                 orientation: 'vertical'
@@ -27,8 +28,7 @@
                     size_hint_y: None
                     height: '50dp'
                     TextInput:
-                        hint_text:
-                            translator.translate('Search active guide articles', translator.active_lang_code)
+                        hint_text: root. search_input_hint_text
                         font_size: '16dp'
                         padding: '12dp', '12dp', '12dp', '12dp'
                         multiline: False
@@ -40,39 +40,15 @@
                             source: 'assets/img/search.png'
                             pos: self.parent.pos
                             size: self.parent.size
-                Label:
-                    text:
-                        translator.translate('Your search did not match any articles', translator.active_lang_code)
-                    text_size: self.size
-                    size_hint_y: None
-                    height: '50dp'
-                    font_size: '18dp'
-                    color: .4, .4, .4, 1
                 BoxLayout:
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
-#                    ArticlesMenuItem:
-#                        title: 'Article 1 title'
-#                        synopsis: 'Article 1 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 2 title'
-#                        synopsis: 'Article 2 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 3 title'
-#                        synopsis: 'Article 3 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 4 title'
-#                        synopsis: 'Article 4 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 5 title'
-#                        synopsis: 'Article 5 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 6 title'
-#                        synopsis: 'Article 6 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 7 title'
-#                        synopsis: 'Article 7 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 8 title'
-#                        synopsis: 'Article 8 synopsis can span over two rows'
+                    padding: '16dp', 0
+                    Label:
+                        text: root.no_results_text
+                        text_size: self.size
+                        size_hint_y: None
+                        height: '50dp'
+                        font_size: '18dp'
+                        color: .4, .4, .4, 1

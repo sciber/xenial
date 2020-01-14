@@ -1,15 +1,13 @@
-import os
-
+from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
 
 from events import ev
 from translator import tr
 from models import guides
 
-
-# from controllers.components.tagslist_controller import TagsList
+from controllers.components.tagslist_controller import TagsList
 from controllers.components.categoriesmenu_controller import CategoriesMenu
-# from controllers.components.articlesmenu_controller import ArticlesMenu
+from controllers.components.articlesmenu_controller import ArticlesMenu
 
 
 class CategoriesMenuScreen(Screen):
@@ -24,46 +22,51 @@ class CategoriesMenuScreen(Screen):
     def translate_ui(self, *args):
         self.screen_title = tr.translate('Categories')
 
-    def set_categoriesmenu_items(self):
+    def set_categoriesmenu_items(self, *args):
         if guides.active_guide is not None:
-            categoriesmenu_items = guides.active_guide.categories_list()
+            self.categoriesmenu_widget.categoriesmenu_items = guides.active_guide.categories_list()
         else:
-            categoriesmenu_items = []
-        self.categoriesmenu_widget.menu_items = categoriesmenu_items
+            self.categoriesmenu_widget.categoriesmenu_items = []
 
 
-# class CategoryScreen(Screen):
-#     from_guide_name = ''
-#
-#     def __init__(self, **kwargs):
-#         super(CategoryScreen, self).__init__(**kwargs)
-#         self.category_icon = ''
-#         self.category_name = ''
-#         self.category_description = ''
-#         self.category_assigned_tags = []
-#         self.tagslist_widget = TagsList(self.category_assigned_tags)
-#         self.ids.tagslist_container.add_widget(self.tagslist_widget)
-#         self.category_related_categories = []
-#         self.categoriesmenu_widget = CategoriesMenu()
-#         self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
-#         self.category_articles = []
-#         self.articlesmenu_widget = ArticlesMenu()
-#         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
-#
-#     def update_category_screen_items(self, category_name):
-#         self.from_guide_name = guides.active_guide_name
-#         category = categories.by_name(category_name)
-#         self.category_icon = os.path.join(guides.active_guide_path, 'icons', 'categories', category['icon'])
-#         self.category_name = category_name
-#         self.category_assigned_tags = category['tags']
-#         self.tagslist_widget.tagslist_items = self.category_assigned_tags
-#         self.category_related_categories = categories.related_categories(category_name)
-#         category_item_keys = ('icon', 'name')
-#         self.categoriesmenu_widget.menu_items = [
-#             {'category_' + key: item[key] for key in category_item_keys} for item in self.category_related_categories
-#         ]
-#         self.category_articles = categories.related_articles(category_name)
-#         article_item_keys = ('icon', 'name', 'title', 'synopsis')
-#         self.articlesmenu_widget.menu_items = [
-#             {'article_' + key: item[key] for key in article_item_keys} for item in self.category_articles
-#         ]
+class CategoryScreen(Screen):
+    category_id = NumericProperty(0)
+
+    def __init__(self, **kwargs):
+        super(CategoryScreen, self).__init__(**kwargs)
+        self.tagslist_widget = TagsList()
+        self.ids.tagslist_container.add_widget(self.tagslist_widget)
+        self.categoriesmenu_widget = CategoriesMenu()
+        self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
+        self.articlesmenu_widget = ArticlesMenu()
+        self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
+        ev.bind(on_ui_lang_code=self.translate_ui)
+        ev.bind(on_active_guide=self.clear_category_screen_items)
+
+    def translate_ui(self, *args):
+        self.screen_title = tr.translate('Category')
+        self.related_categories_subtitle = tr.translate('Related categories')
+        self.related_articles_subtitle = tr.translate('Related articles')
+
+    def clear_category_screen_items(self, *args):
+        if self.category_id:
+            self.category_id = 0
+            self.category_name = ''
+            self.category_icon = ''
+            self.category_description = ''
+            self.tagslist_widget.tagslist_items = []
+            self.categoriesmenu_widget.categoriesmenu_items = []
+            self.articlesmenu_widget.articlesmenu_items = []
+
+    def on_category_id(self, *args):
+        if self.category_id:
+            category = guides.active_guide.category_by_id(self.category_id)
+            print(self.ids.categoriesmenu_container.children[0].children)
+            self.category_name = category.category_name
+            self.category_icon = category.category_icon
+            self.category_description = category.category_description
+            self.tagslist_widget.tagslist_items = category.tags_list()
+            self.categoriesmenu_widget.categoriesmenu_items = category.related_categories_list()
+            self.category_has_related_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
+            self.articlesmenu_widget.articlesmenu_items = category.articles_list()
+            self.category_has_articles = bool(self.articlesmenu_widget.articlesmenu_items)

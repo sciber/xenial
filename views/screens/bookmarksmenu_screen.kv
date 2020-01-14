@@ -1,12 +1,11 @@
 #:kivy 1.11.1
 
-#:import translator translator.translator
-
 <BookmarksMenuItem>:
-    article_icon: ''
-    article_name: ''
-    article_title: ''
-    article_synopsis: ''
+    bookmark_id: 0
+    bookmark_article_id: 0
+    bookmark_article_icon: ''
+    bookmark_article_title: ''
+    bookmark_article_synopsis: ''
     orientation: 'horizontal'
     size_hint_y: None
     height: '120dp'
@@ -25,12 +24,7 @@
                 width: '80dp'
                 padding: '8dp', 0
                 Image:
-                    source:
-                        join_path(
-                        guides.active_guide_path,
-                        'icons',
-                        'articles',
-                        root.article_icon) if root.article_icon else None
+                    source: root.bookmark_article_icon if root.bookmark_article_icon else None
                     size_hint: None, None
                     size: '60dp', '60dp'
             BoxLayout:
@@ -38,7 +32,7 @@
                 padding: '8dp', 0
                 spacing: '4dp'
                 Label:
-                    text: root.article_title
+                    text: root.bookmark_article_title
                     color: .2, .2, .2, 1
                     font_size: '16dp'
                     size_hint_y: .4
@@ -46,7 +40,7 @@
                     halign: 'left'
                     valign: 'bottom'
                 Label:
-                    text: root.article_synopsis
+                    text: root.bookmark_article_synopsis
                     markup: True
                     color: .4, .4, .4, 1
                     font_size: '14dp'
@@ -58,7 +52,7 @@
         size_hint_x: None
         width: '60dp'
         background_normal: ''
-        on_release: app.root.remove_bookmark(root.article_name)
+        on_release: root.delete_bookmark(root.bookmark_id)
         AnchorLayout:
             id: anchor_layout
             anchor_x: 'center'
@@ -72,6 +66,7 @@
 
 <BookmarksMenuScreen>:
     name: 'bookmarksmenu'
+    screen_title: 'Bookmarks'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -82,7 +77,7 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: translator.translate('Bookmarks', translator.active_lang_code)
+            title: root.screen_title
         ScrollView:
             BoxLayout:
                 id: bookmarksmenu_widget

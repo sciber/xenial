@@ -1,15 +1,12 @@
-import kivy
-
 from kivy.properties import ListProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.button import Button
 
-kivy.require('1.11.1')
-
 
 class ArticlesMenuItem(Button):
-    def __init__(self, article_icon, article_name, article_title, article_synopsis, **kwargs):
+    def __init__(self, article_id, article_name, article_icon, article_title, article_synopsis, **kwargs):
         super(ArticlesMenuItem, self).__init__(**kwargs)
+        self.article_id = article_id
         self.article_icon = article_icon
         self.article_name = article_name
         self.article_title = article_title
@@ -17,10 +14,11 @@ class ArticlesMenuItem(Button):
 
 
 class ArticlesMenu(BoxLayout):
-    menu_items = ListProperty([])
+    articlesmenu_items = ListProperty([])
 
-    def on_menu_items(self, instance, value):
+    def on_menu_items(self, *args):
         self.clear_widgets()
-        for item in self.menu_items:
-            item_widget = ArticlesMenuItem(**item)
+        for item in self.articlesmenu_items:
+            item_widget = ArticlesMenuItem(item['article_id'], item['article_name'], item['article_icon'],
+                                           item['article_title'], item['article_synopsis'])
             self.add_widget(item_widget)

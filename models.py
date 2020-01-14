@@ -31,6 +31,7 @@ class GuidesModel:
             with open(os.path.join(GUIDES_DIR, guide_name, 'guide.json'), 'r') as f:
                 guide_json = json.load(f)
             self.guides_list.append(guide_json)
+        self.guides_list.sort(key=lambda item: item['guide_title'])
         if guides_names:
             self.set_active_guide(guides_names[0])
 
@@ -49,30 +50,42 @@ class GuidesModel:
 
     def import_from_archive(self, archive):
         """ Import guide from zip archive to sqlite database """
+        try:
+            guides_names = [filename for filename in os.listdir(GUIDES_DIR)
+                            if os.path.isdir(os.path.join(GUIDES_DIR, filename))]
+            guide_name = os.path.basename(archive).split('.')[0]
 
-        guide_name = os.path.basename(archive).split('.')[0]
+            if guide_name in guides_names:
+                self.guides_list = [item for item in self.guides_list if item['guide_name'] != guide_name]
+                shutil.rmtree(os.path.join(GUIDES_DIR, guide_name))
 
-        with ZipFile(archive, 'r') as zf:
-            zf.extractall(os.path.join(GUIDES_DIR, guide_name))
+            with ZipFile(archive, 'r') as zf:
+                zf.extractall(os.path.join(GUIDES_DIR, guide_name))
 
-        conn = sqlite3.connect(os.path.join(GUIDES_DIR, guide_name, 'guide.db'))
+            conn = sqlite3.connect(os.path.join(GUIDES_DIR, guide_name, 'guide.db'))
 
-        with open(os.path.join(GUIDES_DIR, guide_name, 'guide.json'), 'r') as f:
-            guides_list_item = json.load(f)
+            with open(os.path.join(GUIDES_DIR, guide_name, 'guide.json'), 'r') as f:
+                guides_list_item = json.load(f)
 
-        guides_list_item = self._validate_guides_list_item(guide_name, guides_list_item)
+            guides_list_item = self._validate_guides_list_item(guide_name, guides_list_item)
 
-        self._import_from_archive_guide_categories(conn, guide_name)
-        self._import_from_archive_guide_articles(conn, guide_name)
-        self._import_from_archive_guide_bookmarks(conn, guide_name)
+            self._import_from_archive_guide_categories(conn, guide_name)
+            self._import_from_archive_guide_articles(conn, guide_name)
+            self._import_from_archive_guide_bookmarks(conn, guide_name)
 
-        conn.commit()
-        conn.close()
-        self.guides_list.append(guides_list_item)
-        if len(self.guides_list) == 1:
-            self.set_active_guide(guides_list_item['guide_name'])
+            conn.commit()
+            conn.close()
 
-        return guides_list_item
+            self.guides_list.append(guides_list_item)
+            self.guides_list.sort(key=lambda item: item['guide_title'])
+            if len(self.guides_list) == 1 or self.active_guide.guide_name == guides_list_item['guide_name']:
+                self.set_active_guide(guides_list_item['guide_name'])
+        except Exception as e:
+            print(e)
+            result = False
+        else:
+            result = guides_list_item
+        return result
 
     def remove_guide(self, guide_name):
         guides_list_item_idx = next(idx for idx, guides_list_item in enumerate(self.guides_list)
@@ -467,7 +480,6 @@ class GuideModel:
         self.guide_content = guide['guide_content']
 
     def tags_list(self):
-        # sql_select_all_from_tags = """ SELECT * FROM tags; """
         sql_select_joined_tags = """ SELECT t.id, t.name, IFNULL(tc.count_categories, 0), IFNULL(ta.count_articles, 0) 
                                      FROM tags AS t
                                      LEFT JOIN (
@@ -523,10 +535,10 @@ class GuideModel:
         cur.execute(sql_insert_into_bookmarks, (article_id, str(datetime.now())))
         self.conn.commit()
 
-    def delete_bookmark(self, article_id):
-        sql_delete_from_bookmarks = """ DELETE FROM bookmarks WHERE article_id=?; """
+    def delete_bookmark(self, bookmark_id):
+        sql_delete_from_bookmarks = """ DELETE FROM bookmarks WHERE id=?; """
         cur = self.conn.cursor()
-        cur.execute(sql_delete_from_bookmarks, (article_id,))
+        cur.execute(sql_delete_from_bookmarks, (bookmark_id,))
         self.conn.commit()
 
 
@@ -606,12 +618,14 @@ class CategoryModel:
         categories_ids = self._get_categories_ids()
         related_categories_num_shared_tags = {}
         for inspected_category_id in categories_ids:
+            if inspected_category_id == self.category_id:
+                continue
             inspected_category_tags_ids = self._get_category_tags_ids(inspected_category_id)
             num_shared_tags = len(set(category_tags_ids) & set(inspected_category_tags_ids))
             if num_shared_tags > 0:
                 related_categories_num_shared_tags[inspected_category_id] = num_shared_tags
         related_categories_ids = list(related_categories_num_shared_tags.keys())
-        related_categories_rows = [row.append(related_categories_num_shared_tags[row[0]])
+        related_categories_rows = [row + (related_categories_num_shared_tags[row[0]],)
                                    for row in self._fetchall_related_categories(related_categories_ids)]
         return sorted([dict(zip(RELATED_CATEGORIES_KEYS, row)) for row in related_categories_rows],
                       key=lambda c: c['category_num_shared_tags'], reverse=True)
@@ -666,7 +680,7 @@ class CategoryModel:
                                                    WHERE article_id=?; """
         cur = self.conn.cursor()
         cur.execute(sql_select_tag_id_from_tags_articles, (article_id,))
-        return [row[0] for row in cur.fetchall]
+        return [row[0] for row in cur.fetchall()]
 
 
 class ArticleModel:
@@ -701,6 +715,8 @@ class ArticleModel:
         articles_ids = self._get_articles_ids()
         related_articles_num_shared_tags = {}
         for inspected_article_id in articles_ids:
+            if inspected_article_id == self.article_id:
+                continue
             inspected_article_tags_ids = self._get_article_tags_ids(inspected_article_id)
             num_shared_tags = len(set(article_tags_ids) & set(inspected_article_tags_ids))
             if num_shared_tags > 0:

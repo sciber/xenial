@@ -57,31 +57,28 @@
             image: 'assets/img/search.png'
             disabled: not root.has_active_guide
             on_release:
-#                app.root.show_search_screen()
+                app.root.show_search_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: root.categories_button_title
             image: 'assets/img/category.png'
             disabled: not root.has_active_guide
             on_release:
-#                app.root.show_categoriesmenu_screen()
-                app.root.sm.current = 'categoriesmenu'
+                app.root.show_categoriesmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: root.tags_button_title
             image: 'assets/img/tag.png'
             disabled:  not root.has_active_guide
             on_release:
-#                app.root.show_tagsmenu_screen()
-                app.root.sm.current = 'tagsmenu'
+                app.root.show_tagsmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: root.articles_button_title
             image: 'assets/img/article.png'
             disabled: not root.has_active_guide
             on_release:
-#                app.root.show_articlesmenu_screen()
-                app.root.sm.current = 'articlesmenu'
+                app.root.show_articlesmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: root.bookmarks_button_title
@@ -100,13 +97,11 @@
             title: root.settings_button_title
             image: 'assets/img/settings.png'
             on_release:
-#                app.root.show_settings_screen()
-                app.root.sm.current = 'settings'
+                app.root.show_settings_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
             title: 'Logs'
             image: 'assets/img/log.png'
             on_release:
-#                app.root.show_settings_screen()
-                app.root.sm.current = 'log'
+                app.root.show_log_screen()
                 app.root.toggle_state()
