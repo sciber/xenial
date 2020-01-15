@@ -25,7 +25,7 @@ from kivy.uix.popup import Popup
 from controllers.log_controller import LogScreen
 from controllers.category_controller import CategoriesMenuScreen, CategoryScreen
 from controllers.tag_controller import TagsMenuScreen  #, TagScreen
-from controllers.article_controller import ArticlesMenuScreen  #, ArticleScreen
+from controllers.article_controller import ArticlesMenuScreen, ArticleScreen
 from controllers.settings_controller import SettingsScreen
 from controllers.components.navigationpanel_controller import NavigationPanel
 from controllers.guide_controller import GuidesMenuScreen  #, GuideScreen, GuideLoadFailedWarning
@@ -43,10 +43,10 @@ Builder.load_file('views/components/navigationpanel.kv')
 Builder.load_file('views/components/screentitlebar.kv')
 Builder.load_file('views/components/categoriesmenu.kv')
 Builder.load_file('views/components/articlesmenu.kv')
+Builder.load_file('views/components/articlecontent.kv')
 Builder.load_file('views/components/tagslist.kv')
 # Builder.load_file('views/components/historyswitchguideprompt.kv')
 # Builder.load_file('views/components/leaveappprompt.kv')
-# Builder.load_file('views/components/articlecontent.kv')
 
 # Screens views
 Builder.load_file('views/screens/log_screen.kv')
@@ -55,12 +55,12 @@ Builder.load_file('views/screens/categoriesmenu_screen.kv')
 Builder.load_file('views/screens/category_screen.kv')
 Builder.load_file('views/screens/tagsmenu_screen.kv')
 Builder.load_file('views/screens/articlesmenu_screen.kv')
+Builder.load_file('views/screens/article_screen.kv')
 Builder.load_file('views/screens/bookmarksmenu_screen.kv')
 Builder.load_file('views/screens/search_screen.kv')
 Builder.load_file('views/screens/settings_screen.kv')
 # Builder.load_file('views/screens/guide_screen.kv')
 # Builder.load_file('views/screens/tag_screen.kv')
-# Builder.load_file('views/screens/article_screen.kv')
 
 # Application root view
 Builder.load_string('''
@@ -129,6 +129,15 @@ class ApplicationRoot(NavigationDrawer):
         stop_time = time.time()
         dt = (stop_time - start_time) * 1000
         self.log_screen.add_log_item('[b]Articles menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
+        self.article_screen = ArticleScreen(name='article')
+        self.sm.add_widget(self.article_screen)
+        self.other_article_screen = ArticleScreen(name='other_article')
+        self.sm.add_widget(self.other_article_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Article[/b] screens stubs were built in: {dt:.2f} ms'.format(dt=dt))
 
         start_time = time.time()
         self.bookmarksmenu_screen = BookmarksMenuScreen()
@@ -255,7 +264,13 @@ class ApplicationRoot(NavigationDrawer):
         self.sm.current = 'articlesmenu'
 
     def show_article_screen(self, article_id):
-        pass
+        if self.sm.current == 'article':
+            self.article_screen, self.other_article_screen = self.other_article_screen, self.article_screen
+            self.article_screen.name = 'article'
+            self.other_article_screen.name = 'other_article'
+        self.article_screen.article_id = article_id
+        self.article_screen.ids.screen_content_scrollview.scroll_y = 1
+        self.sm.current = 'article'
 
     def show_bookmarksmenu_screen(self):
         self.bookmarksmenu_screen.ids.bookmarksmenu_widget.parent.scroll_y = 1
@@ -399,7 +414,7 @@ class XenialApp(App):
         self.root = ApplicationRoot()
         stop_time = time.time()
         dt = (stop_time - start_time) * 1000
-        self.root.log_screen.add_log_item('[b]Total[/b] elapsed time: {dt:.2f} ms'.format(dt=dt))
+        self.root.log_screen.add_log_item('[b]Total initialization[/b] time: {dt:.2f} ms'.format(dt=dt))
         return self.root
 
     def on_pause(self):

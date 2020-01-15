@@ -16,7 +16,7 @@ class ArticlesMenuItem(Button):
 class ArticlesMenu(BoxLayout):
     articlesmenu_items = ListProperty([])
 
-    def on_menu_items(self, *args):
+    def on_articlesmenu_items(self, *args):
         self.clear_widgets()
         for item in self.articlesmenu_items:
             item_widget = ArticlesMenuItem(item['article_id'], item['article_name'], item['article_icon'],

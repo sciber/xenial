@@ -14,6 +14,16 @@ TAGS_KEYS = ('tag_id', 'tag_name', 'tag_count_categories', 'tag_count_articles')
 CATEGORIES_KEYS = ('category_id', 'category_name', 'category_icon', 'category_description')
 RELATED_CATEGORIES_KEYS = CATEGORIES_KEYS + ('category_num_shared_tags',)
 ARTICLES_KEYS = ('article_id', 'article_name', 'article_icon', 'article_title', 'article_synopsis')
+ARTICLE_CONTENT_SUBTITLE_BLOCKS_KEYS = ('block_id', 'block_type', 'content_order',
+                                        'subtitle_text')
+ARTICLE_CONTENT_PARAGRAPH_BLOCKS_KEYS = ('block_id', 'block_type', 'content_order',
+                                         'paragraph_text')
+ARTICLE_CONTENT_IMAGE_BLOCKS_KEYS = ('block_id', 'block_type', 'content_order',
+                                     'image_source', 'image_caption_text')
+ARTICLE_CONTENT_AUDIO_BLOCKS_KEYS = ('block_id', 'block_type', 'content_order',
+                                     'audio_source', 'audio_length', 'audio_caption_text')
+ARTICLE_CONTENT_VIDEO_BLOCKS_KEYS = ('block_id', 'block_type', 'content_order',
+                                     'video_source', 'video_length', 'video_cover_source', 'video_caption_text')
 RELATED_ARTICLES_KEYS = ARTICLES_KEYS + ('article_num_shared_tags',)
 BOOKMARKS_KEYS = ('bookmark_id', 'bookmark_created_at',
                   'bookmark_article_id', 'bookmark_article_name', 'bookmark_article_icon',
@@ -242,8 +252,8 @@ class GuidesModel:
                         block_id = self._insert_into_video_blocks(conn, (block['source'], block['caption']))
                 else:
                     continue
-                block_order += 1
                 self._insert_into_articles_blocks(conn, (article_id, block_id, block_order, block['type']))
+                block_order += 1
 
             for tag_name in set(article['tags']):
                 tag_row = self._fetchone_from_tags_where_name(conn, tag_name)
@@ -305,7 +315,8 @@ class GuidesModel:
                                                    article_id integer NOT NULL,
                                                    block_id integer NOT NULL,
                                                    block_order integer NOT NULL,
-                                                   block_type text NOT NULL
+                                                   block_type text NOT NULL,
+                                                   UNIQUE(article_id, block_id, block_order, block_type)
                                                ); """
         cur = conn.cursor()
         cur.execute(sql_create_articles_blocks_table)
@@ -516,7 +527,7 @@ class GuideModel:
         return [dict(zip(ARTICLES_KEYS, row)) for row in articles_rows]
 
     def article_by_id(self, article_id):
-        pass
+        return ArticleModel(self.conn, article_id)
 
     def bookmarks_list(self):
         sql_select_all_from_bookmarked_articles = """ SELECT b.id, b.created_at,
@@ -689,6 +700,16 @@ class ArticleModel:
         (self.article_id, self.article_name,
          self.article_icon, self.article_title, self.article_synopsis) = self._fetchone_from_articles_by_id(article_id)
 
+    def bookmark(self):
+        sql_select_article_bookmark = """ SELECT id, created_at FROM bookmarks
+                                          WHERE article_id=?; """
+        cur = self.conn.cursor()
+        cur.execute(sql_select_article_bookmark, (self.article_id,))
+        bookmark_row = cur.fetchone()
+        if bookmark_row is None:
+            return None
+        return dict(zip(('bookmark_id', 'bookmark_created_at'), bookmark_row))
+
     def tags_list(self):
         sql_select_all_article_tags = """ SELECT t.id, t.name FROM tags AS t
                                           INNER JOIN tags_articles AS ta
@@ -722,10 +743,83 @@ class ArticleModel:
             if num_shared_tags > 0:
                 related_articles_num_shared_tags[inspected_article_id] = num_shared_tags
         related_articles_ids = list(related_articles_num_shared_tags.keys())
-        related_articles_rows = [row.append(related_articles_num_shared_tags[row[0]])
+        related_articles_rows = [row + (related_articles_num_shared_tags[row[0]],)
                                  for row in self._fetchall_related_articles(related_articles_ids)]
         return sorted([dict(zip(RELATED_ARTICLES_KEYS, row)) for row in related_articles_rows],
                       key=lambda a: a['article_num_shared_tags'], reverse=True)
+
+    def content_blocks_list(self):
+        subtitle_blocks_list = self._get_article_subtitle_blocks(self.article_id)
+        paragraph_blocks_list = self._get_article_paragraph_blocks(self.article_id)
+        image_blocks_list = self._get_article_image_blocks(self.article_id)
+        audio_blocks_list = self._get_article_audio_blocks(self.article_id)
+        video_blocks_list = self._get_article_video_blocks(self.article_id)
+        sorted_content_blocks_list = (subtitle_blocks_list + paragraph_blocks_list
+                                      + image_blocks_list + audio_blocks_list
+                                      + video_blocks_list).sort(key=lambda block: block['block_order'])
+        return sorted_content_blocks_list
+
+    def _get_article_subtitle_blocks(self, article_id):
+        sql_select_article_subtitle_blocks_rows = """ SELECT ab.block_id, ab.block_type, ab.block_order, 
+                                                          subtitles.subtitle_text
+                                                      FROM articles_blocks AS ab
+                                                      LEFT JOIN subtitle_blocks AS subtitles
+                                                      ON ab.block_id=subtitles.id
+                                                      WHERE ab.article_id=? AND ab.block_type='subtitle'; """
+        cur = self.conn.cursor()
+        cur.execute(sql_select_article_subtitle_blocks_rows, (article_id,))
+        subtitle_blocks_rows = cur.fetchall()
+        return [dict(zip(ARTICLE_CONTENT_SUBTITLE_BLOCKS_KEYS, row)) for row in subtitle_blocks_rows]
+
+    def _get_article_paragraph_blocks(self, article_id):
+        sql_select_article_paragraph_blocks_rows = """ SELECT ab.block_id, ab.block_type, ab.block_order, 
+                                                           paragraphs.paragraph_text
+                                                       FROM articles_blocks AS ab
+                                                       LEFT JOIN paragraph_blocks AS paragraphs
+                                                       ON ab.block_id=paragraphs.id
+                                                       WHERE ab.article_id=? AND ab.block_type='paragraph'; """
+        cur = self.conn.cursor()
+        cur.execute(sql_select_article_paragraph_blocks_rows, (article_id,))
+        paragraph_blocks_rows = cur.fetchall()
+        return [dict(zip(ARTICLE_CONTENT_PARAGRAPH_BLOCKS_KEYS, row)) for row in paragraph_blocks_rows]
+
+    def _get_article_image_blocks(self, article_id):
+        sql_select_article_image_blocks_rows = """ SELECT ab.block_id, ab_block_type, ab.block_order,
+                                                       images.image_source, images.caption_text
+                                                   FROM articles_blocks AS ab
+                                                   LEFT JOIN image_blocks AS images
+                                                   ON ab.block_id=images.id
+                                                   WHERE ab.article_id=? and ab.block_type='image'; """
+        cur = self.conn.cursor()
+        cur.execute(sql_select_article_image_blocks_rows, (article_id,))
+        image_blocks_rows = cur.fetchall()
+        return [dict(zip(ARTICLE_CONTENT_IMAGE_BLOCKS_KEYS, row)) for row in image_blocks_rows]
+
+    def _get_article_audio_blocks(self, article_id):
+        sql_select_article_audio_blocks_rows = """ SELECT ab.block_id, ab_block_type, ab.block_order,
+                                                       audios.audio_source, IFNULL(audios.audio_length, 0), 
+                                                       audios.caption_text
+                                                   FROM articles_blocks AS ab
+                                                   LEFT JOIN image_blocks AS audios
+                                                   ON ab.block_id=audios.id
+                                                   WHERE ab.article_id=? and ab.block_type='audio'; """
+        cur = self.conn.cursor()
+        cur.execute(sql_select_article_audio_blocks_rows, (article_id,))
+        audio_blocks_rows = cur.fetchall()
+        return [dict(zip(ARTICLE_CONTENT_AUDIO_BLOCKS_KEYS, row)) for row in audio_blocks_rows]
+
+    def _get_article_video_blocks(self, article_id):
+        sql_select_article_video_blocks_rows = """ SELECT ab.block_id, ab_block_type, ab.block_order,
+                                                       videos.video_source, IFNULL(videos.video_length, 0), 
+                                                       IFNULL(videos.video_cover_source, ''), videos.caption_text
+                                                   FROM articles_blocks AS ab
+                                                   LEFT JOIN image_blocks AS videos
+                                                   ON ab.block_id=videos.id
+                                                   WHERE ab.article_id=? and ab.block_type='video'; """
+        cur = self.conn.cursor()
+        cur.execute(sql_select_article_video_blocks_rows, (article_id,))
+        video_blocks_rows = cur.fetchall()
+        return [dict(zip(ARTICLE_CONTENT_VIDEO_BLOCKS_KEYS, row)) for row in video_blocks_rows]
 
     def _fetchone_from_articles_by_id(self, article_id):
         sql_select_all_from_articles_where_id = """ SELECT * FROM articles
@@ -758,7 +852,7 @@ class ArticleModel:
                                                    WHERE article_id=?; """
         cur = self.conn.cursor()
         cur.execute(sql_select_tag_id_from_tags_articles, (article_id,))
-        return [row[0] for row in cur.fetchall]
+        return [row[0] for row in cur.fetchall()]
 
     def _fetchall_related_articles(self, related_articles_ids):
         sql_select_all_related_articles = """ SELECT * FROM articles
@@ -766,7 +860,8 @@ class ArticleModel:
             placeholders=','.join('?' * len(related_articles_ids)))
         cur = self.conn.cursor()
         cur.execute(sql_select_all_related_articles, related_articles_ids)
-        return cur.fetchall
+        return cur.fetchall()
+
 
 
 guides = GuidesModel()

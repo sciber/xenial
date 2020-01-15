@@ -41,7 +41,6 @@ class CategoryScreen(Screen):
         self.articlesmenu_widget = ArticlesMenu()
         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
         ev.bind(on_ui_lang_code=self.translate_ui)
-        ev.bind(on_active_guide=self.clear_category_screen_items)
 
     def translate_ui(self, *args):
         self.screen_title = tr.translate('Category')
@@ -51,12 +50,6 @@ class CategoryScreen(Screen):
     def clear_category_screen_items(self, *args):
         if self.category_id:
             self.category_id = 0
-            self.category_name = ''
-            self.category_icon = ''
-            self.category_description = ''
-            self.tagslist_widget.tagslist_items = []
-            self.categoriesmenu_widget.categoriesmenu_items = []
-            self.articlesmenu_widget.articlesmenu_items = []
 
     def on_category_id(self, *args):
         if self.category_id:
@@ -69,3 +62,10 @@ class CategoryScreen(Screen):
             self.category_has_related_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
             self.articlesmenu_widget.articlesmenu_items = category.articles_list()
             self.category_has_articles = bool(self.articlesmenu_widget.articlesmenu_items)
+        else:
+            self.category_name = ''
+            self.category_icon = ''
+            self.category_description = ''
+            self.tagslist_widget.tagslist_items = []
+            self.categoriesmenu_widget.categoriesmenu_items = []
+            self.articlesmenu_widget.articlesmenu_items = []
