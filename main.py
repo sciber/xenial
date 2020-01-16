@@ -24,11 +24,11 @@ from kivy.uix.popup import Popup
 
 from controllers.log_controller import LogScreen
 from controllers.category_controller import CategoriesMenuScreen, CategoryScreen
-from controllers.tag_controller import TagsMenuScreen  #, TagScreen
+from controllers.tag_controller import TagsMenuScreen, TagScreen
 from controllers.article_controller import ArticlesMenuScreen, ArticleScreen
 from controllers.settings_controller import SettingsScreen
 from controllers.components.navigationpanel_controller import NavigationPanel
-from controllers.guide_controller import GuidesMenuScreen  #, GuideScreen, GuideLoadFailedWarning
+from controllers.guide_controller import GuidesMenuScreen, GuideScreen, GuideLoadFailedWarning
 from controllers.bookmark_controller import BookmarksMenuScreen
 from controllers.search_controller import SearchScreen
 
@@ -54,13 +54,13 @@ Builder.load_file('views/screens/guidesmenu_screen.kv')
 Builder.load_file('views/screens/categoriesmenu_screen.kv')
 Builder.load_file('views/screens/category_screen.kv')
 Builder.load_file('views/screens/tagsmenu_screen.kv')
+Builder.load_file('views/screens/tag_screen.kv')
 Builder.load_file('views/screens/articlesmenu_screen.kv')
 Builder.load_file('views/screens/article_screen.kv')
 Builder.load_file('views/screens/bookmarksmenu_screen.kv')
 Builder.load_file('views/screens/search_screen.kv')
+Builder.load_file('views/screens/guide_screen.kv')
 Builder.load_file('views/screens/settings_screen.kv')
-# Builder.load_file('views/screens/guide_screen.kv')
-# Builder.load_file('views/screens/tag_screen.kv')
 
 # Application root view
 Builder.load_string('''
@@ -71,7 +71,6 @@ Builder.load_string('''
     ScreenManager:
         id: manager
 ''')
-
 
 # class HistorySwitchGuidePrompt(Popup):
 #     def __init__(self, guide_name, **kwargs):
@@ -124,6 +123,15 @@ class ApplicationRoot(NavigationDrawer):
         self.log_screen.add_log_item('[b]Tags menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
         start_time = time.time()
+        self.tag_screen = TagScreen(name='tag')
+        self.sm.add_widget(self.tag_screen)
+        self.other_tag_screen = TagScreen(name='other_tag')
+        self.sm.add_widget(self.other_tag_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Tag[/b] screens stubs were built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
         self.articlesmenu_screen = ArticlesMenuScreen()
         self.sm.add_widget(self.articlesmenu_screen)
         stop_time = time.time()
@@ -154,6 +162,13 @@ class ApplicationRoot(NavigationDrawer):
         self.log_screen.add_log_item('[b]Guides menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
         start_time = time.time()
+        self.guide_screen = GuideScreen()
+        self.sm.add_widget(self.guide_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Guide[/b] screen stub was built in: {dt:.2f} ms'.format(dt=dt))
+
+        start_time = time.time()
         self.settings_screen = SettingsScreen()
         self.sm.add_widget(self.settings_screen)
         stop_time = time.time()
@@ -175,35 +190,16 @@ class ApplicationRoot(NavigationDrawer):
         dt = (stop_time - start_time) * 1000
         self.log_screen.add_log_item('[b]Navigation panel[/b] was built in: {dt:.2f} ms'.format(dt=dt))
 
-        self.show_categoriesmenu_screen()
+        #         self.esc_prompt = None
+        #         self.add_children_widgets()
+        #         self.is_active_guide = bool(guides.active_guide_name)
+        #         EventLoop.window.bind(on_keyboard=self.key_handler)
 
-#         self.esc_prompt = None
-#         self.add_children_widgets()
-#         self.is_active_guide = bool(guides.active_guide_name)
-#         EventLoop.window.bind(on_keyboard=self.key_handler)
-#         if guides.active_guide_name:
-#             self.show_categoriesmenu_screen()
-#         else:
-#             self.show_guidesmenu_screen()
-#
-#     def remove_children_widgets(self):
-#         self.sm.remove_widget(self.guide_screen)
-#         self.guide_screen = None
-#         self.sm.remove_widget(self.tag_screen)
-#         self.tag_screen = None
-#         self.sm.remove_widget(self.article_screen)
-#         self.article_screen = None
+        if guides.active_guide is not None:
+            self.show_categoriesmenu_screen()
+        else:
+            self.show_guidesmenu_screen()
 
-#
-#     def add_children_widgets(self):
-
-#         self.guide_screen = GuideScreen()
-#         self.sm.add_widget(self.guide_screen)
-#         self.tag_screen = TagScreen()
-#         self.sm.add_widget(self.tag_screen)
-#         self.article_screen = ArticleScreen()
-#         self.sm.add_widget(self.article_screen)
-#
 #     def key_handler(self, window, key, *largs):
 #         if key == 27:
 #             if self.esc_prompt:
@@ -257,7 +253,13 @@ class ApplicationRoot(NavigationDrawer):
         self.sm.current = 'tagsmenu'
 
     def show_tag_screen(self, tag_id):
-        pass
+        if self.sm.current == 'tag':
+            self.tag_screen, self.other_tag_screen = self.other_tag_screen, self.tag_screen
+            self.tag_screen.name = 'tag'
+            self.other_tag_screen.name = 'other_tag'
+        self.tag_screen.tag_id = tag_id
+        self.tag_screen.ids.screen_content_scrollview.scroll_y = 1
+        self.sm.current = 'tag'
 
     def show_articlesmenu_screen(self):
         self.articlesmenu_screen.ids.articlesmenu_container.scroll_y = 1
@@ -279,6 +281,11 @@ class ApplicationRoot(NavigationDrawer):
     def show_guidesmenu_screen(self):
         self.guidesmenu_screen.ids.guidesmenu_widget.parent.scroll_y = 1
         self.sm.current = 'guidesmenu'
+
+    def show_guide_screen(self, guide_name):
+        self.guide_screen.guide_name = guide_name
+        self.guide_screen.ids.screen_content_scrollview.scroll_y = 1
+        self.sm.current = 'guide'
 
     def show_search_screen(self):
         self.sm.current = 'search'

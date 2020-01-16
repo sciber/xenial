@@ -68,4 +68,6 @@ class CategoryScreen(Screen):
             self.category_description = ''
             self.tagslist_widget.tagslist_items = []
             self.categoriesmenu_widget.categoriesmenu_items = []
+            self.category_has_related_categories = False
             self.articlesmenu_widget.articlesmenu_items = []
+            self.category_has_articles = False

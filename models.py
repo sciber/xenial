@@ -99,7 +99,14 @@ class GuidesModel:
 
     def remove_guide(self, guide_name):
         guides_list_item_idx = next(idx for idx, guides_list_item in enumerate(self.guides_list)
-                                    if guides_list_item['name'] == guide_name)
+                                    if guides_list_item['guide_name'] == guide_name)
+        if self.active_guide.guide_name == guide_name:
+            if len(self.guides_list) > guides_list_item_idx + 1:
+                self.set_active_guide(self.guides_list[guides_list_item_idx + 1]['guide_name'])
+            elif len(self.guides_list) > 1:
+                self.set_active_guide(self.guides_list[guides_list_item_idx - 1]['guide_name'])
+            else:
+                self.set_active_guide('')
         del self.guides_list[guides_list_item_idx]
         shutil.rmtree(os.path.join(GUIDES_DIR, guide_name))
 
@@ -556,12 +563,12 @@ class GuideModel:
 class TagModel:
     def __init__(self, conn, tag_id):
         self.conn = conn
-        (self.tag_id, self.tag_name) = self._fetchone_from_tags_by_id(tag_id)[1]
+        self.tag_id, self.tag_name = self._fetchone_from_tags_by_id(tag_id)
 
     def tagged_categories_list(self):
         sql_select_all_from_categories_where_tagged_category = """ SELECT * FROM categories 
                                                                    WHERE id IN (
-                                                                       SELECT * from tags_categories
+                                                                       SELECT category_id from tags_categories
                                                                        WHERE tag_id=? 
                                                                    ); """
         cur = self.conn.cursor()
@@ -572,7 +579,7 @@ class TagModel:
     def num_tagged_categories(self):
         sql_select_count_tagged_tagged_categories = """ SELECT COUNT(id) FROM categories
                                                         WHERE id IN (
-                                                            SELECT * FROM tags_categories
+                                                            SELECT category_id FROM tags_categories
                                                             WHERE tag_id=?
                                                         ); """
         cur = self.conn.cursor()
@@ -582,7 +589,7 @@ class TagModel:
     def tagged_articles_list(self):
         sql_select_all_from_articles_where_tagged_article = """ SELECT * FROM articles
                                                                 WHERE id IN (
-                                                                    SELECT * FROM tags_articles
+                                                                    SELECT article_id FROM tags_articles
                                                                     WHERE tag_id=?
                                                                 ); """
         cur = self.conn.cursor()
@@ -593,7 +600,7 @@ class TagModel:
     def num_tagged_articles(self):
         sql_select_count_tagged_tagged_article = """ SELECT COUNT(id) FROM articles
                                                      WHERE id IN (
-                                                         SELECT * FROM tags_articles
+                                                         SELECT article_id FROM tags_articles
                                                          WHERE tag_id=?
                                                      ); """
         cur = self.conn.cursor()

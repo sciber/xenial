@@ -1,4 +1,4 @@
-from kivy.properties import ListProperty
+from kivy.properties import NumericProperty, ListProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
 
@@ -6,8 +6,8 @@ from events import ev
 from translator import tr
 from models import guides
 
-# from controllers.components.categoriesmenu_controller import CategoriesMenu
-# from controllers.components.articlesmenu_controller import ArticlesMenu
+from controllers.components.categoriesmenu_controller import CategoriesMenu
+from controllers.components.articlesmenu_controller import ArticlesMenu
 
 
 class TagsMenuItem(Button):
@@ -46,29 +46,37 @@ class TagsMenuScreen(Screen):
             self.tagsmenu_items = []
 
 
-# class TagScreen(Screen):
-#     from_guide_name = ''
-#
-#     def __init__(self, **kwargs):
-#         super(TagScreen, self).__init__(**kwargs)
-#         self.tag_name = ''
-#         self.tagged_categories = []
-#         self.categoriesmenu_widget = CategoriesMenu()
-#         self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
-#         self.tagged_articles = []
-#         self.articlesmenu_widget = ArticlesMenu()
-#         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
-#
-#     def update_tag_screen_items(self, tag_name):
-#         self.from_guide_name = guides.active_guide_name
-#         self.tag_name = tag_name
-#         self.tagged_categories = tags.tagged_categories(tag_name)
-#         category_item_keys = ('icon', 'name')
-#         self.categoriesmenu_widget.menu_items = [
-#             {'category_' + key: item[key] for key in category_item_keys} for item in self.tagged_categories
-#         ]
-#         self.tagged_articles = tags.tagged_articles(tag_name)
-#         article_item_keys = ('icon', 'name', 'title', 'synopsis')
-#         self.articlesmenu_widget.menu_items = [
-#             {'article_' + key: item[key] for key in article_item_keys} for item in self.tagged_articles
-#         ]
+class TagScreen(Screen):
+    tag_id = NumericProperty(0)
+
+    def __init__(self, **kwargs):
+        super(TagScreen, self).__init__(**kwargs)
+        self.categoriesmenu_widget = CategoriesMenu()
+        self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
+        self.articlesmenu_widget = ArticlesMenu()
+        self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
+        ev.bind(on_ui_lang_code=self.translate_ui)
+
+    def translate_ui(self, *args):
+        self.screen_title = tr.translate('Tag')
+        self.tagged_categories_subtitle = tr.translate('Tagged categories')
+        self.tagged_articles_subtitle = tr.translate('Tagged articles')
+
+    def clear_category_screen_items(self, *args):
+        if self.tag_id:
+            self.tag_id = 0
+
+    def on_tag_id(self, *args):
+        if self.tag_id:
+            tag = guides.active_guide.tag_by_id(self.tag_id)
+            self.tag_name = tag.tag_name
+            self.categoriesmenu_widget.categoriesmenu_items = tag.tagged_categories_list()
+            self.tag_has_tagged_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
+            self.articlesmenu_widget.articlesmenu_items = tag.tagged_articles_list()
+            self.tag_has_tagged_articles = bool(self.articlesmenu_widget.articlesmenu_items)
+        else:
+            self.tag_name = ''
+            self.categoriesmenu_widget.categoriesmenu_items = []
+            self.tag_has_tagged_categories = False
+            self.articlesmenu_widget.articlesmenu_items = []
+            self.tag_has_tagged_articles = False
