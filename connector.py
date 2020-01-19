@@ -1,23 +1,21 @@
+import os
+
 from io import BytesIO
 
-import kivy
-
-from kivy.properties import ListProperty
 from kivy.core.audio import SoundLoader
 from kivy.uix.image import Image
 from kivy.core.image import Image as CoreImage
 from kivy.uix.video import Video
 from kivy.clock import Clock
 
-kivy.require('1.11.1')
-
 
 class AudioMeter:
     @staticmethod
-    def set_audio_length(audio_widget):
-        sound = SoundLoader.load(audio_widget.source)
-        audio_widget.audio_length = sound.length
+    def get_audio_length(audio_source):
+        sound = SoundLoader.load(audio_source)
+        audio_length = sound.length
         sound.unload()
+        return audio_length
 
 
 class AudioConnector:
@@ -77,27 +75,51 @@ class AudioConnector:
 
 
 class VideoMeter(Video):
-    video_widgets = ListProperty([])
-    processed_widget_frame_num = 0
-    processed_widget = None
+    video_sources = []
+    video_metrics = {}
+    dbname = ''
+    current_processed_video_source = ''
+    frame_count = 0
+    callback = None
     volume = 0
 
-    def on_video_widgets(self, instance, value):
-        if self.video_widgets:
-            self.processed_widget = self.video_widgets[0]
-            self.source = self.processed_widget.source
-            self.state = 'play'
+    def get_videos_lengths_and_covers(self, video_sources, callback, dbname):
+        self.video_sources = video_sources
+        self.callback = callback
+        self.dbname = dbname
+        self.video_metrics = {}
+        if self.video_sources:
+            self.current_processed_video_source = self.video_sources.pop()
+            self._start_video_processing(self.current_processed_video_source)
 
-    def set_video_attrs(self, video_widget):
-        self.video_widgets = self.video_widgets + [video_widget]
+    def _start_video_processing(self, source):
+        self.source = source
+        self.state = 'play'
 
     def _on_video_frame(self, *largs):
         super(VideoMeter, self)._on_video_frame(*largs)
-        if self.processed_widget is not None:
-            self.processed_widget.video_length = self.duration
-            self.processed_widget.video_aspect_ratio = self.texture.size
-        self.unload()
-        self.video_widgets = self.video_widgets[1:]
+        if self.current_processed_video_source == self.source:
+            if self.frame_count == 1:
+                self.seek(.5)
+                self.frame_count += 1
+            elif self.frame_count == 5:
+                video_cover_source = os.path.splitext(self.current_processed_video_source)[0] + '.png'
+                im = CoreImage(self.texture)
+                im.save(video_cover_source)
+                self.video_metrics[self.current_processed_video_source] = {
+                    'video_length': self.duration,
+                    'video_cover_source': video_cover_source
+                }
+                self.state = 'stop'
+                self.unload()
+                if self.video_sources:
+                    self.current_processed_video_source = self.video_sources.pop()
+                    self._start_video_processing(self.current_processed_video_source)
+                    self.frame_count = 0
+                else:
+                    self.callback(self.video_metrics, self.dbname)
+            else:
+                self.frame_count += 1
 
 
 class VideoConnector(Video):
@@ -128,7 +150,7 @@ class VideoConnector(Video):
                 self.texture = self.widget_video_container.children[0].texture
                 self.widget_video_container.clear_widgets()
             self.widget_video_container.add_widget(self)
-            self.source = self.widget.source
+            self.source = self.widget.video_source
             self._play()
 
     def _play(self):

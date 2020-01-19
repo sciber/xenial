@@ -12,7 +12,7 @@ from controllers.components.categoriesmenu_controller import CategoriesMenu
 from controllers.components.articlesmenu_controller import ArticlesMenu
 from controllers.components.articlecontent_controller import ArticleContent
 
-# from connector import audio, video, video_meter
+from connector import audio, video
 
 
 class ArticlesMenuScreen(Screen):
@@ -50,6 +50,8 @@ class ArticleScreen(Screen):
         self.articlecontent_widget = ArticleContent()
         self.ids.articlecontent_container.add_widget(self.articlecontent_widget)
         ev.bind(on_ui_lang_code=self.translate_ui)
+        ev.bind(on_add_bookmark=self.on_toggle_bookmark)
+        ev.bind(on_delete_bookmark=self.on_toggle_bookmark)
 
     def translate_ui(self, *args):
         self.screen_title = tr.translate('Article')
@@ -72,7 +74,8 @@ class ArticleScreen(Screen):
             self.article_has_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
             self.articlesmenu_widget.articlesmenu_items = article.related_articles_list()
             self.article_has_related_articles = bool(self.articlesmenu_widget.articlesmenu_items)
-            # self.articlecontent_widget.articlecontent_items = article.content_blocks_list()
+            self.articlecontent_widget.articlecontent_blocks = article.content_blocks_list()
+            self.article_is_bookmarked = article.bookmark() is not None
         else:
             self.article_name = ''
             self.article_icon = ''
@@ -81,15 +84,44 @@ class ArticleScreen(Screen):
             self.tagslist_widget.tagslist_items = []
             self.categoriesmenu_widget.categoriesmenu_items = []
             self.articlesmenu_widget.articlesmenu_items = []
-            # self.articlecontent_widget.articlecontent_items = []
+            self.articlecontent_widget.articlecontent_items = []
+            self.article_is_bookmarked = False
 
-    #     self.on_pre_leave = self._on_pre_leave
-    #
-    # @staticmethod
-    # def _on_pre_leave():
-    #     audio.stop()
-    #     video.stop()
-    #
+    @staticmethod
+    def on_pre_leave():
+        audio.stop()
+        video.stop()
+
+    def toggle_article_bookmark(self):
+        if not self.article_id:
+            return
+        article = guides.active_guide.article_by_id(self.article_id)
+        article_bookmark = article.bookmark()
+        if article_bookmark is not None:
+            guides.active_guide.delete_bookmark(article_bookmark['bookmark_id'])
+            ev.dispatch('on_delete_bookmark', self.article_id)
+        else:
+            guides.active_guide.add_bookmark(self.article_id)
+            ev.dispatch('on_add_bookmark', self.article_id)
+
+    def on_toggle_bookmark(self, instance, article_id):
+        if not self.article_id or self.article_id != article_id:
+            return
+        article = guides.active_guide.article_by_id(self.article_id)
+        article_bookmark = article.bookmark()
+        self.article_is_bookmarked = article_bookmark is not None
+
+    # def on_delete_bookmark(self, instance, article_id):
+    #     print('on_delete_bookmark - article_id', self.article_id)
+    #     if not self.article_id:
+    #         return
+    #     article = guides.active_guide.article_by_id(self.article_id)
+    #     print('on_delete_bookmark - article', article)
+    #     article_bookmark = article.bookmark()
+    #     print('on_delete_bookmark - article_bookmark', article_bookmark)
+    #     if article_bookmark['bookmark_id'] == bookmark_id:
+    #         self.article_is_bookmarked = False
+
     # def update_article_screen_items(self, article_name):
     #     self.from_guide_name = guides.active_guide_name
     #     article = articles.by_name(article_name)
@@ -113,8 +145,6 @@ class ArticleScreen(Screen):
     #         {'article_' + key: item[key] for key in article_item_keys} for item in self.article_related_articles
     #     ]
 
-    def toggle_article_bookmark(self):
-        pass
     #     if not bookmarks.is_article_bookmarked(self.article_name):
     #         bookmarks.add(self.article_name)
     #         self.article_is_bookmarked = True

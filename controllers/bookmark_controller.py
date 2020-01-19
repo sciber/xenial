@@ -17,10 +17,9 @@ class BookmarksMenuItem(BoxLayout):
         self.bookmark_article_title = bookmark_article_title
         self.bookmark_article_synopsis = bookmark_article_synopsis
 
-    @staticmethod
-    def delete_bookmark(bookmark_id):
+    def delete_bookmark(self, bookmark_id):
         guides.active_guide.delete_bookmark(bookmark_id)
-        ev.dispatch('on_delete_bookmark')
+        ev.dispatch('on_delete_bookmark', self.bookmark_article_id)
 
 
 class BookmarksMenuScreen(Screen):
@@ -31,13 +30,14 @@ class BookmarksMenuScreen(Screen):
         ev.bind(on_ui_lang_code=self.translate_ui)
         self.bookmarksmenu_widget = self.ids.bookmarksmenu_widget
         ev.bind(on_active_guide=self.set_bookmarksmenu_items)
+        ev.bind(on_add_bookmark=self.set_bookmarksmenu_items)
         ev.bind(on_delete_bookmark=self.set_bookmarksmenu_items)
         self.set_bookmarksmenu_items()
 
     def translate_ui(self, *args):
         self.screen_title = tr.translate('Bookmarks')
 
-    def on_bookmarksmenu_items(self, instance, value):
+    def on_bookmarksmenu_items(self, *args):
         self.bookmarksmenu_widget.clear_widgets()
         for item in self.bookmarksmenu_items:
             item_widget = BookmarksMenuItem(item['bookmark_id'], item['bookmark_article_id'],

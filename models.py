@@ -1,10 +1,11 @@
 import os
 import shutil
 import json
+import re
 import sqlite3
 from zipfile import ZipFile
 from datetime import datetime
-
+from connector import audio_meter, video_meter
 
 GUIDES_DIR = 'guides'
 
@@ -46,56 +47,50 @@ class GuidesModel:
             self.set_active_guide(guides_names[0])
 
     def set_active_guide(self, guide_name):
-        self.active_guide = self.guide_by_name(guide_name)
+        try:
+            next(item for item in self.guides_list if item['guide_name'] == guide_name)
+        except StopIteration:
+            self.active_guide = None
+        else:
+            self.active_guide = self.guide_by_name(guide_name)
 
     def guide_by_name(self, guide_name):
-        try:
-            guides_list_item = next(item for item in self.guides_list if item['guide_name'] == guide_name)
-        except Exception as e:
-            print(e)
-            guide = None
-        else:
-            guide = GuideModel(guides_list_item['guide_name'])
-        return guide
+        return GuideModel(guide_name)
 
     def import_from_archive(self, archive):
         """ Import guide from zip archive to sqlite database """
-        try:
-            guides_names = [filename for filename in os.listdir(GUIDES_DIR)
-                            if os.path.isdir(os.path.join(GUIDES_DIR, filename))]
-            guide_name = os.path.basename(archive).split('.')[0]
 
-            if guide_name in guides_names:
-                self.guides_list = [item for item in self.guides_list if item['guide_name'] != guide_name]
-                shutil.rmtree(os.path.join(GUIDES_DIR, guide_name))
+        guides_names = [filename for filename in os.listdir(GUIDES_DIR)
+                        if os.path.isdir(os.path.join(GUIDES_DIR, filename))]
+        guide_name = os.path.basename(archive).split('.')[0]
 
-            with ZipFile(archive, 'r') as zf:
-                zf.extractall(os.path.join(GUIDES_DIR, guide_name))
+        if guide_name in guides_names:
+            self.guides_list = [item for item in self.guides_list if item['guide_name'] != guide_name]
+            shutil.rmtree(os.path.join(GUIDES_DIR, guide_name))
 
-            conn = sqlite3.connect(os.path.join(GUIDES_DIR, guide_name, 'guide.db'))
+        with ZipFile(archive, 'r') as zf:
+            zf.extractall(os.path.join(GUIDES_DIR, guide_name))
 
-            with open(os.path.join(GUIDES_DIR, guide_name, 'guide.json'), 'r') as f:
-                guides_list_item = json.load(f)
+        conn = sqlite3.connect(os.path.join(GUIDES_DIR, guide_name, 'guide.db'))
 
-            guides_list_item = self._validate_guides_list_item(guide_name, guides_list_item)
+        with open(os.path.join(GUIDES_DIR, guide_name, 'guide.json'), 'r') as f:
+            guides_list_item = json.load(f)
 
-            self._import_from_archive_guide_categories(conn, guide_name)
-            self._import_from_archive_guide_articles(conn, guide_name)
-            self._import_from_archive_guide_bookmarks(conn, guide_name)
+        guides_list_item = self._validate_guides_list_item(guide_name, guides_list_item)
 
-            conn.commit()
-            conn.close()
+        self._import_from_archive_guide_categories(conn, guide_name)
+        self._import_from_archive_guide_articles(conn, guide_name)
+        self._import_from_archive_guide_bookmarks(conn, guide_name)
 
-            self.guides_list.append(guides_list_item)
-            self.guides_list.sort(key=lambda item: item['guide_title'])
-            if len(self.guides_list) == 1 or self.active_guide.guide_name == guides_list_item['guide_name']:
-                self.set_active_guide(guides_list_item['guide_name'])
-        except Exception as e:
-            print(e)
-            result = False
-        else:
-            result = guides_list_item
-        return result
+        conn.commit()
+        conn.close()
+
+        self.guides_list.append(guides_list_item)
+        self.guides_list.sort(key=lambda item: item['guide_title'])
+        if len(self.guides_list) == 1 or self.active_guide.guide_name == guides_list_item['guide_name']:
+            self.set_active_guide(guides_list_item['guide_name'])
+
+        return guides_list_item
 
     def remove_guide(self, guide_name):
         guides_list_item_idx = next(idx for idx, guides_list_item in enumerate(self.guides_list)
@@ -217,6 +212,9 @@ class GuidesModel:
     def _import_from_archive_guide_articles(self, conn, guide_name):
         self._create_articles_table(conn)
         self._create_tags_articles_table(conn)
+        self._fill_articles_tags_articles_tables(conn, guide_name)
+        shutil.rmtree(os.path.join(GUIDES_DIR, guide_name, 'articles'))
+
         self._create_articles_blocks_table(conn)
         self._create_subtitle_blocks_table(conn)
         self._create_paragraph_blocks_table(conn)
@@ -224,52 +222,7 @@ class GuidesModel:
         self._create_audio_blocks_table(conn)
         self._create_video_blocks_table(conn)
 
-        articles_jsons = [filename for filename in os.listdir(os.path.join(GUIDES_DIR, guide_name, 'articles'))]
-        for article_json in articles_jsons:
-            with open(os.path.join(GUIDES_DIR, guide_name, 'articles', article_json), 'r') as f:
-                article = json.load(f)
-            article_id = self._insert_into_articles(
-                conn, (article['name'],
-                       os.path.join(GUIDES_DIR, guide_name, article['icon']),
-                       article['title'],
-                       article['synopsis']))
-            block_order = 0
-            for block in article['content']:
-                if block['type'] == 'subtitle':
-                    block_id = self._insert_into_subtitle_blocks(conn, block['text'])
-                elif block['type'] == 'paragraph':
-                    block_id = self._insert_into_paragraph_blocks(conn, block['text'])
-                elif block['type'] == 'image':
-                    image_block_row = self._fetchone_from_image_blocks_where_image_source(conn, block['source'])
-                    if image_block_row is not None:
-                        block_id = image_block_row[0]
-                    else:
-                        block_id = self._insert_into_image_blocks(conn, (block['source'], block['caption']))
-                elif block['type'] == 'audio':
-                    audio_block_row = self._fetchone_from_audio_blocks_where_audio_source(conn, block['source'])
-                    if audio_block_row is not None:
-                        block_id = audio_block_row[0]
-                    else:
-                        block_id = self._insert_into_audio_blocks(conn, (block['source'], block['caption']))
-                elif block['type'] == 'video':
-                    video_block_row = self._fetchone_from_video_blocks_where_video_source(conn, block['source'])
-                    if video_block_row is not None:
-                        block_id = video_block_row[0]
-                    else:
-                        block_id = self._insert_into_video_blocks(conn, (block['source'], block['caption']))
-                else:
-                    continue
-                self._insert_into_articles_blocks(conn, (article_id, block_id, block_order, block['type']))
-                block_order += 1
-
-            for tag_name in set(article['tags']):
-                tag_row = self._fetchone_from_tags_where_name(conn, tag_name)
-                if tag_row is not None:
-                    tag_id = tag_row[0]
-                else:
-                    tag_id = self._insert_into_tags(conn, tag_name)
-                self._insert_into_tags_articles(conn, (tag_id, article_id))
-        shutil.rmtree(os.path.join(GUIDES_DIR, guide_name, 'articles'))
+        self._fill_articles_content_block_tables(conn, guide_name)
 
     @staticmethod
     def _create_articles_table(conn):
@@ -278,18 +231,51 @@ class GuidesModel:
                                             name text UNIQUE NOT NULL,
                                             icon text,
                                             title text,
-                                            synopsis text
+                                            synopsis text,
+                                            content text
                                         ); """
         cur = conn.cursor()
         cur.execute(sql_create_articles_table)
 
+    def _fill_articles_tags_articles_tables(self, conn, guide_name):
+        articles_jsons = [filename for filename in os.listdir(os.path.join(GUIDES_DIR, guide_name, 'articles'))]
+        for article_json in articles_jsons:
+            with open(os.path.join(GUIDES_DIR, guide_name, 'articles', article_json), 'r') as f:
+                article = json.load(f)
+
+            article_name = os.path.basename(article_json).split('.')[0]
+            if article_name != article['name']:
+                continue
+
+            article_id = self._insert_into_articles(
+                conn, (article['name'],
+                       os.path.join(GUIDES_DIR, guide_name, article['icon']),
+                       article['title'],
+                       article['synopsis'],
+                       json.dumps(article['content'])))
+
+            for tag_name in set(article['tags']):
+                tag_row = self._fetchone_from_tags_where_name(conn, tag_name)
+                if tag_row is not None:
+                    tag_id = tag_row[0]
+                else:
+                    tag_id = self._insert_into_tags(conn, tag_name)
+                self._insert_into_tags_articles(conn, (tag_id, article_id))
+
     @staticmethod
     def _insert_into_articles(conn, values):
-        sql_insert_into_articles = """ INSERT INTO articles (name, icon, title, synopsis)
-                                       VALUES (?, ?, ?, ?); """
+        sql_insert_into_articles = """ INSERT INTO articles (name, icon, title, synopsis, content)
+                                       VALUES (?, ?, ?, ?, ?); """
         cur = conn.cursor()
         cur.execute(sql_insert_into_articles, values)
         return cur.lastrowid
+
+    @staticmethod
+    def _fetchall_id_name_content_from_articles(conn):
+        sql_select_id_name_from_articles = """ SELECT id, name, content FROM articles; """
+        cur = conn.cursor()
+        cur.execute(sql_select_id_name_from_articles)
+        return cur.fetchall()
 
     @staticmethod
     def _fetchone_from_articles_where_name(conn, article_name):
@@ -315,6 +301,138 @@ class GuidesModel:
         cur = conn.cursor()
         cur.execute(sql_insert_into_tags_articles, values)
         return cur.lastrowid
+
+    def _fill_articles_content_block_tables(self, conn, guide_name):
+        articles_rows = self._fetchall_id_name_content_from_articles(conn)
+        articles_dicts = {row[1]: [row[0], row[2]] for row in articles_rows}
+        for article_name in articles_dicts:
+            article_id = articles_dicts[article_name][0]
+            article_content = json.loads(articles_dicts[article_name][1])
+            block_order = 0
+            for block in article_content:
+                if block['type'] == 'subtitle':
+                    block_id = self._insert_into_subtitle_blocks(conn, block['text'])
+                elif block['type'] == 'paragraph':
+                    updated_refs_paragraph = self._update_text_refs(block['text'], articles_dicts)
+                    block_id = self._insert_into_paragraph_blocks(conn, updated_refs_paragraph)
+                elif block['type'] == 'image':
+                    guide_block_source = os.path.join(GUIDES_DIR, guide_name, block['source'])
+                    image_block_row = self._fetchone_from_image_blocks_where_image_source(conn, guide_block_source)
+                    if image_block_row is not None:
+                        block_id = image_block_row[0]
+                    else:
+                        updated_refs_image_caption_text = self._update_text_refs(block['caption'], articles_dicts)
+                        block_id = self._insert_into_image_blocks(
+                            conn, (guide_block_source, updated_refs_image_caption_text))
+                elif block['type'] == 'audio':
+                    guide_block_source = os.path.join(GUIDES_DIR, guide_name, block['source'])
+                    audio_block_row = self._fetchone_from_audio_blocks_where_audio_source(conn, guide_block_source)
+                    if audio_block_row is not None:
+                        block_id = audio_block_row[0]
+                    else:
+                        updated_refs_audio_caption_text = self._update_text_refs(block['caption'], articles_dicts)
+                        block_id = self._insert_into_audio_blocks(
+                            conn, (guide_block_source, updated_refs_audio_caption_text))
+                elif block['type'] == 'video':
+                    guide_block_source = os.path.join(GUIDES_DIR, guide_name, block['source'])
+                    video_block_row = self._fetchone_from_video_blocks_where_video_source(conn, guide_block_source)
+                    if video_block_row is not None:
+                        block_id = video_block_row[0]
+                    else:
+                        updated_refs_audio_caption_text = self._update_text_refs(block['caption'], articles_dicts)
+                        block_id = self._insert_into_video_blocks(
+                            conn, (guide_block_source, updated_refs_audio_caption_text))
+                else:
+                    continue
+                self._insert_into_articles_blocks(conn, (article_id, block_id, block_order, block['type']))
+                block_order += 1
+
+        self._alter_table_articles_drop_column_content(conn)
+        self._update_audio_length_in_audio_blocks_table(conn)
+        self._update_video_length_and_cover_in_video_blocks(conn)
+
+    @staticmethod
+    def _update_audio_length_in_audio_blocks_table(conn):
+        sql_select_audio_source_from_audio_blocks = """ SELECT audio_source FROM audio_blocks; """
+        sql_update_audio_blocks_audio_length = """ UPDATE audio_blocks
+                                                   SET audio_length=?
+                                                   WHERE audio_source=?; """
+        cur = conn.cursor()
+        cur.execute(sql_select_audio_source_from_audio_blocks)
+        audio_blocks_sources_rows = cur.fetchall()
+        for row in audio_blocks_sources_rows:
+            audio_source = row[0]
+            audio_length = audio_meter.get_audio_length(audio_source)
+            cur.execute(sql_update_audio_blocks_audio_length, (audio_length, audio_source))
+
+    def _update_video_length_and_cover_in_video_blocks(self, conn):
+
+        sql_select_video_source_from_video_blocks = """ SELECT video_source FROM video_blocks; """
+        cur = conn.cursor()
+        cur.execute(sql_select_video_source_from_video_blocks)
+        video_blocks_sources_rows = cur.fetchall()
+        video_block_sources = [row[0] for row in video_blocks_sources_rows]
+        cur.execute("PRAGMA database_list;")
+        dbname = cur.fetchone()[-1]
+        video_meter.get_videos_lengths_and_covers(video_block_sources, self.store_video_metrics, dbname)
+
+    @staticmethod
+    def store_video_metrics(video_metrics, dbname):
+        sql_update_video_blocks_video_length_and_cover = """ UPDATE video_blocks
+                                                             SET video_length=?,
+                                                                 video_cover_source=?
+                                                             WHERE video_source=?; """
+        conn = sqlite3.connect(dbname)
+        cur = conn.cursor()
+        for video_source in video_metrics:
+            cur.execute(sql_update_video_blocks_video_length_and_cover,
+                        (video_metrics[video_source]['video_length'],
+                         video_metrics[video_source]['video_cover_source'],
+                         video_source))
+        conn.commit()
+        conn.close()
+
+    @staticmethod
+    def _alter_table_articles_drop_column_content(conn):
+        sql_create_articles_new_table = """
+            CREATE TABLE articles_new (
+                id integer PRIMARY KEY,
+                name text UNIQUE NOT NULL,
+                icon text,
+                title text,
+                synopsis text
+            );
+        """
+        sql_insert_data_from_articles_to_articles_new = """
+            INSERT INTO articles_new (id, name, icon, title, synopsis)
+            SELECT id, name, icon, title, synopsis FROM articles;
+        """
+        sql_drop_articles_table = """ 
+            DROP TABLE articles; 
+        """
+        sql_rename_articles_new_to_articles = """
+            ALTER TABLE articles_new RENAME TO articles;
+        """
+        cur = conn.cursor()
+        cur.execute(sql_create_articles_new_table)
+        cur.execute(sql_insert_data_from_articles_to_articles_new)
+        cur.execute(sql_drop_articles_table)
+        cur.execute(sql_rename_articles_new_to_articles)
+        conn.commit()
+
+    @staticmethod
+    def _update_text_refs(block_text, articles_dicts):
+        def replace_name_ref(matchobj):
+            article_name = matchobj.group(1).strip()
+            if article_name not in articles_dicts:
+                replacement = '[ref=]'
+            else:
+                article_id = articles_dicts[article_name][0]
+                replacement = '[ref={ref}]'.format(ref=article_id)
+            return replacement
+
+        result = re.sub(r'\[ref=(.*?)\]', replace_name_ref, block_text)
+        return result
 
     @staticmethod
     def _create_articles_blocks_table(conn):
@@ -541,7 +659,8 @@ class GuideModel:
                                                              b.article_id, a.name, a.icon, a.title, a.synopsis
                                                       FROM bookmarks AS b
                                                       INNER JOIN articles AS a
-                                                      ON b.article_id=a.id; """
+                                                      ON b.article_id=a.id 
+                                                      ORDER BY b.created_at; """
         cur = self.conn.cursor()
         cur.execute(sql_select_all_from_bookmarked_articles)
         bookmarked_articles_rows = cur.fetchall()
@@ -761,9 +880,9 @@ class ArticleModel:
         image_blocks_list = self._get_article_image_blocks(self.article_id)
         audio_blocks_list = self._get_article_audio_blocks(self.article_id)
         video_blocks_list = self._get_article_video_blocks(self.article_id)
-        sorted_content_blocks_list = (subtitle_blocks_list + paragraph_blocks_list
+        sorted_content_blocks_list = sorted(subtitle_blocks_list + paragraph_blocks_list
                                       + image_blocks_list + audio_blocks_list
-                                      + video_blocks_list).sort(key=lambda block: block['block_order'])
+                                      + video_blocks_list, key=lambda block: block['content_order'])
         return sorted_content_blocks_list
 
     def _get_article_subtitle_blocks(self, article_id):
@@ -791,7 +910,7 @@ class ArticleModel:
         return [dict(zip(ARTICLE_CONTENT_PARAGRAPH_BLOCKS_KEYS, row)) for row in paragraph_blocks_rows]
 
     def _get_article_image_blocks(self, article_id):
-        sql_select_article_image_blocks_rows = """ SELECT ab.block_id, ab_block_type, ab.block_order,
+        sql_select_article_image_blocks_rows = """ SELECT ab.block_id, ab.block_type, ab.block_order,
                                                        images.image_source, images.caption_text
                                                    FROM articles_blocks AS ab
                                                    LEFT JOIN image_blocks AS images
@@ -803,11 +922,11 @@ class ArticleModel:
         return [dict(zip(ARTICLE_CONTENT_IMAGE_BLOCKS_KEYS, row)) for row in image_blocks_rows]
 
     def _get_article_audio_blocks(self, article_id):
-        sql_select_article_audio_blocks_rows = """ SELECT ab.block_id, ab_block_type, ab.block_order,
+        sql_select_article_audio_blocks_rows = """ SELECT ab.block_id, ab.block_type, ab.block_order,
                                                        audios.audio_source, IFNULL(audios.audio_length, 0), 
                                                        audios.caption_text
                                                    FROM articles_blocks AS ab
-                                                   LEFT JOIN image_blocks AS audios
+                                                   LEFT JOIN audio_blocks AS audios
                                                    ON ab.block_id=audios.id
                                                    WHERE ab.article_id=? and ab.block_type='audio'; """
         cur = self.conn.cursor()
@@ -816,11 +935,11 @@ class ArticleModel:
         return [dict(zip(ARTICLE_CONTENT_AUDIO_BLOCKS_KEYS, row)) for row in audio_blocks_rows]
 
     def _get_article_video_blocks(self, article_id):
-        sql_select_article_video_blocks_rows = """ SELECT ab.block_id, ab_block_type, ab.block_order,
+        sql_select_article_video_blocks_rows = """ SELECT ab.block_id, ab.block_type, ab.block_order,
                                                        videos.video_source, IFNULL(videos.video_length, 0), 
                                                        IFNULL(videos.video_cover_source, ''), videos.caption_text
                                                    FROM articles_blocks AS ab
-                                                   LEFT JOIN image_blocks AS videos
+                                                   LEFT JOIN video_blocks AS videos
                                                    ON ab.block_id=videos.id
                                                    WHERE ab.article_id=? and ab.block_type='video'; """
         cur = self.conn.cursor()

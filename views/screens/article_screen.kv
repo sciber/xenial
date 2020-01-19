@@ -11,7 +11,7 @@
     article_synopsis: ''
     article_has_categories: False
     article_has_related_articles: False
-    article_bookmark: None
+    article_is_bookmarked: False
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -25,7 +25,7 @@
         ScreenTitleBar:
             title: root.screen_title
             action_disabled: False
-            action_image: 'assets/img/bookmark-color.png' if root.article_bookmark is not None else 'assets/img/bookmark.png'
+            action_image: 'assets/img/bookmark-color.png' if root.article_is_bookmarked else 'assets/img/bookmark.png'
             action_callback: root.toggle_article_bookmark
         ScrollView:
             id: screen_content_scrollview

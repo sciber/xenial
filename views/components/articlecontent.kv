@@ -1,7 +1,8 @@
 #:kivy 1.11.1
 
 <ArticleSubtitle>:
-    text: ''
+    subtitle_text: ''
+    text: self.subtitle_text
     font_size: '20dp'
     text_size: self.size
     bold: True
@@ -12,31 +13,34 @@
     height: '60dp'
 
 <ArticleParagraph>:
-    text: ''
+    paragraph_text: ''
+    text: self.paragraph_text
     markup: True
     font_size: '16dp'
     text_size: self.width, None
     color: .2, .2, .2, 1
     size_hint_y: None
     height: self.texture_size[1]
-    on_ref_press: app.root.show_article_screen(args[1])
+    on_ref_press:
+        print(args[1])
+        app.root.show_article_screen(args[1])
 
 <ArticleImage>:
-    source: ''
-    caption: ''
+    image_source: ''
+    image_caption_text: ''
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
     spacing: '8dp'
     AsyncImage:
-        source: root.source
+        source: root.image_source
         size_hint: None, None
         width: self.parent.width - (2 * self.parent.padding[0])
         height: self.parent.width/self.image_ratio
         keep_ratio: True
         allow_stretch: True
     Label:
-        text: root.caption
+        text: root.image_caption_text
         font_size: '14dp'
         text_size: self.width, None
         size_hint_y: None
@@ -47,11 +51,11 @@
 
 
 <ArticleAudio>:
-    caption: ''
     audio_state: 'stop'
     audio_pos: 0
     audio_length: 0
     slider_value: 0
+    audio_caption_text: ''
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -100,7 +104,7 @@
                 halign: 'right'
                 color: .2, .2, .2, 1
     Label:
-        text: root.caption
+        text: root.audio_caption_text
         text_size: self.width, None
         markup: True
         font_size: '14dp'
@@ -110,12 +114,12 @@
         on_ref_press: app.root.show_article_screen(args[1])
 
 <ArticleVideo>:
-    caption: ''
     video_state: 'stop'
     video_pos: 0
     video_length: 0
     slider_value: 0
     video_aspect_ratio: (16, 9)
+    video_caption_text: ''
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -174,7 +178,7 @@
                 halign: 'right'
                 color: .2, .2, .2, 1
     Label:
-        text: root.caption
+        text: root.video_caption_text
         text_size: self.width, None
         markup: True
         font_size: '14dp'

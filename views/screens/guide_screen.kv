@@ -4,7 +4,7 @@
 
 #:import ev events.ev
 
-<UnloadGuideWarningPopup>:
+<RemoveGuideWarningPopup>:
     message: ''
     cancel_button_text: 'Cancel'
     delete_button_text: 'Delete'
@@ -138,4 +138,4 @@
             size_hint_y: None
             height: '60dp'
             on_release:
-                Factory.UnloadGuideWarningPopup(guide_name=root.guide_name, guide_title=root.guide_title).open()
+                Factory.RemoveGuideWarningPopup(guide_name=root.guide_name, guide_title=root.guide_title).open()

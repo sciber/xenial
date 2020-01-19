@@ -270,8 +270,8 @@ class ApplicationRoot(NavigationDrawer):
             self.article_screen, self.other_article_screen = self.other_article_screen, self.article_screen
             self.article_screen.name = 'article'
             self.other_article_screen.name = 'other_article'
-        self.article_screen.article_id = article_id
         self.article_screen.ids.screen_content_scrollview.scroll_y = 1
+        self.article_screen.article_id = article_id
         self.sm.current = 'article'
 
     def show_bookmarksmenu_screen(self):
@@ -410,7 +410,10 @@ class XenialApp(App):
 
     @staticmethod
     def set_active_guide_name_settings(*args):
-        app_settings.set('active_guide_name', guides.active_guide.guide_name)
+        if guides.active_guide is not None:
+            app_settings.set('active_guide_name', guides.active_guide.guide_name)
+        else:
+            app_settings.set('active_guide_name', '')
 
     @staticmethod
     def set_translator_ui_lang_code_settings(instance, lang_code):

@@ -136,14 +136,15 @@ class GuideScreen(Screen):
             return
         before_active_guide_name = guides.active_guide.guide_name
         guides.remove_guide(self.guide_name)
-        if before_active_guide_name != guides.active_guide.guide_name:
+        if guides.active_guide is None or before_active_guide_name != guides.active_guide.guide_name:
             ev.dispatch('on_active_guide')
 
 
-class UnloadGuideWarningPopup(Popup):
+class RemoveGuideWarningPopup(Popup):
     def __init__(self, guide_name, guide_title, **kwargs):
-        super(UnloadGuideWarningPopup, self).__init__(**kwargs)
+        super(RemoveGuideWarningPopup, self).__init__(**kwargs)
         self.guide_name = guide_name
         self.title = tr.translate('Warning')
         self.message = (tr.translate('Delete guide') + '\n"[b]{}[/b]"?').format(guide_title)
         self.cancel_button_text = tr.translate('Cancel')
+        self.delete_button_text = tr.translate('Delete')

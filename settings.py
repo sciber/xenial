@@ -15,7 +15,12 @@ class SettingsManager:
         return self.settings_dict[key]
 
     def set(self, key, value):
-        self.settings_dict[key] = value
+        if not value:
+            if key not in self.settings_dict:
+                return
+            del self.settings_dict[key]
+        else:
+            self.settings_dict[key] = value
         with open(SETTINGS_FILE, 'w') as f:
             json.dump(self.settings_dict, f)
 
