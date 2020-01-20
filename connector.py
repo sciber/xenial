@@ -99,10 +99,7 @@ class VideoMeter(Video):
     def _on_video_frame(self, *largs):
         super(VideoMeter, self)._on_video_frame(*largs)
         if self.current_processed_video_source == self.source:
-            if self.frame_count == 1:
-                self.seek(.5)
-                self.frame_count += 1
-            elif self.frame_count == 5:
+            if self.frame_count == 5:
                 video_cover_source = os.path.splitext(self.current_processed_video_source)[0] + '.png'
                 im = CoreImage(self.texture)
                 im.save(video_cover_source)
@@ -131,14 +128,19 @@ class VideoConnector(Video):
         self.play_timer = None
 
     def toggle_play(self, widget):
+        print('toggle_play - self.widget:', self.widget, '; widget:', widget)
         if self.widget is widget:
+            print('self.widget is widget')
             if self.state == 'play':
                 self.stop()
             else:
                 self._play()
         else:
+            print('self.widget is NOT widget')
             if self.widget is not None:
+                print('self.widget is not None')
                 if self.state == 'play':
+                    print("self.state == 'play'")
                     self.stop()
                 self.widget_video_container.remove_widget(self)
                 self._store_current_video_frame()
@@ -147,6 +149,7 @@ class VideoConnector(Video):
             self.widget = widget
             self.widget_video_container = self.widget.ids.video_container
             if self.widget_video_container.children:
+                print(self.widget_video_container.children)
                 self.texture = self.widget_video_container.children[0].texture
                 self.widget_video_container.clear_widgets()
             self.widget_video_container.add_widget(self)
@@ -173,6 +176,7 @@ class VideoConnector(Video):
         self.widget.video_state = 'stop'
         self.widget.video_pos = 0
         self.widget.slider_value = 0
+        self.texture = self.widget.video_cover_image.texture
 
     def stop(self):
         self.state = 'pause'

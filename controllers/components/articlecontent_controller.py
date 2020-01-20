@@ -5,6 +5,7 @@ import kivy
 from kivy.properties import ListProperty
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
+from kivy.uix.image import AsyncImage
 
 from models import guides
 
@@ -50,16 +51,24 @@ class ArticleAudio(BoxLayout):
             audio.change_pos(self, slider_value)
 
 
+class VideoCoverImage(AsyncImage):
+    def __init__(self, source, **kwargs):
+        super(VideoCoverImage, self).__init__(**kwargs)
+        self.source = source
+
+
 class ArticleVideo(BoxLayout):
     def __init__(self, video_source, video_length, video_cover_source, video_caption_text, **kwargs):
         super(ArticleVideo, self).__init__(**kwargs)
         self.video_source = video_source
         self.video_length = video_length
+        self.video_cover_source = video_cover_source
+        self.video_cover_image = VideoCoverImage(video_cover_source)
+        self.ids.video_container.add_widget(self.video_cover_image)
         self.video_caption_text = video_caption_text
         self.video_state = 'stop'
         self.video_pos = 0
         self.slider_value = 0
-        self.video_aspect_ratio = (16, 9)
         self.video_track_timer = None
 
     def toggle_video_play(self):

@@ -74,7 +74,7 @@ class ArticleScreen(Screen):
             self.article_has_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
             self.articlesmenu_widget.articlesmenu_items = article.related_articles_list()
             self.article_has_related_articles = bool(self.articlesmenu_widget.articlesmenu_items)
-            self.articlecontent_widget.articlecontent_blocks = article.content_blocks_list()
+            self.articlecontent_widget.articlecontent_blocks = []
             self.article_is_bookmarked = article.bookmark() is not None
         else:
             self.article_name = ''
@@ -86,6 +86,10 @@ class ArticleScreen(Screen):
             self.articlesmenu_widget.articlesmenu_items = []
             self.articlecontent_widget.articlecontent_items = []
             self.article_is_bookmarked = False
+
+    def on_enter(self):
+        article = guides.active_guide.article_by_id(self.article_id)
+        self.articlecontent_widget.articlecontent_blocks = article.content_blocks_list()
 
     @staticmethod
     def on_pre_leave():
