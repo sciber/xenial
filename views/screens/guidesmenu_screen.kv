@@ -64,6 +64,7 @@
     guide_from_place_label: 'From:'
     guide_to_place_label: 'To'
     guide_description: ''
+    is_active_guide: False
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -138,7 +139,7 @@
                             halign: 'left'
                             valign: 'top'
         CheckBox:
-            active: guides.active_guide.guide_name == root.guide_name
+            active: root.is_active_guide
             group: 'guides'
             allow_no_selection: False
             size_hint_x: None

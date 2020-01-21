@@ -1,12 +1,10 @@
 #:kivy 1.11.1
 
-#:import exit sys.exit
-
-#:import translator translator.translator
-
 <LeaveAppPrompt>:
+    prompt_text: 'Do you want to leave the app?'
+    cancel_button_text: 'Cancel'
+    quit_button_text: ''
     auto_dismiss: False
-    title: translator.translate('Warning', translator.active_lang_code)
     title_color: 8, .2, .2, 1
     separator_color: 8, .2, .2, 1
     size_hint_y: None
@@ -14,14 +12,14 @@
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: translator.translate('Do you want to leave the app?', translator.active_lang_code)
+            text: root.prompt_text
         BoxLayout:
             orientation: 'horizontal'
             size_hint_y: None
             height: '40dp'
             Button:
-                text: translator.translate('Cancel', translator.active_lang_code)
+                text: root.cancel_button_text
                 on_release: root.dismiss()
             Button:
-                text: translator.translate('Quit', translator.active_lang_code)
-                on_release: exit(0)
+                text: root.quit_button_text
+                on_release: app.stop()

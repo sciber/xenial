@@ -1,11 +1,10 @@
-import os
-
 from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
 
 from events import ev
 from translator import tr
 from models import guides
+from history import hist
 
 from controllers.components.tagslist_controller import TagsList
 from controllers.components.categoriesmenu_controller import CategoriesMenu
@@ -114,44 +113,3 @@ class ArticleScreen(Screen):
         article = guides.active_guide.article_by_id(self.article_id)
         article_bookmark = article.bookmark()
         self.article_is_bookmarked = article_bookmark is not None
-
-    # def on_delete_bookmark(self, instance, article_id):
-    #     print('on_delete_bookmark - article_id', self.article_id)
-    #     if not self.article_id:
-    #         return
-    #     article = guides.active_guide.article_by_id(self.article_id)
-    #     print('on_delete_bookmark - article', article)
-    #     article_bookmark = article.bookmark()
-    #     print('on_delete_bookmark - article_bookmark', article_bookmark)
-    #     if article_bookmark['bookmark_id'] == bookmark_id:
-    #         self.article_is_bookmarked = False
-
-    # def update_article_screen_items(self, article_name):
-    #     self.from_guide_name = guides.active_guide_name
-    #     article = articles.by_name(article_name)
-    #     self.article_icon = os.path.join(guides.active_guide_path, 'icons', 'articles', article['icon'])
-    #     self.article_name = article_name
-    #     self.article_title = article['title']
-    #     self.article_synopsis = article['synopsis']
-    #     self.article_is_bookmarked = bookmarks.is_article_bookmarked(article_name)
-    #     self.article_assigned_tags = article['tags']
-    #     self.tagslist_widget.tagslist_items = self.article_assigned_tags
-    #     self.article_content = articles.content(article_name)
-    #     self.articlecontent_widget.content_items = self.article_content
-    #     self.article_related_categories = articles.related_categories(article_name)
-    #     category_item_keys = ('icon', 'name')
-    #     self.categoriesmenu_widget.menu_items = [
-    #         {'category_' + key: item[key] for key in category_item_keys} for item in self.article_related_categories
-    #     ]
-    #     self.article_related_articles = articles.related_articles(article_name)
-    #     article_item_keys = ('icon', 'name', 'title', 'synopsis')
-    #     self.articlesmenu_widget.menu_items = [
-    #         {'article_' + key: item[key] for key in article_item_keys} for item in self.article_related_articles
-    #     ]
-
-    #     if not bookmarks.is_article_bookmarked(self.article_name):
-    #         bookmarks.add(self.article_name)
-    #         self.article_is_bookmarked = True
-    #     else:
-    #         bookmarks.remove(self.article_name)
-    #         self.article_is_bookmarked = False

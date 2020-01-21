@@ -1,5 +1,6 @@
 import os
 
+from kivy.base import EventLoop
 from kivy.properties import StringProperty, ListProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
@@ -23,11 +24,16 @@ class GuidesMenuItem(BoxLayout):
         self.guide_lang = guide_lang
         self.guide_from_place = guide_from_place
         self.guide_to_place = guide_to_place
+        self.is_active_guide = (self.guide_name == guides.active_guide.guide_name)
         ev.bind(on_ui_lang_code=self.translate_ui)
+        ev.bind(on_active_guide=self.check_is_guide_active)
 
     def translate_ui(self, *args):
         self.guide_from_place_label = (tr.translate('From') + ': [b]{}[/b]').format(self.guide_from_place)
         self.guide_to_place_label = (tr.translate('To') + ': [b]{}[/b]').format(self.guide_to_place)
+
+    def check_is_guide_active(self, *args):
+        self.is_active_guide = (self.guide_name == guides.active_guide.guide_name)
 
     def activate_guide(self):
         guides.set_active_guide(self.guide_name)
@@ -68,23 +74,35 @@ class LoadGuidePopup(Popup):
         self.cancel_button_text = tr.translate('Cancel')
         self.load_button_text = tr.translate('Load')
 
+    def _handle_keyboard(self, window, key, *largs):
+        super(LoadGuidePopup, self)._handle_keyboard(window, key, *largs)
+        if key == 27:
+            self.dismiss()
+            return True
+
     @staticmethod
     def import_guide(archive):
         guides_list_item = guides.import_from_archive(archive)
-        if guides_list_item:
-            ev.dispatch('on_import_guide')
-            if guides_list_item['guide_name'] == guides.active_guide.guide_name:
-                ev.dispatch('on_active_guide')
-        else:
-            GuideLoadFailedWarning(os.path.basename(archive)).open()
+        ev.dispatch('on_import_guide', guides_list_item['guide_name'])
+        if len(guides.guides_list) == 1:
+            guides.set_active_guide(guides_list_item['guide_name'])
+            ev.dispath('on_active_guide')
 
 
+# Will not be called when import fails as for now only an exception is thrown
+# The class perhaps should be moved to the models module
 class GuideLoadFailedWarning(Popup):
     def __init__(self, archive, **kwargs):
         super(GuideLoadFailedWarning, self).__init__(**kwargs)
         self.message = tr.translate('"[b]{}[/b]"\n guide load failed!').format(os.path.basename(archive))
         self.title = tr.translate('Error')
         self.ok_button_text = tr.translate('OK')
+
+    def _handle_keyboard(self, window, key, *largs):
+        super(GuideLoadFailedWarning, self)._handle_keyboard(window, key, *largs)
+        if key == 27:
+            self.dismiss()
+            return True
 
 
 class GuideScreen(Screen):
@@ -134,10 +152,11 @@ class GuideScreen(Screen):
     def remove_guide(self, instance, guide_name):
         if guide_name != self.guide_name:
             return
-        before_active_guide_name = guides.active_guide.guide_name
+        # before_active_guide_name = guides.active_guide.guide_name
         guides.remove_guide(self.guide_name)
-        if guides.active_guide is None or before_active_guide_name != guides.active_guide.guide_name:
-            ev.dispatch('on_active_guide')
+        ev.dispatch('on_remove_guide', self._guide_name)
+        # if guides.active_guide is None or before_active_guide_name != guides.active_guide.guide_name:
+        #     ev.dispatch('on_active_guide')
 
 
 class RemoveGuideWarningPopup(Popup):
@@ -148,3 +167,9 @@ class RemoveGuideWarningPopup(Popup):
         self.message = (tr.translate('Delete guide') + '\n"[b]{}[/b]"?').format(guide_title)
         self.cancel_button_text = tr.translate('Cancel')
         self.delete_button_text = tr.translate('Delete')
+
+    def _handle_keyboard(self, window, key, *largs):
+        super(RemoveGuideWarningPopup, self)._handle_keyboard(window, key, *largs)
+        if key == 27:
+            self.dismiss()
+            return True
