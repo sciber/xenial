@@ -48,6 +48,7 @@ class ArticleScreen(Screen):
         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
         self.articlecontent_widget = ArticleContent()
         self.ids.articlecontent_container.add_widget(self.articlecontent_widget)
+        ev.bind(on_active_guide=self.clear_article_screen_items)
         ev.bind(on_ui_lang_code=self.translate_ui)
         ev.bind(on_add_bookmark=self.on_toggle_bookmark)
         ev.bind(on_delete_bookmark=self.on_toggle_bookmark)

@@ -48,6 +48,10 @@ class ScreensHistory:
             ev.dispatch('on_active_guide')
             return last_visited_screen
 
+    def remove_screen(self, screen_name, model_id):
+        if self.guides_history_list and (screen_name, model_id) in self.guides_history_list[-1]['visited_screens']:
+            self.guides_history_list[-1]['visited_screens'].remove((screen_name, model_id))
+
     def _get_guides_history_list_item_with_last_visited_screen(self):
         try:
             history_list_item = next(item for item in self.guides_history_list[::-1] if item['visited_screens'])
@@ -60,57 +64,6 @@ class ScreensHistory:
         visited_screens = [screen for screen in self.guides_history_list[-1]['visited_screens']
                            if screen != last_visited_screen] + [last_visited_screen]
         self.guides_history_list[-1]['visited_screens'] = visited_screens
-
-
-    # def pop_active_guide_history_prev_screen(self):
-    #     if not(self.screens_history and self.screens_history[-1][1]):
-    #         return None
-    #     return self.screens_history[-1][1].pop()
-    #
-    # def push_active_guide_history_screen(self, screen_name, screen_content_name):
-    #     if (screen_name, screen_content_name) in self.screens_history:
-    #         self.screens_history.remove((screen_name, screen_content_name))
-    #     self.screens_history[-1][1].append((screen_name, screen_content_name))
-    #
-    # def switch_to_active_guide_history(self):
-    #     active_guide_history_idx = next(idx for idx, guide_history in enumerate(self.screens_history)
-    #                                     if guide_history[0] == guides.active_guide_name)
-    #     active_guide_history = self.screens_history.pop(active_guide_history_idx)
-    #     self.screens_history.append(active_guide_history)
-    #
-    # def is_current_screen_active_guide_history_prev_screen(self, screen_name, screen_content_name):
-    #     if not(self.screens_history and self.screens_history[-1][1]):
-    #         return False
-    #     return self.screens_history[-1][1][-1] == (screen_name, screen_content_name)
-    #
-    # def active_guide_history_has_prev_screen(self):
-    #     return self.screens_history[-1][1]
-    #
-    # def other_guide_history_has_prev_screen(self):
-    #     if not self.screens_history:
-    #         return False
-    #     try:
-    #         next(guide_history for guide_history in reversed(self.screens_history) if guide_history[1])
-    #     except StopIteration:
-    #         return False
-    #     return True
-    #
-    # def name_of_other_guide_with_prev_screen_in_history(self):
-    #     if not self.screens_history:
-    #         return ''
-    #     try:
-    #         other_guide_history = next(guide_history for guide_history in reversed(self.screens_history)
-    #                                    if guide_history[1])
-    #     except StopIteration:
-    #         return ''
-    #     return other_guide_history[0]
-    #
-    # def remove_guide_history(self, guide_name):
-    #     self.screens_history = [guide_history for guide_history in self.screens_history
-    #                             if guide_name != guide_history[0]]
-    #
-    # def add_guide_history(self, guide_name):
-    #     self.screens_history.insert(0, (guide_name, []))
 
 
 hist = ScreensHistory()

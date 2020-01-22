@@ -40,6 +40,7 @@ class CategoryScreen(Screen):
         self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
         self.articlesmenu_widget = ArticlesMenu()
         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
+        ev.bind(on_active_guide=self.clear_category_screen_items)
         ev.bind(on_ui_lang_code=self.translate_ui)
 
     def translate_ui(self, *args):

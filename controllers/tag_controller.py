@@ -55,6 +55,7 @@ class TagScreen(Screen):
         self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
         self.articlesmenu_widget = ArticlesMenu()
         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
+        ev.bind(on_active_guide=self.clear_tag_screen_items)
         ev.bind(on_ui_lang_code=self.translate_ui)
 
     def translate_ui(self, *args):
@@ -62,7 +63,7 @@ class TagScreen(Screen):
         self.tagged_categories_subtitle = tr.translate('Tagged categories')
         self.tagged_articles_subtitle = tr.translate('Tagged articles')
 
-    def clear_category_screen_items(self, *args):
+    def clear_tag_screen_items(self, *args):
         if self.tag_id:
             self.tag_id = 0
 

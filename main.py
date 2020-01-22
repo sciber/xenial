@@ -216,7 +216,7 @@ class ApplicationRoot(NavigationDrawer):
 
             return True
 
-    def _push_current_screen_to_history(self):
+    def _push_prev_screen_to_history(self):
         if self.sm.current_screen.name == 'article':
             hist.append_screen(self.sm.current_screen.name, self.sm.current_screen.article_id)
         elif self.sm.current_screen.name == 'category':
@@ -224,21 +224,29 @@ class ApplicationRoot(NavigationDrawer):
         elif self.sm.current_screen.name == 'tag':
             hist.append_screen(self.sm.current_screen.name, self.sm.current_screen.tag_id)
 
+    def _remove_current_screen_from_history(self):
+        if self.sm.current_screen.name == 'article':
+            hist.remove_screen(self.sm.current_screen.name, self.sm.current_screen.article_id)
+        elif self.sm.current_screen.name == 'category':
+            hist.remove_screen(self.sm.current_screen.name, self.sm.current_screen.category_id)
+        elif self.sm.current_screen.name == 'tag':
+            hist.remove_screen(self.sm.current_screen.name, self.sm.current_screen.tag_id)
+
     def show_log_screen(self):
-        self._push_current_screen_to_history()
+        self._push_prev_screen_to_history()
         self.log_screen.ids.logslist_widget.parent.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'log'
 
     def show_categoriesmenu_screen(self):
-        self._push_current_screen_to_history()
+        self._push_prev_screen_to_history()
         self.categoriesmenu_screen.ids.categoriesmenu_container.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'categoriesmenu'
 
     def show_category_screen(self, category_id, is_prev_screen=False):
         if not is_prev_screen:
-            self._push_current_screen_to_history()
+            self._push_prev_screen_to_history()
             self.sm.transition.direction = 'left'
         else:
             self.sm.transition.direction = 'right'
@@ -249,16 +257,17 @@ class ApplicationRoot(NavigationDrawer):
         self.category_screen.category_id = category_id
         self.category_screen.ids.screen_content_scrollview.scroll_y = 1
         self.sm.current = 'category'
+        self._remove_current_screen_from_history()
 
     def show_tagsmenu_screen(self):
-        self._push_current_screen_to_history()
+        self._push_prev_screen_to_history()
         self.tagsmenu_screen.ids.tagsmenu_widget.parent.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'tagsmenu'
 
     def show_tag_screen(self, tag_id, is_prev_screen=False):
         if not is_prev_screen:
-            self._push_current_screen_to_history()
+            self._push_prev_screen_to_history()
             self.sm.transition.direction = 'left'
         else:
             self.sm.transition.direction = 'right'
@@ -269,16 +278,17 @@ class ApplicationRoot(NavigationDrawer):
         self.tag_screen.tag_id = tag_id
         self.tag_screen.ids.screen_content_scrollview.scroll_y = 1
         self.sm.current = 'tag'
+        self._remove_current_screen_from_history()
 
     def show_articlesmenu_screen(self):
-        self._push_current_screen_to_history()
+        self._push_prev_screen_to_history()
         self.articlesmenu_screen.ids.articlesmenu_container.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'articlesmenu'
 
     def show_article_screen(self, article_id, is_prev_screen=False):
         if not is_prev_screen:
-            self._push_current_screen_to_history()
+            self._push_prev_screen_to_history()
             self.sm.transition.direction = 'left'
         else:
             self.sm.transition.direction = 'right'
@@ -289,33 +299,34 @@ class ApplicationRoot(NavigationDrawer):
         self.article_screen.ids.screen_content_scrollview.scroll_y = 1
         self.article_screen.article_id = article_id
         self.sm.current = 'article'
+        self._remove_current_screen_from_history()
 
     def show_bookmarksmenu_screen(self):
-        self._push_current_screen_to_history()
+        self._push_prev_screen_to_history()
         self.bookmarksmenu_screen.ids.bookmarksmenu_widget.parent.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'bookmarksmenu'
 
     def show_guidesmenu_screen(self):
-        self._push_current_screen_to_history()
+        self._push_prev_screen_to_history()
         self.guidesmenu_screen.ids.guidesmenu_widget.parent.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'guidesmenu'
 
     def show_guide_screen(self, guide_name):
-        self._push_current_screen_to_history()
+        self._push_prev_screen_to_history()
         self.guide_screen.guide_name = guide_name
         self.guide_screen.ids.screen_content_scrollview.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'guide'
 
     def show_search_screen(self):
-        self._push_current_screen_to_history()
+        self._push_prev_screen_to_history()
         self.sm.transition.direction = 'left'
         self.sm.current = 'search'
 
     def show_settings_screen(self):
-        self._push_current_screen_to_history()
+        self._push_prev_screen_to_history()
         self.sm.transition.direction = 'left'
         self.sm.current = 'settings'
 
