@@ -365,7 +365,9 @@ class XenialApp(App):
     def on_pause(self):
         return True
 
+from fts5 import test
 
 if __name__ == '__main__':
+    # test()
     app = XenialApp()
     app.run()

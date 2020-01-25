@@ -221,6 +221,26 @@ class GuidesModel:
         self._create_video_blocks_table(conn)
 
         self._fill_articles_content_block_tables(conn, guide_name)
+        self._create_and_fill_article_block_search_table(conn)
+
+    @staticmethod
+    def _create_and_fill_article_block_search_table(conn):
+        cur = conn.cursor()
+        cur.execute(""" CREATE VIRTUAL TABLE article_block_search  USING fts5(block_type, block_id, block_text); """)
+        cur.execute(""" INSERT INTO article_block_search
+                        SELECT 'subtitle' AS block_type, id AS block_id, subtitle_text AS block_text 
+                        FROM subtitle_blocks
+                        UNION 
+                        SELECT 'paragraph' AS block_type, id AS block_id, paragraph_text AS block_text 
+                        FROM paragraph_blocks
+                        UNION SELECT 'image' AS block_type, id AS block_id, caption_text AS block_text 
+                        FROM image_blocks
+                        UNION SELECT 'audio' AS block_type, id AS block_id, caption_text AS block_text 
+                        FROM audio_blocks
+                        UNION SELECT 'video' AS block_type, id AS block_id, caption_text AS block_text 
+                        FROM video_blocks
+                        ORDER BY block_type, block_id; """)
+        conn.commit()
 
     @staticmethod
     def _create_articles_table(conn):

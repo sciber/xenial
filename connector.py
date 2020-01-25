@@ -128,28 +128,23 @@ class VideoConnector(Video):
         self.play_timer = None
 
     def toggle_play(self, widget):
-        print('toggle_play - self.widget:', self.widget, '; widget:', widget)
         if self.widget is widget:
-            print('self.widget is widget')
             if self.state == 'play':
                 self.stop()
             else:
                 self._play()
         else:
-            print('self.widget is NOT widget')
             if self.widget is not None:
-                print('self.widget is not None')
                 if self.state == 'play':
-                    print("self.state == 'play'")
                     self.stop()
                 self.widget_video_container.remove_widget(self)
                 self._store_current_video_frame()
                 self.texture = None
+                self.source = ''
                 self.unload()
             self.widget = widget
             self.widget_video_container = self.widget.ids.video_container
             if self.widget_video_container.children:
-                print(self.widget_video_container.children)
                 self.texture = self.widget_video_container.children[0].texture
                 self.widget_video_container.clear_widgets()
             self.widget_video_container.add_widget(self)

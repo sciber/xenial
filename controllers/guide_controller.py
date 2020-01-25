@@ -24,7 +24,7 @@ class GuidesMenuItem(BoxLayout):
         self.guide_lang = guide_lang
         self.guide_from_place = guide_from_place
         self.guide_to_place = guide_to_place
-        self.is_active_guide = (self.guide_name == guides.active_guide.guide_name)
+        self.is_active_guide = (guides.active_guide is not None and self.guide_name == guides.active_guide.guide_name)
         ev.bind(on_ui_lang_code=self.translate_ui)
         ev.bind(on_active_guide=self.check_is_guide_active)
 
@@ -86,7 +86,7 @@ class LoadGuidePopup(Popup):
         ev.dispatch('on_import_guide', guides_list_item['guide_name'])
         if len(guides.guides_list) == 1:
             guides.set_active_guide(guides_list_item['guide_name'])
-            ev.dispath('on_active_guide')
+            ev.dispatch('on_active_guide')
 
 
 # Will not be called when import fails as for now only an exception is thrown
