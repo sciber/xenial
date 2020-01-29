@@ -93,13 +93,6 @@ class GuidesModel:
     def remove_guide(self, guide_name):
         guides_list_item_idx = next(idx for idx, guides_list_item in enumerate(self.guides_list)
                                     if guides_list_item['guide_name'] == guide_name)
-        # if self.active_guide.guide_name == guide_name:
-        #     if len(self.guides_list) > guides_list_item_idx + 1:
-        #         self.set_active_guide(self.guides_list[guides_list_item_idx + 1]['guide_name'])
-        #     elif len(self.guides_list) > 1:
-        #         self.set_active_guide(self.guides_list[guides_list_item_idx - 1]['guide_name'])
-        #     else:
-        #         self.set_active_guide('')
         del self.guides_list[guides_list_item_idx]
         shutil.rmtree(os.path.join(GUIDES_DIR, guide_name))
 
@@ -226,20 +219,45 @@ class GuidesModel:
     @staticmethod
     def _create_and_fill_article_block_search_table(conn):
         cur = conn.cursor()
-        cur.execute(""" CREATE VIRTUAL TABLE article_block_search  USING fts5(block_type, block_id, block_text); """)
+        cur.execute(""" CREATE VIRTUAL TABLE article_block_search  USING fts5(article_id, block_order, block_type, block_id, block_text); """)
+        # cur.execute(""" INSERT INTO article_block_search
+        #                 SELECT 'subtitle' AS block_type, id AS block_id, subtitle_text AS block_text
+        #                 FROM subtitle_blocks
+        #                 UNION
+        #                 SELECT 'paragraph' AS block_type, id AS block_id, paragraph_text AS block_text
+        #                 FROM paragraph_blocks
+        #                 UNION SELECT 'image' AS block_type, id AS block_id, caption_text AS block_text
+        #                 FROM image_blocks
+        #                 UNION SELECT 'audio' AS block_type, id AS block_id, caption_text AS block_text
+        #                 FROM audio_blocks
+        #                 UNION SELECT 'video' AS block_type, id AS block_id, caption_text AS block_text
+        #                 FROM video_blocks
+        #                 ORDER BY block_type, block_id; """)
         cur.execute(""" INSERT INTO article_block_search
-                        SELECT 'subtitle' AS block_type, id AS block_id, subtitle_text AS block_text 
-                        FROM subtitle_blocks
-                        UNION 
-                        SELECT 'paragraph' AS block_type, id AS block_id, paragraph_text AS block_text 
-                        FROM paragraph_blocks
-                        UNION SELECT 'image' AS block_type, id AS block_id, caption_text AS block_text 
-                        FROM image_blocks
-                        UNION SELECT 'audio' AS block_type, id AS block_id, caption_text AS block_text 
-                        FROM audio_blocks
-                        UNION SELECT 'video' AS block_type, id AS block_id, caption_text AS block_text 
-                        FROM video_blocks
-                        ORDER BY block_type, block_id; """)
+                        SELECT id AS article_id, -2 AS block_order, 'title' AS block_type, NULL AS block_id, title AS block_text FROM articles
+                        UNION
+                        SELECT id AS article_id, -1 AS block_order, 'synopsis' AS block_type, NULL AS block_id, synopsis AS block_text FROM articles
+                        UNION
+                        SELECT ab.article_id, ab.block_order, ab.block_type, ab.block_id, sub.subtitle_text AS block_text FROM articles_blocks AS ab
+                        JOIN subtitle_blocks AS sub
+                        ON sub.id=ab.block_id AND ab.block_type='subtitle'
+                        UNION
+                        SELECT ab.article_id, ab.block_order, ab.block_type, ab.block_id, pab.paragraph_text AS block_text FROM articles_blocks AS ab
+                        JOIN paragraph_blocks AS pab
+                        ON pab.id=ab.block_id AND ab.block_type='paragraph'
+                        UNION
+                        SELECT ab.article_id, ab.block_order, ab.block_type, ab.block_id, imb.caption_text AS block_text FROM articles_blocks AS ab
+                        JOIN image_blocks AS imb
+                        ON imb.id=ab.block_id AND ab.block_type='image'
+                        UNION
+                        SELECT ab.article_id, ab.block_order, ab.block_type, ab.block_id, aub.caption_text AS block_text FROM articles_blocks AS ab
+                        JOIN audio_blocks AS aub
+                        ON aub.id=ab.block_id AND ab.block_type='audio'
+                        UNION
+                        SELECT ab.article_id, ab.block_order, ab.block_type, ab.block_id, vib.caption_text as block_text from articles_blocks as ab
+                        JOIN video_blocks AS vib
+                        ON vib.id=ab.block_id AND ab.block_type='video'
+                        ORDER BY article_id, block_order """)
         conn.commit()
 
     @staticmethod
@@ -335,31 +353,40 @@ class GuidesModel:
                     block_id = self._insert_into_paragraph_blocks(conn, updated_refs_paragraph)
                 elif block['type'] == 'image':
                     guide_block_source = os.path.join(GUIDES_DIR, guide_name, block['source'])
-                    image_block_row = self._fetchone_from_image_blocks_where_image_source(conn, guide_block_source)
-                    if image_block_row is not None:
-                        block_id = image_block_row[0]
-                    else:
-                        updated_refs_image_caption_text = self._update_text_refs(block['caption'], articles_dicts)
-                        block_id = self._insert_into_image_blocks(
-                            conn, (guide_block_source, updated_refs_image_caption_text))
+                    # image_block_row = self._fetchone_from_image_blocks_where_image_source(conn, guide_block_source)
+                    # if image_block_row is not None:
+                    #     block_id = image_block_row[0]
+                    # else:
+                    #     updated_refs_image_caption_text = self._update_text_refs(block['caption'], articles_dicts)
+                    #     block_id = self._insert_into_image_blocks(
+                    #         conn, (guide_block_source, updated_refs_image_caption_text))
+                    updated_refs_image_caption_text = self._update_text_refs(block['caption'], articles_dicts)
+                    block_id = self._insert_into_image_blocks(
+                        conn, (guide_block_source, updated_refs_image_caption_text))
                 elif block['type'] == 'audio':
                     guide_block_source = os.path.join(GUIDES_DIR, guide_name, block['source'])
-                    audio_block_row = self._fetchone_from_audio_blocks_where_audio_source(conn, guide_block_source)
-                    if audio_block_row is not None:
-                        block_id = audio_block_row[0]
-                    else:
-                        updated_refs_audio_caption_text = self._update_text_refs(block['caption'], articles_dicts)
-                        block_id = self._insert_into_audio_blocks(
-                            conn, (guide_block_source, updated_refs_audio_caption_text))
+                    # audio_block_row = self._fetchone_from_audio_blocks_where_audio_source(conn, guide_block_source)
+                    # if audio_block_row is not None:
+                    #     block_id = audio_block_row[0]
+                    # else:
+                    #     updated_refs_audio_caption_text = self._update_text_refs(block['caption'], articles_dicts)
+                    #     block_id = self._insert_into_audio_blocks(
+                    #         conn, (guide_block_source, updated_refs_audio_caption_text))
+                    updated_refs_audio_caption_text = self._update_text_refs(block['caption'], articles_dicts)
+                    block_id = self._insert_into_audio_blocks(
+                        conn, (guide_block_source, updated_refs_audio_caption_text))
                 elif block['type'] == 'video':
                     guide_block_source = os.path.join(GUIDES_DIR, guide_name, block['source'])
-                    video_block_row = self._fetchone_from_video_blocks_where_video_source(conn, guide_block_source)
-                    if video_block_row is not None:
-                        block_id = video_block_row[0]
-                    else:
-                        updated_refs_audio_caption_text = self._update_text_refs(block['caption'], articles_dicts)
-                        block_id = self._insert_into_video_blocks(
-                            conn, (guide_block_source, updated_refs_audio_caption_text))
+                    # video_block_row = self._fetchone_from_video_blocks_where_video_source(conn, guide_block_source)
+                    # if video_block_row is not None:
+                    #     block_id = video_block_row[0]
+                    # else:
+                    #     updated_refs_audio_caption_text = self._update_text_refs(block['caption'], articles_dicts)
+                    #     block_id = self._insert_into_video_blocks(
+                    #         conn, (guide_block_source, updated_refs_audio_caption_text))
+                    updated_refs_audio_caption_text = self._update_text_refs(block['caption'], articles_dicts)
+                    block_id = self._insert_into_video_blocks(
+                        conn, (guide_block_source, updated_refs_audio_caption_text))
                 else:
                     continue
                 self._insert_into_articles_blocks(conn, (article_id, block_id, block_order, block['type']))
@@ -510,7 +537,7 @@ class GuidesModel:
     def _create_image_blocks_table(conn):
         sql_create_image_blocks_table = """ CREATE TABLE image_blocks (
                                                 id integer PRIMARY KEY,
-                                                image_source text UNIQUE NOT NULL,
+                                                image_source text NOT NULL,
                                                 caption_text text
                                             ); """
         cur = conn.cursor()
@@ -536,8 +563,7 @@ class GuidesModel:
     def _create_audio_blocks_table(conn):
         sql_create_audio_blocks_table = """ CREATE TABLE audio_blocks (
                                                 id integer PRIMARY KEY,
-                                                block_type text NOT NULL DEFAULT 'audio',
-                                                audio_source text UNIQUE NOT NULL,
+                                                audio_source text NOT NULL,
                                                 audio_length real,
                                                 caption_text text
                                             ); """
@@ -564,7 +590,7 @@ class GuidesModel:
     def _create_video_blocks_table(conn):
         sql_create_video_blocks_table = """ CREATE TABLE video_blocks (
                                                 id integer PRIMARY KEY,
-                                                video_source text UNIQUE NOT NULL,
+                                                video_source text NOT NULL,
                                                 video_length real,
                                                 video_cover_source text,
                                                 caption_text text
@@ -671,6 +697,13 @@ class GuideModel:
 
     def article_by_id(self, article_id):
         return ArticleModel(self.conn, article_id)
+
+    def search_articles(self, query):
+        cur = self.conn.cursor()
+        cur.execute(""" SELECT article_id, block_order, block_type, block_id, highlight(article_block_search, 4, '[color=#24AF24]', '[/color]')
+                        FROM article_block_search
+                        WHERE article_block_search MATCH ? ORDER BY rank;""", query)
+        return cur.fetchall()
 
     def bookmarks_list(self):
         sql_select_all_from_bookmarked_articles = """ SELECT b.id, b.created_at,

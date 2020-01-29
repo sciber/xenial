@@ -27,9 +27,11 @@ def test():
     rows = cur.fetchall()
     for row in rows:
         print(row)
-    cur.execute(""" SELECT highlight(article_block_search, 2, '[color=#00FF00]', '[/color]') 
-                    FROM article_block_search 
-                    WHERE article_block_search MATCH 'block_text:(trouble AND those)' ORDER BY rank
+    cur.execute(""" SELECT article_id, block_order, block_type, block_id, highlight(article_block_search, 4, '[color=#00FF00]', '[/color]')
+                    FROM article_block_search
+                    WHERE article_block_search MATCH 'block_text:(avoid unit)' ORDER BY rank
                     ;""")
+    # cur.execute(""" select * from article_block_search where article_block_search match 'rest lose + up'; """)
     result = cur.fetchall()
+    print('Result:')
     print(result)

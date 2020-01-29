@@ -173,13 +173,6 @@ class ApplicationRoot(NavigationDrawer):
         self.log_screen.add_log_item('[b]Guide[/b] screen stub was built in: {dt:.2f} ms'.format(dt=dt))
 
         start_time = time.time()
-        self.settings_screen = SettingsScreen()
-        self.sm.add_widget(self.settings_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.log_screen.add_log_item('[b]Settings[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
-
-        start_time = time.time()
         self.search_screen = SearchScreen()
         self.sm.add_widget(self.search_screen)
         stop_time = time.time()
@@ -193,6 +186,14 @@ class ApplicationRoot(NavigationDrawer):
         stop_time = time.time()
         dt = (stop_time - start_time) * 1000
         self.log_screen.add_log_item('[b]Navigation panel[/b] was built in: {dt:.2f} ms'.format(dt=dt))
+
+        # Settings screen should be initialized last so all the UI of the previous screens is translated automatically
+        start_time = time.time()
+        self.settings_screen = SettingsScreen()
+        self.sm.add_widget(self.settings_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Settings[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
         if guides.active_guide is not None:
             self.show_categoriesmenu_screen()
@@ -286,7 +287,7 @@ class ApplicationRoot(NavigationDrawer):
         self.sm.transition.direction = 'left'
         self.sm.current = 'articlesmenu'
 
-    def show_article_screen(self, article_id, is_prev_screen=False):
+    def show_article_screen(self, article_id, search_results=None, is_prev_screen=False):
         if not is_prev_screen:
             self._push_prev_screen_to_history()
             self.sm.transition.direction = 'left'

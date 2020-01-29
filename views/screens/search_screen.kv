@@ -1,16 +1,60 @@
 #:kivy 1.11.1
 
+<BlockSearchResultsItem>:
+    markup: True
+    font_size: '14dp'
+    text_size: self.width, None
+    color: .2, .2, .2, 1
+    size_hint_y: None
+    height: self.texture_size[1]
+
+
+<ArticleSearchResultsItem>:
+    article_id: 0
+    article_title: ''
+    article_synopsis: ''
+    size_hint_y: None
+    height: search_results_container.height
+    background_normal: ''
+    on_release: app.root.show_article_screen(self.article_id)
+    BoxLayout:
+        id: search_results_container
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        pos: self.parent.pos
+        size_hint_x: None
+        width: self.parent.width
+        spacing: '4dp'
+        Label:
+            text: root.article_title
+            markup: True
+            bold: True
+            font_size: '18dp'
+            text_size: self.width, None
+            color: .4, .4, .4, 1
+            size_hint_y: None
+            height: self.texture_size[1]
+        Label:
+            text: root.article_synopsis
+            markup: True
+            font_size: '16dp'
+            text_size: self.width, None
+            color: .4, .4, .4, 1
+            size_hint_y: None
+            height: self.texture_size[1]
+
 <SearchScreen>:
     search_input: search_input
     name: 'search'
     screen_title: 'Search'
     search_input_hint_text: 'Search active guide articles'
-#    search_query: ''
-    search_results_title: ''
-#    no_results_text: 'Your search did not match any articles'
+    search_query: ''
+    search_results_head: ''
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
+        spacing: '8dp'
         canvas:
             Color:
                 rgba: 1, 1, 1, 1
@@ -19,76 +63,49 @@
                 size: self.size
         ScreenTitleBar:
             title: root.screen_title
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '50dp'
+            TextInput:
+                id: search_input
+                hint_text: root.search_input_hint_text
+                font_size: '16dp'
+                padding: '12dp', '12dp', '12dp', '12dp'
+                multiline: False
+            Button:
+                size_hint_x: None
+                width: self.height
+                background_normal: ''
+                on_release: root.search_articles()
+                Image:
+                    source: 'assets/img/search.png'
+                    pos: self.parent.pos
+                    size: self.parent.size
         ScrollView:
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                padding: '4dp'
-                spacing: '12dp'
-                BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    height: '50dp'
-                    TextInput:
-                        id: search_input
-#                        text: root.search_query
-                        hint_text: root.search_input_hint_text
-                        font_size: '16dp'
-                        padding: '12dp', '12dp', '12dp', '12dp'
-                        multiline: False
-                    Button:
-                        size_hint_x: None
-                        width: self.height
-                        background_normal: ''
-                        on_release: root.search_articles()
-                        Image:
-                            source: 'assets/img/search.png'
-                            pos: self.parent.pos
-                            size: self.parent.size
+                padding: '8dp', 0
+                spacing: '16dp'
                 BoxLayout:
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
-                    padding: '8dp', 0
-#                    BoxLayout:
-#                        orientation: 'horizontal'
-#                        size_hint_y: None
-#                        height: '40dp' if root.article_has_categories else 0
-#                        opacity: 1 if root.article_has_categories else 0
-#                        Image:
-#                            pos: self.parent.pos
-#                            source: 'assets/img/category.png'
-#                            size_hint_x: None
-#                            width: self.height
-#                            color: 1, 1, 1, .5
-#                        Label:
-#                            text: root.related_categories_subtitle
-#                            font_size: '18dp'
-#                            bold: True
-#                            padding: '8dp', '8dp'
-#                            text_size: self.size
-#                            halign: 'left'
-#                            valign: 'middle'
-#                            color: .6, .6, .6, 1
-                    BoxLayout:
-                        orientation: 'vertical'
-                        size_hint_y: None
-                        height: self.minimum_height
-#                        height: self.minimum_height if root.search_query else 0
-                        opacity: .8 if root.search_query else .2
-#                        Label:
-#                            text: root.search_query
-#                            markup: True
-#                            text_size: self.width, None
-#                            font_size: '18dp'
-#                            color: .4, .4, .4, 1
-#                            size_hint_y: None
-#                            height: self.texture_size[1]
+                    height: self.minimum_height if root.search_query else 0
+                    opacity: 1 if root.search_query else 0
                     Label:
-                        text: 'footer'
-                        text_size: self.size
-                        size_hint_y: None
-                        height: '50dp'
+                        text: root.search_results_head
+                        markup: True
+                        text_size: self.width, None
                         font_size: '18dp'
-                        color: 1, .4, .4, 1
+                        color: .4, .4, .4, 1
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                BoxLayout:
+                    id: search_results_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: '18dp'

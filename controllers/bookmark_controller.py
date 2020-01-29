@@ -35,6 +35,7 @@ class BookmarksMenuScreen(Screen):
         self.set_bookmarksmenu_items()
 
     def translate_ui(self, *args):
+        print('bookmarks translate_ui')
         self.screen_title = tr.translate('Bookmarks')
 
     def on_bookmarksmenu_items(self, *args):

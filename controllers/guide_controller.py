@@ -33,7 +33,7 @@ class GuidesMenuItem(BoxLayout):
         self.guide_to_place_label = (tr.translate('To') + ': [b]{}[/b]').format(self.guide_to_place)
 
     def check_is_guide_active(self, *args):
-        self.is_active_guide = (self.guide_name == guides.active_guide.guide_name)
+        self.is_active_guide = guides.active_guide is not None and self.guide_name == guides.active_guide.guide_name
 
     def activate_guide(self):
         guides.set_active_guide(self.guide_name)
@@ -152,11 +152,7 @@ class GuideScreen(Screen):
     def remove_guide(self, instance, guide_name):
         if guide_name != self.guide_name:
             return
-        # before_active_guide_name = guides.active_guide.guide_name
         guides.remove_guide(self.guide_name)
-        ev.dispatch('on_remove_guide', self._guide_name)
-        # if guides.active_guide is None or before_active_guide_name != guides.active_guide.guide_name:
-        #     ev.dispatch('on_active_guide')
 
 
 class RemoveGuideWarningPopup(Popup):

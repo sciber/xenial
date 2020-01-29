@@ -10,7 +10,6 @@ class NavigationPanel(ScrollView):
         super(NavigationPanel, self).__init__(**kwargs)
         self.set_has_active_guide()
         ev.bind(on_active_guide=self.set_has_active_guide)
-        self.translate_ui()
         ev.bind(on_ui_lang_code=self.translate_ui)
 
     def set_has_active_guide(self, *args):

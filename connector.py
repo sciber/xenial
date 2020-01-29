@@ -47,7 +47,8 @@ class AudioConnector:
             self.play_timer.cancel()
         else:
             self.widget.audio_pos = self.sound.get_pos()
-            self.widget.slider_value = round(self.widget.audio_pos / self.widget.audio_length * 100)
+            pos_percent = 0 if not self.widget.audio_length else self.widget.audio_pos / self.widget.audio_length * 100
+            self.widget.slider_value = round(pos_percent)
 
     def _load(self, widget):
         if self.widget is not None:
@@ -161,7 +162,8 @@ class VideoConnector(Video):
 
     def _on_load(self, *largs):
         super(VideoConnector, self)._on_load(*largs)
-        self.seek(self.widget.video_pos / self.widget.video_length, precise=True)
+        seek_pos = 0 if not self.video_length else self.widget.video_pos / self.widget.video_length
+        self.seek(seek_pos, precise=True)
         self.widget.video_state = 'play'
         self.play_timer = Clock.schedule_interval(self._update_widget_controls, .1)
 
@@ -189,7 +191,8 @@ class VideoConnector(Video):
 
     def _update_widget_controls(self, dt):
         self.widget.video_pos = self.position
-        self.widget.slider_value = round(self.widget.video_pos / self.widget.video_length * 100)
+        pos_percent = 0 if not self.widget.video_length else self.widget.video_pos / self.widget.video_length * 100
+        self.widget.slider_value = round(pos_percent)
 
     def _store_current_video_frame(self):
         data = BytesIO()
