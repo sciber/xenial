@@ -15,21 +15,22 @@ class BlockSearchResultsItem(Label):
 class ArticleSearchResultsItem(Button):
     def __init__(self, article_search_results_item, **kwargs):
         super(ArticleSearchResultsItem, self).__init__(**kwargs)
-        self.article_id = article_search_results_item[0][0]
+        self.article_search_results_item = article_search_results_item
+        self.article_id = self.article_search_results_item[0][0]
         article_list_item = next(item for item in guides.active_guide.articles_list()
                                  if item['article_id'] == self.article_id)
-        for idx, item in enumerate(article_search_results_item):
+        blocks_search_results = []
+        for idx, item in enumerate(self.article_search_results_item):
             if item[2] == 'title':
                 article_list_item['article_title'] = item[4]
             elif item[2] == 'synopsis':
                 article_list_item['article_synopsis'] = item[4]
             else:
-                continue
-            del article_search_results_item[idx]
+                blocks_search_results.append(item)
         self.article_title = article_list_item['article_title']
         self.article_synopsis = article_list_item['article_synopsis']
         search_results_container = self.ids.search_results_container
-        for block_result in article_search_results_item:
+        for block_result in blocks_search_results:
             block_result_widget = BlockSearchResultsItem(text=block_result[4])
             search_results_container.add_widget(block_result_widget)
 
@@ -57,6 +58,7 @@ class SearchScreen(Screen):
         self.articles_search_results = []
         self.search_results_container.clear_widgets()
         if self.search_query:
+            self.search_input_hint_text = self.search_query
             search_results_rows = guides.active_guide.search_articles(('block_text:({})'.format(self.search_query),))
             articles_ranks_indices = {}
             for row in search_results_rows:
@@ -71,5 +73,7 @@ class SearchScreen(Screen):
                 article_results_item.sort(key=lambda row: row[1])
                 article_search_results_item_widget = ArticleSearchResultsItem(article_results_item)
                 self.search_results_container.add_widget(article_search_results_item_widget)
+        else:
+            self.search_input_hint_text = tr.translate('Search active guide articles')
         self.search_results_head = tr.translate('{0} results for [b]"{1}"[/b]'.
                                                 format(len(self.articles_search_results), self.search_query))

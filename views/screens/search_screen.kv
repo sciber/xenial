@@ -13,10 +13,11 @@
     article_id: 0
     article_title: ''
     article_synopsis: ''
+    article_search_results_item: None
     size_hint_y: None
     height: search_results_container.height
     background_normal: ''
-    on_release: app.root.show_article_screen(self.article_id)
+    on_release: app.root.show_article_screen(self.article_id, self.article_search_results_item)
     BoxLayout:
         id: search_results_container
         orientation: 'vertical'

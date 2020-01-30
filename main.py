@@ -299,6 +299,8 @@ class ApplicationRoot(NavigationDrawer):
             self.other_article_screen.name = 'other_article'
         self.article_screen.ids.screen_content_scrollview.scroll_y = 1
         self.article_screen.article_id = article_id
+        if search_results is not None:
+            self.article_screen.search_results = search_results
         self.sm.current = 'article'
         self._remove_current_screen_from_history()
 
@@ -366,9 +368,7 @@ class XenialApp(App):
     def on_pause(self):
         return True
 
-from fts5 import test
 
 if __name__ == '__main__':
-    # test()
     app = XenialApp()
     app.run()

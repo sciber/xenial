@@ -38,7 +38,7 @@ class ArticleAudio(BoxLayout):
         super(ArticleAudio, self).__init__(**kwargs)
         self.source = audio_source
         self.audio_length = audio_length
-        self.caption = audio_caption_text
+        self.audio_caption_text = audio_caption_text
         self.audio_state = 'stop'
         self.audio_pos = 0
         self.slider_value = 0

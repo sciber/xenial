@@ -1,4 +1,4 @@
-from kivy.properties import NumericProperty
+from kivy.properties import NumericProperty, ListProperty
 from kivy.uix.screenmanager import Screen
 
 from events import ev
@@ -37,6 +37,7 @@ class ArticlesMenuScreen(Screen):
 
 class ArticleScreen(Screen):
     article_id = NumericProperty(0)
+    search_results = []
 
     def __init__(self, **kwargs):
         super(ArticleScreen, self).__init__(**kwargs)
@@ -84,12 +85,43 @@ class ArticleScreen(Screen):
             self.tagslist_widget.tagslist_items = []
             self.categoriesmenu_widget.categoriesmenu_items = []
             self.articlesmenu_widget.articlesmenu_items = []
-            self.articlecontent_widget.articlecontent_items = []
+            self.articlecontent_widget.articlecontent_blocks = []
+            self.search_results = []
             self.article_is_bookmarked = False
 
     def on_enter(self):
         article = guides.active_guide.article_by_id(self.article_id)
         self.articlecontent_widget.articlecontent_blocks = article.content_blocks_list()
+        # print(self.articlecontent_widget.articlecontent_blocks)
+        if self.search_results:
+            # print(self.search_results)
+
+            for item in self.search_results:
+                # print(item)
+                if item[1] == -2:
+                    self.article_title = item[4]
+                elif item[1] == -1:
+                    self.article_synopsis = item[4]
+                else:
+                    # print(item[1])
+                    if item[2] == 'subtitle':
+                        block_text_key = 'subtitle_text'
+                    elif item[2] == 'paragraph':
+                        block_text_key = 'paragraph_text'
+                    elif item[2] == 'image':
+                        block_text_key = 'image_caption_text'
+                    elif item[2] == 'audio':
+                        block_text_key = 'audio_caption_text'
+                    elif item[2] == 'video':
+                        block_text_key = 'video_caption_text'
+                    else:
+                        continue
+                    block = self.articlecontent_widget.articlecontent_blocks[item[1]].copy()
+                    block[block_text_key] = item[4]
+                    print('block_text_key', block_text_key)
+                    print('block[block_text_key]', item[4])
+                    print('block', block)
+                    self.articlecontent_widget.articlecontent_blocks[item[1]] = block
 
     @staticmethod
     def on_pre_leave():
