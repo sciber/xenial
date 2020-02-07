@@ -4,7 +4,7 @@ from kivy.uix.boxlayout import BoxLayout
 
 from events import ev
 from translator import tr
-from models import guides
+from models.guides_model import guides
 
 
 class BookmarksMenuItem(BoxLayout):

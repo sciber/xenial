@@ -3,7 +3,7 @@ from kivy.uix.screenmanager import Screen
 
 from events import ev
 from translator import tr
-from models import guides
+from models.guides_model import guides
 from history import hist
 
 from controllers.components.tagslist_controller import TagsList

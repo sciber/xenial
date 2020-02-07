@@ -4,7 +4,7 @@
 
 #:import Factory kivy.factory.Factory
 
-#:import guides models.guides
+#:import guides models.guides_model.guides
 
 <LoadGuidePopup>
     cancel_button_text: 'Cancel'
@@ -16,7 +16,7 @@
         orientation: 'vertical'
         FileChooserListView:
             id: filechooser
-            path: getcwd()
+            path: 'guides'
             filters: ['*.zip']
             dirselect: False
             multiselect: False
@@ -32,7 +32,7 @@
                 disabled: not filechooser.selection
                 on_release:
                     root.dismiss()
-                    root.import_guide(*filechooser.selection)
+                    root.load_guide(*filechooser.selection)
 
 <GuideLoadFailedWarning>:
     message: ''

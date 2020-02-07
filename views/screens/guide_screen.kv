@@ -33,7 +33,7 @@
                 text: root.delete_button_text
                 on_release:
                     root.dismiss()
-                    ev.dispatch('on_remove_guide', root.guide_name)
+                    root.unload_guide()
                     app.root.show_guidesmenu_screen()
 
 <GuideScreen>:

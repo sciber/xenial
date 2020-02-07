@@ -2,7 +2,7 @@ from kivy.uix.scrollview import ScrollView
 
 from events import ev
 from translator import tr
-from models import guides
+from models.guides_model import guides
 
 
 class NavigationPanel(ScrollView):

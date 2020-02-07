@@ -4,7 +4,7 @@ from kivy.uix.button import Button
 
 from events import ev
 from translator import tr
-from models import guides
+from models.guides_model import guides
 
 from controllers.components.categoriesmenu_controller import CategoriesMenu
 from controllers.components.articlesmenu_controller import ArticlesMenu

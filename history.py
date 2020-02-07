@@ -1,5 +1,5 @@
 from events import ev
-from models import guides
+from models.guides_model import guides
 
 
 class ScreensHistory:
@@ -8,8 +8,8 @@ class ScreensHistory:
                                     for item in guides.guides_list]
         self._promote_active_guide_history()
         ev.bind(on_active_guide=self._promote_active_guide_history)
-        ev.bind(on_import_guide=self._add_guides_history_list_item)
-        ev.bind(on_remove_guide=self._delete_guides_history_list_item)
+        ev.bind(on_load_guide=self._add_guides_history_list_item)
+        ev.bind(on_unload_guide=self._delete_guides_history_list_item)
 
     def _promote_active_guide_history(self, *args):
         if self.guides_history_list:
@@ -19,6 +19,10 @@ class ScreensHistory:
 
     def _add_guides_history_list_item(self, instance, guide_name):
         self.guides_history_list.insert(0, {'guide_name': guide_name, 'visited_screens': []})
+        if len(guides.guides_list) == 1:
+            guides.set_active_guide(guide_name)
+            ev.dispatch('on_active_guide')
+        ev.dispatch('on_change_guides_list')
 
     def _delete_guides_history_list_item(self, instance, guide_name):
         if self.guides_history_list[-1]['guide_name'] == guide_name:
@@ -32,6 +36,7 @@ class ScreensHistory:
             item_idx = next(idx for idx, item in enumerate(self.guides_history_list)
                             if item['guide_name'] == guide_name)
             del self.guides_history_list[item_idx]
+        ev.dispatch('on_change_guides_list')
 
     def pop_screen(self):
         if not self.guides_history_list:

@@ -162,7 +162,7 @@ class VideoConnector(Video):
 
     def _on_load(self, *largs):
         super(VideoConnector, self)._on_load(*largs)
-        seek_pos = 0 if not self.video_length else self.widget.video_pos / self.widget.video_length
+        seek_pos = 0 if not self.widget.video_length else self.widget.video_pos / self.widget.video_length
         self.seek(seek_pos, precise=True)
         self.widget.video_state = 'play'
         self.play_timer = Clock.schedule_interval(self._update_widget_controls, .1)

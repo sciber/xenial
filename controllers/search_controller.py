@@ -3,7 +3,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
 from kivy.uix.label import Label
 
-from models import guides
+from models.guides_model import guides
 from events import ev
 from translator import tr
 

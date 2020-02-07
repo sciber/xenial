@@ -1,14 +1,14 @@
 import os
 
 from kivy.base import EventLoop
-from kivy.properties import StringProperty, ListProperty
+from kivy.properties import BooleanProperty, StringProperty, ListProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 
 from events import ev
 from translator import tr
-from models import guides
+from models.guides_model import guides
 
 from controllers.components.tagslist_controller import TagsList
 
@@ -23,7 +23,9 @@ class GuidesMenuItem(BoxLayout):
         self.guide_description = guide_description
         self.guide_lang = guide_lang
         self.guide_from_place = guide_from_place
+        self.guide_from_place_label = (tr.translate('From') + ': [b]{}[/b]').format(self.guide_from_place)
         self.guide_to_place = guide_to_place
+        self.guide_to_place_label = (tr.translate('To') + ': [b]{}[/b]').format(self.guide_to_place)
         self.is_active_guide = (guides.active_guide is not None and self.guide_name == guides.active_guide.guide_name)
         ev.bind(on_ui_lang_code=self.translate_ui)
         ev.bind(on_active_guide=self.check_is_guide_active)
@@ -47,8 +49,8 @@ class GuidesMenuScreen(Screen):
         super(GuidesMenuScreen, self).__init__(**kwargs)
         ev.bind(on_ui_lang_code=self.translate_ui)
         self.guidesmenu_widget = self.ids.guidesmenu_widget
-        ev.bind(on_import_guide=self.set_guidesmenu_items)
-        ev.bind(on_remove_guide=self.set_guidesmenu_items)
+        ev.bind(on_change_guides_list=self.set_guidesmenu_items)
+        # ev.bind(on_unload_guide=self.set_guidesmenu_items)
         self.set_guidesmenu_items()
 
     def translate_ui(self, *args):
@@ -81,16 +83,15 @@ class LoadGuidePopup(Popup):
             return True
 
     @staticmethod
-    def import_guide(archive):
-        guides_list_item = guides.import_from_archive(archive)
-        ev.dispatch('on_import_guide', guides_list_item['guide_name'])
-        if len(guides.guides_list) == 1:
-            guides.set_active_guide(guides_list_item['guide_name'])
-            ev.dispatch('on_active_guide')
+    def load_guide(archive):
+        guide_name = os.path.splitext(os.path.basename(archive))[0]
+        guides_list_item = guides.load_guide(guide_name)
+        if guides_list_item is None:
+            GuideLoadFailedWarning(archive).open()
+            return
+        ev.dispatch('on_load_guide', guides_list_item['guide_name'])
 
 
-# Will not be called when import fails as for now only an exception is thrown
-# The class perhaps should be moved to the models module
 class GuideLoadFailedWarning(Popup):
     def __init__(self, archive, **kwargs):
         super(GuideLoadFailedWarning, self).__init__(**kwargs)
@@ -116,7 +117,6 @@ class GuideScreen(Screen):
         self.tagslist_widget = TagsList()
         self.ids.tagslist_container.add_widget(self.tagslist_widget)
         ev.bind(on_ui_lang_code=self.translate_ui)
-        ev.bind(on_remove_guide=self.remove_guide)
 
     def translate_ui(self, *args):
         self.screen_title = tr.translate('Guide')
@@ -148,11 +148,12 @@ class GuideScreen(Screen):
             self.guide_to_place = ''
             self.tagslist_widget.tagslist_items = []
         self.translate_ui()
-
-    def remove_guide(self, instance, guide_name):
-        if guide_name != self.guide_name:
-            return
-        guides.remove_guide(self.guide_name)
+    #
+    # def remove_guide(self, instance, guide_name):
+    #     if guide_name != self.guide_name:
+    #         return
+    #     guides.unload_guide(guide_name)
+    #     ev.dispatch('on_unload_guide', guide_name)
 
 
 class RemoveGuideWarningPopup(Popup):
@@ -163,6 +164,10 @@ class RemoveGuideWarningPopup(Popup):
         self.message = (tr.translate('Delete guide') + '\n"[b]{}[/b]"?').format(guide_title)
         self.cancel_button_text = tr.translate('Cancel')
         self.delete_button_text = tr.translate('Delete')
+
+    def unload_guide(self):
+        guides.unload_guide(self.guide_name)
+        ev.dispatch('on_unload_guide', self.guide_name)
 
     def _handle_keyboard(self, window, key, *largs):
         super(RemoveGuideWarningPopup, self)._handle_keyboard(window, key, *largs)

@@ -10,7 +10,7 @@ from kivy.garden.navigationdrawer import NavigationDrawer
 from settings import app_settings
 from events import ev
 from translator import tr
-from models import guides
+from models.guides_model import guides
 from history import hist
 
 import os
@@ -337,7 +337,7 @@ class ApplicationRoot(NavigationDrawer):
 class XenialApp(App):
     def __init__(self, **kwargs):
         super(XenialApp, self).__init__(**kwargs)
-        if app_settings.exists('active_guide_name'):
+        if app_settings.exists('active_guide_name') and guides.does_guide_exist(app_settings.get('active_guide_name')):
             guides.set_active_guide(app_settings.get('active_guide_name'))
         elif guides.active_guide is not None:
             self.set_active_guide_name_settings(self, guides.active_guide.guide_name)
