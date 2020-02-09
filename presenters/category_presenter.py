@@ -59,7 +59,7 @@ class CategoryScreen(Screen):
         ev.bind(on_ui_lang_code=self._translate_ui)
 
     def on_category_id(self, instance, category_id):
-        """ Updates object attributes according to `category_id` argument """
+        """ Updates object attributes according to `category_id` argument. """
 
         if category_id:
             category = guides.active_guide.category_by_id(category_id)
