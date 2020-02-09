@@ -95,7 +95,6 @@ class ArticleContent(BoxLayout):
                                            audio_length=content_block['audio_length'],
                                            audio_caption_text=content_block['audio_caption_text'])
             elif content_block['block_type'] == 'video':
-                print(content_block)
                 item_widget = ArticleVideo(video_source=content_block['video_source'],
                                            video_length=content_block['video_length'],
                                            video_cover_source=content_block['video_cover_source'],

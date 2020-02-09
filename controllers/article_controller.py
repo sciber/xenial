@@ -92,18 +92,14 @@ class ArticleScreen(Screen):
     def on_enter(self):
         article = guides.active_guide.article_by_id(self.article_id)
         self.articlecontent_widget.articlecontent_blocks = article.content_blocks_list()
-        # print(self.articlecontent_widget.articlecontent_blocks)
         if self.search_results:
-            # print(self.search_results)
 
             for item in self.search_results:
-                # print(item)
                 if item[1] == -2:
                     self.article_title = item[4]
                 elif item[1] == -1:
                     self.article_synopsis = item[4]
                 else:
-                    # print(item[1])
                     if item[2] == 'subtitle':
                         block_text_key = 'subtitle_text'
                     elif item[2] == 'paragraph':
@@ -118,9 +114,6 @@ class ArticleScreen(Screen):
                         continue
                     block = self.articlecontent_widget.articlecontent_blocks[item[1]].copy()
                     block[block_text_key] = item[4]
-                    print('block_text_key', block_text_key)
-                    print('block[block_text_key]', item[4])
-                    print('block', block)
                     self.articlecontent_widget.articlecontent_blocks[item[1]] = block
 
     @staticmethod

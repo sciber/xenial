@@ -9,7 +9,7 @@ from models.models_constants import *
 
 class Article:
     """
-    Provides all data stored in a guide database corresponding to an article of given `article_id`
+    Provides all data stored in a guide database corresponding to an article of given `article_id`.
     """
 
     def __init__(self, conn, article_id):
@@ -43,7 +43,7 @@ class Article:
         return dict(zip(('bookmark_id', 'bookmark_created_at'), bookmark_row))
 
     def tags_list(self):
-        """ Returns list of tags assigned to the articles. """
+        """ Returns list of tags assigned to the article. """
 
         cur = self.conn.cursor()
         cur.execute(""" SELECT t.id, t.name FROM tags AS t
@@ -55,8 +55,8 @@ class Article:
 
     def related_articles_list(self):
         """ Returns list of items containing basic information about articles related to the article corresponding to
-            the class instance. To be an article considered related to the article, both articles hast to share at least
-            one tag assigned to them.
+            the class instance. For an article to be considered related to the article, both articles has to share
+            at least one tag assigned to them.
             Articles are sorted from the most similar (shares most tags with the article) to the least similar. """
 
         article_tags_ids = self._get_article_tags_ids(self.article_id)
