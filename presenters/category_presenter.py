@@ -1,3 +1,10 @@
+"""
+Category presenter
+==================
+Contains CategoriesMenuScreen and CategoryScreen classes presenting data to the 'categoriesmenu_screen.kv' and
+'category_screen.kv' views, respectively.
+"""
+
 from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
 
@@ -11,18 +18,22 @@ from presenters.components.articlesmenu_presenter import ArticlesMenu
 
 
 class CategoriesMenuScreen(Screen):
+    """
+    Presents data to the CategoriesMenu 'categoriesmenu_screen.kv' screen view.
+    """
+
     def __init__(self, **kwargs):
         super(CategoriesMenuScreen, self).__init__(**kwargs)
-        ev.bind(on_ui_lang_code=self.translate_ui)
+        ev.bind(on_ui_lang_code=self._translate_ui)
         self.categoriesmenu_widget = CategoriesMenu()
         self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
-        ev.bind(on_active_guide=self.set_categoriesmenu_items)
+        ev.bind(on_active_guide=self._set_categoriesmenu_items)
         self.set_categoriesmenu_items()
 
-    def translate_ui(self, *args):
+    def _translate_ui(self, *args):
         self.screen_title = tr.translate('Categories')
 
-    def set_categoriesmenu_items(self, *args):
+    def _set_categoriesmenu_items(self, *args):
         if guides.active_guide is not None:
             self.categoriesmenu_widget.categoriesmenu_items = guides.active_guide.categories_list()
         else:
@@ -30,6 +41,10 @@ class CategoriesMenuScreen(Screen):
 
 
 class CategoryScreen(Screen):
+    """
+    Presents data to the Category 'category_screen.kv' screen view.
+    """
+
     category_id = NumericProperty(0)
 
     def __init__(self, **kwargs):
@@ -40,21 +55,14 @@ class CategoryScreen(Screen):
         self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
         self.articlesmenu_widget = ArticlesMenu()
         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
-        ev.bind(on_active_guide=self.clear_category_screen_items)
-        ev.bind(on_ui_lang_code=self.translate_ui)
+        ev.bind(on_active_guide=self._clear_category_screen_items)
+        ev.bind(on_ui_lang_code=self._translate_ui)
 
-    def translate_ui(self, *args):
-        self.screen_title = tr.translate('Category')
-        self.related_categories_subtitle = tr.translate('Related categories')
-        self.related_articles_subtitle = tr.translate('Related articles')
+    def on_category_id(self, instance, category_id):
+        """ Updates object attributes according to `category_id` argument """
 
-    def clear_category_screen_items(self, *args):
-        if self.category_id:
-            self.category_id = 0
-
-    def on_category_id(self, *args):
-        if self.category_id:
-            category = guides.active_guide.category_by_id(self.category_id)
+        if category_id:
+            category = guides.active_guide.category_by_id(category_id)
             self.category_name = category.category_name
             self.category_icon = category.category_icon
             self.category_description = category.category_description
@@ -72,3 +80,12 @@ class CategoryScreen(Screen):
             self.category_has_related_categories = False
             self.articlesmenu_widget.articlesmenu_items = []
             self.category_has_articles = False
+
+    def _translate_ui(self, *args):
+        self.screen_title = tr.translate('Category')
+        self.related_categories_subtitle = tr.translate('Related categories')
+        self.related_articles_subtitle = tr.translate('Related articles')
+
+    def _clear_category_screen_items(self, *args):
+        if self.category_id:
+            self.category_id = 0
