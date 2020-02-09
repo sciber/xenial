@@ -2,11 +2,14 @@
 
 #:import Factory kivy.factory.Factory
 
-<UnloadGuideWarningPopup>:
+#:import ev events.ev
+
+<RemoveGuideWarningPopup>:
+    message: ''
+    cancel_button_text: 'Cancel'
+    delete_button_text: 'Delete'
     guide_name: ''
-    guide_title: ''
     auto_dismiss: False
-    title: 'Warning'
     title_color: 1, .4, .4, 1
     separator_color: 1, .4, .4, 1
     size_hint_y: None
@@ -14,7 +17,7 @@
     BoxLayout:
         orientation: 'vertical'
         Label:
-            text: 'Delete guide\n"[b]{}[/b]"?'.format(root.guide_title)
+            text: root.message
             markup: True
             text_size: self.size
             valign: 'middle'
@@ -24,24 +27,26 @@
             size_hint_y: None
             height: '40dp'
             Button:
-                text: 'Cancel'
+                text: root.cancel_button_text
                 on_release: root.dismiss()
             Button:
-                text: 'Delete'
+                text: root.delete_button_text
                 on_release:
                     root.dismiss()
-                    app.root.unload_guide(root.guide_name)
+                    root.unload_guide()
+                    app.root.show_guidesmenu_screen()
 
 <GuideScreen>:
     name: 'guide'
+    screen_title: 'Guide'
+    lang_name_label: 'Language:'
+    from_place_label: 'From:'
+    to_place_label: 'To:'
+    delete_guide_button_text: 'Delete guide'
     guide_name: ''
     guide_icon: ''
     guide_title: ''
     guide_description: ''
-    guide_lang: ('', '')
-    guide_from_place: ''
-    guide_to_place: ''
-    guide_tags: []
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -53,8 +58,9 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Guide'
+            title: root.screen_title
         ScrollView:
+            id: screen_content_scrollview
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
@@ -81,7 +87,7 @@
                         valign: 'middle'
                         color: .2, .2, .2, 1
                 Label:
-                    text: 'Language: [b]{}[/b]'.format(root.guide_lang[0])
+                    text: root.lang_name_label
                     markup: True
                     text_size: self.size
                     font_size: '18dp'
@@ -91,7 +97,7 @@
                     height: '20dp'
                     color: .4, .4, .4, 1
                 Label:
-                    text: 'From: [b]{}[/b]'.format(root.guide_from_place)
+                    text: root.from_place_label
                     markup: True
                     text_size: self.size
                     font_size: '18dp'
@@ -101,7 +107,7 @@
                     height: '20dp'
                     color: .4, .4, .4, 1
                 Label:
-                    text: 'To: [b]{}[/b]'.format(root.guide_to_place)
+                    text: root.to_place_label
                     markup: True
                     text_size: self.size
                     font_size: '18dp'
@@ -124,7 +130,7 @@
                     font_size: '18dp'
                     color: .2, .2, .2, 1
         Button:
-            text: 'Delete the guide'
+            text: root.delete_guide_button_text
             font_size: '18dp'
             color: 0, 0, 0, 1
             background_normal: ''
@@ -132,4 +138,4 @@
             size_hint_y: None
             height: '60dp'
             on_release:
-                Factory.UnloadGuideWarningPopup(guide_name=root.guide_name, guide_title=root.guide_title).open()
+                Factory.RemoveGuideWarningPopup(guide_name=root.guide_name, guide_title=root.guide_title).open()

@@ -1,6 +1,6 @@
 #:kivy 1.11.1
 
-#:import guides guides
+#:import guides models.guides_model.guides
 
 <NavigationPanelButton@Button>:
     title: '<undefined>'
@@ -32,8 +32,15 @@
             color: .2, .2, .2, 1
             disabled_color: .8, .8, .8, 1
 
-<NavigationPanel@ScrollView>:
-    is_active_guide: True
+<NavigationPanel>:
+    has_active_guide: False
+    search_button_title: 'Search'
+    categories_button_title: 'Categories'
+    tags_button_title: 'Tags'
+    articles_button_title: 'Articles'
+    bookmarks_button_title: 'Bookmarks'
+    guides_button_title: 'Guides'
+    settings_button_title: 'Settings'
     canvas.before:
         Color:
             rgba: 1, 1, 1, 1
@@ -46,49 +53,55 @@
         height: self.minimum_height
         padding: '4dp'
         NavigationPanelButton:
-            title: 'Search'
+            title: root.search_button_title
             image: 'assets/img/search.png'
-            disabled: not root.is_active_guide
+            disabled: not root.has_active_guide
             on_release:
                 app.root.show_search_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Categories'
+            title: root.categories_button_title
             image: 'assets/img/category.png'
-            disabled: not root.is_active_guide
+            disabled: not root.has_active_guide
             on_release:
                 app.root.show_categoriesmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Tags'
+            title: root.tags_button_title
             image: 'assets/img/tag.png'
-            disabled:  not root.is_active_guide
+            disabled:  not root.has_active_guide
             on_release:
                 app.root.show_tagsmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Articles'
+            title: root.articles_button_title
             image: 'assets/img/article.png'
-            disabled: not root.is_active_guide
+            disabled: not root.has_active_guide
             on_release:
                 app.root.show_articlesmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Bookmarks'
+            title: root.bookmarks_button_title
             image: 'assets/img/bookmark.png'
-            disabled: not root.is_active_guide
+            disabled: not root.has_active_guide
             on_release:
                 app.root.show_bookmarksmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Guides'
+            title: root.guides_button_title
             image: 'assets/img/guide.png'
             on_release:
                 app.root.show_guidesmenu_screen()
                 app.root.toggle_state()
         NavigationPanelButton:
-            title: 'Settings'
+            title: root.settings_button_title
             image: 'assets/img/settings.png'
             on_release:
                 app.root.show_settings_screen()
+                app.root.toggle_state()
+        NavigationPanelButton:
+            title: 'Logs'
+            image: 'assets/img/log.png'
+            on_release:
+                app.root.show_log_screen()
                 app.root.toggle_state()

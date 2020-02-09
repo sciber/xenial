@@ -1,17 +1,18 @@
 #:kivy 1.11.1
 
 <TagsListItem>:
-    text: ''
+    tag_id: 0
+    tag_name: ''
+    text: self.tag_name
     size_hint: None, None
     size: self.texture_size
     padding: '8dp', '4dp'
     background_normal: ''
     color: 1, 1, 1, 1
     background_color: 0, .7, .7, 1
-    on_release: app.root.show_tag_screen(self.text)
+    on_release: app.root.show_tag_screen(self.tag_id)
 
 <TagsList>:
-    list_items: []
     size_hint_y: None
     height: self.minimum_height
     spacing: '2dp'

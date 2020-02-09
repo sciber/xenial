@@ -1,9 +1,7 @@
 #: kivy 1.11.1
 
-#:import join_path os.path.join
-#:import guides models.guides
-
 <ArticlesMenuItem>:
+    article_id: 0
     article_icon: ''
     article_name: ''
     article_title: ''
@@ -11,7 +9,7 @@
     size_hint_y: None
     height: '100dp'
     background_normal: ''
-    on_release: app.root.show_article_screen(self.article_name)
+    on_release: app.root.show_article_screen(self.article_id)
     BoxLayout:
         orientation: 'horizontal'
         pos: self.parent.pos
@@ -24,12 +22,7 @@
             width: '80dp'
             padding: '8dp', 0
             Image:
-                source:
-                    join_path(
-                    guides.active_guide_path,
-                    'icons',
-                    'articles',
-                    root.article_icon) if root.article_icon else None
+                source: root.article_icon if root.article_icon else None
         BoxLayout:
             orientation: 'vertical'
             padding: '8dp', 0

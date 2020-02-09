@@ -2,6 +2,7 @@
 
 <ArticlesMenuScreen>:
     name: 'articlesmenu'
+    screen_title: 'Articles'
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -12,6 +13,6 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Articles'
+            title: root.screen_title
         ScrollView:
             id: articlesmenu_container

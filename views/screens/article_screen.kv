@@ -1,15 +1,16 @@
 #:kivy 1.11.1
 
-#:import partial functools.partial
-
 <ArticleScreen>:
     name: 'article'
+    screen_title: 'Article'
+    related_categories_subtitle: 'Related categories'
+    related_articles_subtitle: 'Related articles'
     article_icon: ''
     article_name: ''
     article_title: ''
     article_synopsis: ''
-    article_related_categories: []
-    article_related_articles: []
+    article_has_categories: False
+    article_has_related_articles: False
     article_is_bookmarked: False
     BoxLayout:
         orientation: 'vertical'
@@ -22,11 +23,12 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Article'
+            title: root.screen_title
             action_disabled: False
             action_image: 'assets/img/bookmark-color.png' if root.article_is_bookmarked else 'assets/img/bookmark.png'
             action_callback: root.toggle_article_bookmark
         ScrollView:
+            id: screen_content_scrollview
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
@@ -74,8 +76,8 @@
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: '40dp' if root.article_related_categories else 0
-                    opacity: 1 if root.article_related_categories else 0
+                    height: '40dp' if root.article_has_categories else 0
+                    opacity: 1 if root.article_has_categories else 0
                     Image:
                         pos: self.parent.pos
                         source: 'assets/img/category.png'
@@ -83,7 +85,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Related categories'
+                        text: root.related_categories_subtitle
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'
@@ -99,8 +101,8 @@
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: '40dp' if root.article_related_articles else 0
-                    opacity: 1 if root.article_related_articles else 0
+                    height: '40dp' if root.article_has_related_articles else 0
+                    opacity: 1 if root.article_has_related_articles else 0
                     Image:
                         pos: self.parent.pos
                         source: 'assets/img/article.png'
@@ -108,7 +110,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Related articles'
+                        text: root.related_articles_subtitle
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'

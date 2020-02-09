@@ -1,18 +1,17 @@
 #:kivy 1.11.1
 
-#:import join_path os.path.join
-#:import guides models.guides
-
-#:set categoriesmenu_item_width dp(120)
+#:set categoriesmenu_item_width dp(100)
 #:set categoriesmenu_item_height dp(140)
 
 <CategoriesMenuItem>:
+    category_id: 0
     category_icon: ''
     category_name: ''
     size_hint: None, None
-    size: categoriesmenu_item_width, categoriesmenu_item_height
+    width: categoriesmenu_item_width
+    height: categoriesmenu_item_height
     background_normal: ''
-    on_release: app.root.show_category_screen(self.category_name)
+    on_release: app.root.show_category_screen(self.category_id)
     BoxLayout:
         orientation: 'vertical'
         pos: self.parent.pos
@@ -23,8 +22,7 @@
             size_hint_y: .6
             padding: '8dp'
             Image:
-                source:
-                    join_path(guides.active_guide_path, 'icons', 'categories', root.category_icon) if root.category_icon else None
+                source: root.category_icon if root.category_icon else None
         Label:
             text: root.category_name
             color: .2, .2, .2, 1

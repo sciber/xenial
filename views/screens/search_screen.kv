@@ -1,10 +1,61 @@
 #:kivy 1.11.1
 
+<BlockSearchResultsItem>:
+    markup: True
+    font_size: '14dp'
+    text_size: self.width, None
+    color: .2, .2, .2, 1
+    size_hint_y: None
+    height: self.texture_size[1]
+
+
+<ArticleSearchResultsItem>:
+    article_id: 0
+    article_title: ''
+    article_synopsis: ''
+    article_search_results_item: None
+    size_hint_y: None
+    height: search_results_container.height
+    background_normal: ''
+    on_release: app.root.show_article_screen(self.article_id, self.article_search_results_item)
+    BoxLayout:
+        id: search_results_container
+        orientation: 'vertical'
+        size_hint_y: None
+        height: self.minimum_height
+        pos: self.parent.pos
+        size_hint_x: None
+        width: self.parent.width
+        spacing: '4dp'
+        Label:
+            text: root.article_title
+            markup: True
+            bold: True
+            font_size: '18dp'
+            text_size: self.width, None
+            color: .4, .4, .4, 1
+            size_hint_y: None
+            height: self.texture_size[1]
+        Label:
+            text: root.article_synopsis
+            markup: True
+            font_size: '16dp'
+            text_size: self.width, None
+            color: .4, .4, .4, 1
+            size_hint_y: None
+            height: self.texture_size[1]
+
 <SearchScreen>:
+    search_input: search_input
     name: 'search'
+    screen_title: 'Search'
+    search_input_hint_text: 'Search active guide articles'
+    search_query: ''
+    search_results_head: ''
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
+        spacing: '8dp'
         canvas:
             Color:
                 rgba: 1, 1, 1, 1
@@ -12,62 +63,50 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Search'
+            title: root.screen_title
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '50dp'
+            TextInput:
+                id: search_input
+                hint_text: root.search_input_hint_text
+                font_size: '16dp'
+                padding: '12dp', '12dp', '12dp', '12dp'
+                multiline: False
+            Button:
+                size_hint_x: None
+                width: self.height
+                background_normal: ''
+                on_release: root.search_articles()
+                Image:
+                    source: 'assets/img/search.png'
+                    pos: self.parent.pos
+                    size: self.parent.size
         ScrollView:
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                padding: '4dp'
-                spacing: '12dp'
-                BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    height: '50dp'
-                    TextInput:
-                        hint_text: 'Search guide articles'
-                        font_size: '20dp'
-                        padding: '12dp', '12dp', '12dp', '12dp'
-                        multiline: False
-                    Button:
-                        size_hint_x: None
-                        width: self.height
-                        background_normal: ''
-                        Image:
-                            source: 'assets/img/search.png'
-                            pos: self.parent.pos
-                            size: self.parent.size
-                Label:
-                    text: 'Your search did not match any articles'
-                    size_hint_y: None
-                    height: '50dp'
-                    font_size: '18dp'
-                    color: .4, .4, .4, 1
+                padding: '8dp', 0
+                spacing: '16dp'
                 BoxLayout:
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
-#                    ArticlesMenuItem:
-#                        title: 'Article 1 title'
-#                        synopsis: 'Article 1 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 2 title'
-#                        synopsis: 'Article 2 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 3 title'
-#                        synopsis: 'Article 3 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 4 title'
-#                        synopsis: 'Article 4 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 5 title'
-#                        synopsis: 'Article 5 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 6 title'
-#                        synopsis: 'Article 6 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 7 title'
-#                        synopsis: 'Article 7 synopsis can span over two rows'
-#                    ArticlesMenuItem:
-#                        title: 'Article 8 title'
-#                        synopsis: 'Article 8 synopsis can span over two rows'
+                    height: self.minimum_height if root.search_query else 0
+                    opacity: 1 if root.search_query else 0
+                    Label:
+                        text: root.search_results_head
+                        markup: True
+                        text_size: self.width, None
+                        font_size: '18dp'
+                        color: .4, .4, .4, 1
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                BoxLayout:
+                    id: search_results_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: '18dp'

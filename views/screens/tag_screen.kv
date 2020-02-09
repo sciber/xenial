@@ -2,9 +2,12 @@
 
 <TagScreen>:
     name: 'tag'
+    screen_title: 'Tag'
+    tagged_categories_subtitle: 'Tagged categories'
+    tagged_articles_subtitle: 'Tagged_articles'
     tag_name: ''
-    tagged_categories: []
-    tagged_articles: []
+    tag_has_tagged_categories: False
+    tag_has_tagged_articles: False
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -16,8 +19,9 @@
                 pos: self.pos
                 size: self.size
         ScreenTitleBar:
-            title: 'Tag'
+            title: root.screen_title
         ScrollView:
+            id: screen_content_scrollview
             BoxLayout:
                 orientation: 'vertical'
                 size_hint_y: None
@@ -44,8 +48,8 @@
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: '40dp' if root.tagged_categories else 0
-                    opacity: 1 if root.tagged_categories else 0
+                    height: '40dp' if root.tag_has_tagged_categories else 0
+                    opacity: 1 if root.tag_has_tagged_categories else 0
                     Image:
                         pos: self.parent.pos
                         source: 'assets/img/category.png'
@@ -53,7 +57,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Tagged categories'
+                        text: root.tagged_categories_subtitle
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'
@@ -69,8 +73,8 @@
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: '40dp' if root.tagged_articles else 0
-                    opacity: 1 if root.tagged_articles else 0
+                    height: '40dp' if root.tag_has_tagged_articles else 0
+                    opacity: 1 if root.tag_has_tagged_articles else 0
                     Image:
                         pos: self.parent.pos
                         source: 'assets/img/article.png'
@@ -78,7 +82,7 @@
                         width: self.height
                         color: 1, 1, 1, .5
                     Label:
-                        text: 'Tagged articles'
+                        text: root.tagged_articles_subtitle
                         font_size: '18dp'
                         bold: True
                         padding: '8dp', '8dp'

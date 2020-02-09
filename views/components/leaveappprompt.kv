@@ -1,0 +1,25 @@
+#:kivy 1.11.1
+
+<LeaveAppPrompt>:
+    prompt_text: 'Do you want to leave the app?'
+    cancel_button_text: 'Cancel'
+    quit_button_text: ''
+    auto_dismiss: False
+    title_color: 8, .2, .2, 1
+    separator_color: 8, .2, .2, 1
+    size_hint_y: None
+    height: '200dp'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: root.prompt_text
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '40dp'
+            Button:
+                text: root.cancel_button_text
+                on_release: root.dismiss()
+            Button:
+                text: root.quit_button_text
+                on_release: app.stop()
