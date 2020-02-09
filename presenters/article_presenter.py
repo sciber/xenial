@@ -6,10 +6,10 @@ from translator import tr
 from models.guides_model import guides
 from history import hist
 
-from controllers.components.tagslist_controller import TagsList
-from controllers.components.categoriesmenu_controller import CategoriesMenu
-from controllers.components.articlesmenu_controller import ArticlesMenu
-from controllers.components.articlecontent_controller import ArticleContent
+from presenters.components.tagslist_presenter import TagsList
+from presenters.components.categoriesmenu_presenter import CategoriesMenu
+from presenters.components.articlesmenu_presenter import ArticlesMenu
+from presenters.components.articlecontent_presenter import ArticleContent
 
 from connector import audio, video
 

@@ -10,7 +10,7 @@ from events import ev
 from translator import tr
 from models.guides_model import guides
 
-from controllers.components.tagslist_controller import TagsList
+from presenters.components.tagslist_presenter import TagsList
 
 
 class GuidesMenuItem(BoxLayout):

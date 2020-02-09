@@ -23,15 +23,15 @@ from kivy.uix.popup import Popup
 
 # from models import guides, bookmarks
 
-from controllers.log_controller import LogScreen
-from controllers.category_controller import CategoriesMenuScreen, CategoryScreen
-from controllers.tag_controller import TagsMenuScreen, TagScreen
-from controllers.article_controller import ArticlesMenuScreen, ArticleScreen
-from controllers.settings_controller import SettingsScreen
-from controllers.components.navigationpanel_controller import NavigationPanel
-from controllers.guide_controller import GuidesMenuScreen, GuideScreen, GuideLoadFailedWarning
-from controllers.bookmark_controller import BookmarksMenuScreen
-from controllers.search_controller import SearchScreen
+from presenters.log_presenter import LogScreen
+from presenters.category_presenter import CategoriesMenuScreen, CategoryScreen
+from presenters.tag_presenter import TagsMenuScreen, TagScreen
+from presenters.article_presenter import ArticlesMenuScreen, ArticleScreen
+from presenters.settings_presenter import SettingsScreen
+from presenters.components.navigationpanel_presenter import NavigationPanel
+from presenters.guide_presenter import GuidesMenuScreen, GuideScreen, GuideLoadFailedWarning
+from presenters.bookmark_presenter import BookmarksMenuScreen
+from presenters.search_presenter import SearchScreen
 
 # from history import history
 #
@@ -85,7 +85,6 @@ class LeaveAppPrompt(Popup):
         self.cancel_button_text = tr.translate('Cancel')
         self.quit_button_text = tr.translate('Quit')
 
-
     def _handle_keyboard(self, window, key, *largs):
         super(LeaveAppPrompt, self)._handle_keyboard(window, key, *largs)
         if key == 27:
@@ -102,6 +101,14 @@ class ApplicationRoot(NavigationDrawer):
 
         self.log_screen = LogScreen()
         self.sm.add_widget(self.log_screen)
+        self.sm.current = 'log'
+
+        start_time = time.time()
+        self.search_screen = SearchScreen()
+        self.sm.add_widget(self.search_screen)
+        stop_time = time.time()
+        dt = (stop_time - start_time) * 1000
+        self.log_screen.add_log_item('[b]Search[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
         start_time = time.time()
         self.categoriesmenu_screen = CategoriesMenuScreen()
@@ -173,13 +180,6 @@ class ApplicationRoot(NavigationDrawer):
         self.log_screen.add_log_item('[b]Guide[/b] screen stub was built in: {dt:.2f} ms'.format(dt=dt))
 
         start_time = time.time()
-        self.search_screen = SearchScreen()
-        self.sm.add_widget(self.search_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.log_screen.add_log_item('[b]Search[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
-
-        start_time = time.time()
         self.navigation_panel_container = self.ids.navigation_panel_container
         self.navigation_panel = NavigationPanel()
         self.navigation_panel_container.add_widget(self.navigation_panel)
@@ -217,27 +217,16 @@ class ApplicationRoot(NavigationDrawer):
 
             return True
 
-    def _push_prev_screen_to_history(self):
-        if self.sm.current_screen.name == 'article':
-            hist.append_screen(self.sm.current_screen.name, self.sm.current_screen.article_id)
-        elif self.sm.current_screen.name == 'category':
-            hist.append_screen(self.sm.current_screen.name, self.sm.current_screen.category_id)
-        elif self.sm.current_screen.name == 'tag':
-            hist.append_screen(self.sm.current_screen.name, self.sm.current_screen.tag_id)
-
-    def _remove_current_screen_from_history(self):
-        if self.sm.current_screen.name == 'article':
-            hist.remove_screen(self.sm.current_screen.name, self.sm.current_screen.article_id)
-        elif self.sm.current_screen.name == 'category':
-            hist.remove_screen(self.sm.current_screen.name, self.sm.current_screen.category_id)
-        elif self.sm.current_screen.name == 'tag':
-            hist.remove_screen(self.sm.current_screen.name, self.sm.current_screen.tag_id)
-
     def show_log_screen(self):
         self._push_prev_screen_to_history()
         self.log_screen.ids.logslist_widget.parent.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'log'
+
+    def show_search_screen(self):
+        self._push_prev_screen_to_history()
+        self.sm.transition.direction = 'left'
+        self.sm.current = 'search'
 
     def show_categoriesmenu_screen(self):
         self._push_prev_screen_to_history()
@@ -258,27 +247,6 @@ class ApplicationRoot(NavigationDrawer):
         self.category_screen.category_id = category_id
         self.category_screen.ids.screen_content_scrollview.scroll_y = 1
         self.sm.current = 'category'
-        self._remove_current_screen_from_history()
-
-    def show_tagsmenu_screen(self):
-        self._push_prev_screen_to_history()
-        self.tagsmenu_screen.ids.tagsmenu_widget.parent.scroll_y = 1
-        self.sm.transition.direction = 'left'
-        self.sm.current = 'tagsmenu'
-
-    def show_tag_screen(self, tag_id, is_prev_screen=False):
-        if not is_prev_screen:
-            self._push_prev_screen_to_history()
-            self.sm.transition.direction = 'left'
-        else:
-            self.sm.transition.direction = 'right'
-        if self.sm.current == 'tag':
-            self.tag_screen, self.other_tag_screen = self.other_tag_screen, self.tag_screen
-            self.tag_screen.name = 'tag'
-            self.other_tag_screen.name = 'other_tag'
-        self.tag_screen.tag_id = tag_id
-        self.tag_screen.ids.screen_content_scrollview.scroll_y = 1
-        self.sm.current = 'tag'
         self._remove_current_screen_from_history()
 
     def show_articlesmenu_screen(self):
@@ -310,6 +278,27 @@ class ApplicationRoot(NavigationDrawer):
         self.sm.transition.direction = 'left'
         self.sm.current = 'bookmarksmenu'
 
+    def show_tagsmenu_screen(self):
+        self._push_prev_screen_to_history()
+        self.tagsmenu_screen.ids.tagsmenu_widget.parent.scroll_y = 1
+        self.sm.transition.direction = 'left'
+        self.sm.current = 'tagsmenu'
+
+    def show_tag_screen(self, tag_id, is_prev_screen=False):
+        if not is_prev_screen:
+            self._push_prev_screen_to_history()
+            self.sm.transition.direction = 'left'
+        else:
+            self.sm.transition.direction = 'right'
+        if self.sm.current == 'tag':
+            self.tag_screen, self.other_tag_screen = self.other_tag_screen, self.tag_screen
+            self.tag_screen.name = 'tag'
+            self.other_tag_screen.name = 'other_tag'
+        self.tag_screen.tag_id = tag_id
+        self.tag_screen.ids.screen_content_scrollview.scroll_y = 1
+        self.sm.current = 'tag'
+        self._remove_current_screen_from_history()
+
     def show_guidesmenu_screen(self):
         self._push_prev_screen_to_history()
         self.guidesmenu_screen.ids.guidesmenu_widget.parent.scroll_y = 1
@@ -323,15 +312,26 @@ class ApplicationRoot(NavigationDrawer):
         self.sm.transition.direction = 'left'
         self.sm.current = 'guide'
 
-    def show_search_screen(self):
-        self._push_prev_screen_to_history()
-        self.sm.transition.direction = 'left'
-        self.sm.current = 'search'
-
     def show_settings_screen(self):
         self._push_prev_screen_to_history()
         self.sm.transition.direction = 'left'
         self.sm.current = 'settings'
+
+    def _push_prev_screen_to_history(self):
+        if self.sm.current_screen.name == 'article':
+            hist.append_screen(self.sm.current_screen.name, self.sm.current_screen.article_id)
+        elif self.sm.current_screen.name == 'category':
+            hist.append_screen(self.sm.current_screen.name, self.sm.current_screen.category_id)
+        elif self.sm.current_screen.name == 'tag':
+            hist.append_screen(self.sm.current_screen.name, self.sm.current_screen.tag_id)
+
+    def _remove_current_screen_from_history(self):
+        if self.sm.current_screen.name == 'article':
+            hist.remove_screen(self.sm.current_screen.name, self.sm.current_screen.article_id)
+        elif self.sm.current_screen.name == 'category':
+            hist.remove_screen(self.sm.current_screen.name, self.sm.current_screen.category_id)
+        elif self.sm.current_screen.name == 'tag':
+            hist.remove_screen(self.sm.current_screen.name, self.sm.current_screen.tag_id)
 
 
 class XenialApp(App):

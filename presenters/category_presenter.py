@@ -5,9 +5,9 @@ from events import ev
 from translator import tr
 from models.guides_model import guides
 
-from controllers.components.tagslist_controller import TagsList
-from controllers.components.categoriesmenu_controller import CategoriesMenu
-from controllers.components.articlesmenu_controller import ArticlesMenu
+from presenters.components.tagslist_presenter import TagsList
+from presenters.components.categoriesmenu_presenter import CategoriesMenu
+from presenters.components.articlesmenu_presenter import ArticlesMenu
 
 
 class CategoriesMenuScreen(Screen):
