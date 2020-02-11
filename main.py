@@ -248,6 +248,7 @@ class ApplicationRoot(NavigationDrawer):
         self.sm.current = 'articlesmenu'
 
     def show_article_screen(self, article_id, search_results=None, is_prev_screen=False):
+        print(article_id, search_results, is_prev_screen)
         if not is_prev_screen:
             self._push_prev_screen_to_history()
             self.sm.transition.direction = 'left'
@@ -261,6 +262,8 @@ class ApplicationRoot(NavigationDrawer):
         self.article_screen.article_id = article_id
         if search_results is not None:
             self.article_screen.search_results = search_results
+        else:
+            self.article_screen.search_results = []
         self.sm.current = 'article'
         self._remove_current_screen_from_history()
 
