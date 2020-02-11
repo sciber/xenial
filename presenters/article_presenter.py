@@ -1,10 +1,16 @@
-from kivy.properties import NumericProperty, ListProperty
+"""
+Article presenter
+=================
+Contains ArticlesMenuScreen, ArticleScreen classes which present data to the 'articlesmenu_screen.kv' and
+'article_screen.kv' screens views, respectively.
+"""
+
+from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
 
 from events import ev
 from translator import tr
 from models.guides_model import guides
-from history import hist
 
 from presenters.components.tagslist_presenter import TagsList
 from presenters.components.categoriesmenu_presenter import CategoriesMenu
@@ -15,20 +21,24 @@ from connector import audio, video
 
 
 class ArticlesMenuScreen(Screen):
+    """
+    Presents data to the Articles menu 'articlesmenu_screen.kv' screen view.
+    """
+
     from_guide_name = ''
 
     def __init__(self, **kwargs):
         super(ArticlesMenuScreen, self).__init__(**kwargs)
-        ev.bind(on_ui_lang_code=self.translate_ui)
+        ev.bind(on_ui_lang_code=self._translate_ui)
         self.articlesmenu_widget = ArticlesMenu()
         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
-        ev.bind(on_active_guide=self.set_articlesmenu_items)
-        self.set_articlesmenu_items()
+        ev.bind(on_active_guide=self._set_articlesmenu_items)
+        self._set_articlesmenu_items()
 
-    def translate_ui(self, *args):
+    def _translate_ui(self, *args):
         self.screen_title = tr.translate('Articles')
 
-    def set_articlesmenu_items(self, *args):
+    def _set_articlesmenu_items(self, *args):
         if guides.active_guide is not None:
             self.articlesmenu_widget.articlesmenu_items = guides.active_guide.articles_list()
         else:
@@ -36,6 +46,10 @@ class ArticlesMenuScreen(Screen):
 
 
 class ArticleScreen(Screen):
+    """
+    Presents data to the Article 'article_screen.kv' screen view.
+    """
+
     article_id = NumericProperty(0)
     search_results = []
 
@@ -49,22 +63,15 @@ class ArticleScreen(Screen):
         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
         self.articlecontent_widget = ArticleContent()
         self.ids.articlecontent_container.add_widget(self.articlecontent_widget)
-        ev.bind(on_active_guide=self.clear_article_screen_items)
-        ev.bind(on_ui_lang_code=self.translate_ui)
+        ev.bind(on_active_guide=self._clear_article_screen_items)
+        ev.bind(on_ui_lang_code=self._translate_ui)
         ev.bind(on_add_bookmark=self.on_toggle_bookmark)
-        ev.bind(on_delete_bookmark=self.on_toggle_bookmark)
+        ev.bind(on_remove_bookmark=self.on_toggle_bookmark)
 
-    def translate_ui(self, *args):
-        self.screen_title = tr.translate('Article')
-        self.related_categories_subtitle = tr.translate('Related categories')
-        self.related_articles_subtitle = tr.translate('Related articles')
+    def on_article_id(self, instance, article_id):
+        """ Updates object attributes according to `article_id` attribute/argument. """
 
-    def clear_article_screen_items(self, *args):
-        if self.article_id:
-            self.article_id = 0
-
-    def on_article_id(self, *args):
-        if self.article_id:
+        if article_id:
             article = guides.active_guide.article_by_id(self.article_id)
             self.article_name = article.article_name
             self.article_icon = article.article_icon
@@ -90,10 +97,11 @@ class ArticleScreen(Screen):
             self.article_is_bookmarked = False
 
     def on_enter(self):
+        """ Highlights search results (if present) in the article's texts when entering the page. """
+
         article = guides.active_guide.article_by_id(self.article_id)
         self.articlecontent_widget.articlecontent_blocks = article.content_blocks_list()
         if self.search_results:
-
             for item in self.search_results:
                 if item[1] == -2:
                     self.article_title = item[4]
@@ -118,24 +126,39 @@ class ArticleScreen(Screen):
 
     @staticmethod
     def on_pre_leave():
+        """ Turn off any article's audio/video playing component when leaving the article's screen. """
+
         audio.stop()
         video.stop()
 
+    def on_toggle_bookmark(self, instance, article_id):
+        """ Change the bookmark's sign upon `on_add_bookmark` and `on_remove_bookmark` events. """
+
+        if not self.article_id or self.article_id != article_id:
+            return
+        article = guides.active_guide.article_by_id(self.article_id)
+        article_bookmark = article.bookmark()
+        self.article_is_bookmarked = article_bookmark is not None
+
     def toggle_article_bookmark(self):
+        """ Toggle article bookmark in Article model and dispatch an appropriate event. """
+
         if not self.article_id:
             return
         article = guides.active_guide.article_by_id(self.article_id)
         article_bookmark = article.bookmark()
         if article_bookmark is not None:
             guides.active_guide.delete_bookmark(article_bookmark['bookmark_id'])
-            ev.dispatch('on_delete_bookmark', self.article_id)
+            ev.dispatch('on_remove_bookmark', self.article_id)
         else:
             guides.active_guide.add_bookmark(self.article_id)
             ev.dispatch('on_add_bookmark', self.article_id)
 
-    def on_toggle_bookmark(self, instance, article_id):
-        if not self.article_id or self.article_id != article_id:
-            return
-        article = guides.active_guide.article_by_id(self.article_id)
-        article_bookmark = article.bookmark()
-        self.article_is_bookmarked = article_bookmark is not None
+    def _clear_article_screen_items(self, *args):
+        if self.article_id:
+            self.article_id = 0
+
+    def _translate_ui(self, *args):
+        self.screen_title = tr.translate('Article')
+        self.related_categories_subtitle = tr.translate('Related categories')
+        self.related_articles_subtitle = tr.translate('Related articles')

@@ -4,58 +4,6 @@
 
 #:import Factory kivy.factory.Factory
 
-#:import guides models.guides_model.guides
-
-<LoadGuidePopup>
-    cancel_button_text: 'Cancel'
-    load_button_text: 'Load'
-    auto_dismiss: False
-    title_color: 0, .6, .4, 1
-    separator_color: 0, .6, .4, 1
-    BoxLayout:
-        orientation: 'vertical'
-        FileChooserListView:
-            id: filechooser
-            path: 'guides'
-            filters: ['*.zip']
-            dirselect: False
-            multiselect: False
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint_y: None
-            height: '40dp'
-            Button:
-                text: root.cancel_button_text
-                on_release: root.dismiss()
-            Button:
-                text: root.load_button_text
-                disabled: not filechooser.selection
-                on_release:
-                    root.dismiss()
-                    root.load_guide(*filechooser.selection)
-
-<GuideLoadFailedWarning>:
-    message: ''
-    ok_button_text: 'OK'
-    auto_dismiss: True
-    title_color: .8, .2, .2, 1
-    separator_color: .8, .2, .2, 1
-    size_hint_y: None
-    height: '200dp'
-    BoxLayout:
-        orientation: 'vertical'
-        Label:
-            text: root.message
-            text_size: self.size
-            valign: 'middle'
-            halign: 'center'
-            markup: True
-        Button:
-            text: root.ok_button_text
-            size_hint_y: None
-            height: '40dp'
-            on_release: root.dismiss()
-
 <GuidesMenuItem>:
     guide_icon: ''
     guide_name: ''
@@ -190,3 +138,53 @@
             size_hint_y: None
             height: '60dp'
             on_release: Factory.LoadGuidePopup().open()
+
+<LoadGuidePopup>
+    cancel_button_text: 'Cancel'
+    load_button_text: 'Load'
+    auto_dismiss: False
+    title_color: 0, .6, .4, 1
+    separator_color: 0, .6, .4, 1
+    BoxLayout:
+        orientation: 'vertical'
+        FileChooserListView:
+            id: filechooser
+            path: 'guides'
+            filters: ['*.zip']
+            dirselect: False
+            multiselect: False
+        BoxLayout:
+            orientation: 'horizontal'
+            size_hint_y: None
+            height: '40dp'
+            Button:
+                text: root.cancel_button_text
+                on_release: root.dismiss()
+            Button:
+                text: root.load_button_text
+                disabled: not filechooser.selection
+                on_release:
+                    root.dismiss()
+                    root.load_guide(*filechooser.selection)
+
+<GuideLoadFailedWarning>:
+    message: ''
+    ok_button_text: 'OK'
+    auto_dismiss: True
+    title_color: .8, .2, .2, 1
+    separator_color: .8, .2, .2, 1
+    size_hint_y: None
+    height: '200dp'
+    BoxLayout:
+        orientation: 'vertical'
+        Label:
+            text: root.message
+            text_size: self.size
+            valign: 'middle'
+            halign: 'center'
+            markup: True
+        Button:
+            text: root.ok_button_text
+            size_hint_y: None
+            height: '40dp'
+            on_release: root.dismiss()

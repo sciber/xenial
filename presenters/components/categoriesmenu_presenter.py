@@ -1,7 +1,7 @@
 """
 Categories menu component presenter
 ===================================
-Contains CategoriesMenu class presented data to the 'categoriesmenu.kv' component view.
+Contains CategoriesMenu class presenting data to the 'categoriesmenu.kv' component view.
 """
 
 from kivy.properties import ListProperty
@@ -11,7 +11,7 @@ from kivy.uix.button import Button
 
 class CategoriesMenuItem(Button):
     """
-    Present data to the Categories menu item component.
+    Presents data to the Categories menu item view component.
     """
 
     def __init__(self, category_id, category_name, category_icon, **kwargs):
@@ -29,7 +29,7 @@ class CategoriesMenu(GridLayout):
     categoriesmenu_items = ListProperty([])
 
     def on_categoriesmenu_items(self, instance, categoriesmenu_items):
-        """ Updates object attributes according to `categoriesmenu_items` attribute/argument. """
+        """ Updates the object attributes according to `categoriesmenu_items` attribute/argument. """
 
         self.clear_widgets()
         for item in categoriesmenu_items:

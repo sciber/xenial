@@ -2,7 +2,7 @@
 Category presenter
 ==================
 Contains CategoriesMenuScreen and CategoryScreen classes presenting data to the 'categoriesmenu_screen.kv' and
-'category_screen.kv' views, respectively.
+'category_screen.kv' screens views, respectively.
 """
 
 from kivy.properties import NumericProperty
@@ -19,7 +19,7 @@ from presenters.components.articlesmenu_presenter import ArticlesMenu
 
 class CategoriesMenuScreen(Screen):
     """
-    Presents data to the CategoriesMenu 'categoriesmenu_screen.kv' screen view.
+    Presents data to the Categories menu 'categoriesmenu_screen.kv' screen view.
     """
 
     def __init__(self, **kwargs):
@@ -28,7 +28,7 @@ class CategoriesMenuScreen(Screen):
         self.categoriesmenu_widget = CategoriesMenu()
         self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
         ev.bind(on_active_guide=self._set_categoriesmenu_items)
-        self.set_categoriesmenu_items()
+        self._set_categoriesmenu_items()
 
     def _translate_ui(self, *args):
         self.screen_title = tr.translate('Categories')
@@ -59,7 +59,7 @@ class CategoryScreen(Screen):
         ev.bind(on_ui_lang_code=self._translate_ui)
 
     def on_category_id(self, instance, category_id):
-        """ Updates object attributes according to `category_id` argument. """
+        """ Updates object attributes according to `category_id` attribute/argument. """
 
         if category_id:
             category = guides.active_guide.category_by_id(category_id)
@@ -81,11 +81,11 @@ class CategoryScreen(Screen):
             self.articlesmenu_widget.articlesmenu_items = []
             self.category_has_articles = False
 
+    def _clear_category_screen_items(self, *args):
+        if self.category_id:
+            self.category_id = 0
+
     def _translate_ui(self, *args):
         self.screen_title = tr.translate('Category')
         self.related_categories_subtitle = tr.translate('Related categories')
         self.related_articles_subtitle = tr.translate('Related articles')
-
-    def _clear_category_screen_items(self, *args):
-        if self.category_id:
-            self.category_id = 0

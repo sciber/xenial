@@ -9,7 +9,7 @@ class AppGlobalEventDispatcher(EventDispatcher):
         self.register_event_type('on_change_guides_list')
         self.register_event_type('on_unload_guide')
         self.register_event_type('on_add_bookmark')
-        self.register_event_type('on_delete_bookmark')
+        self.register_event_type('on_remove_bookmark')
         super(AppGlobalEventDispatcher, self).__init__(**kwargs)
 
     def on_ui_lang_code(self, *args):
@@ -30,7 +30,7 @@ class AppGlobalEventDispatcher(EventDispatcher):
     def on_add_bookmark(self, *args):
         pass
 
-    def on_delete_bookmark(self, *args):
+    def on_remove_bookmark(self, *args):
         pass
 
 

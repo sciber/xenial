@@ -1,3 +1,10 @@
+"""
+Tag presenter
+=============
+Contains TagsMenuScreen and TagScreen classes which present data to the 'tagsmenu_screen.kv' and 'tag_screen.kv'
+screens views, respectively.
+"""
+
 from kivy.properties import NumericProperty, ListProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
@@ -11,6 +18,10 @@ from presenters.components.articlesmenu_presenter import ArticlesMenu
 
 
 class TagsMenuItem(Button):
+    """
+    Presents data to the Tags menu item view component (defined in 'tagsmenu_screen.kv').
+    """
+
     def __init__(self, tag_id, tag_name, tag_count_categories, tag_count_articles, **kwargs):
         super(TagsMenuItem, self).__init__(**kwargs)
         self.tag_id = tag_id
@@ -20,33 +31,43 @@ class TagsMenuItem(Button):
 
 
 class TagsMenuScreen(Screen):
+    """
+    Presents data to the Tags menu 'tagsmenu_screen.kv' screen view.
+    """
+
     tagsmenu_items = ListProperty([])
 
     def __init__(self, **kwargs):
         super(TagsMenuScreen, self).__init__(**kwargs)
-        ev.bind(on_ui_lang_code=self.translate_ui)
         self.tagsmenu_widget = self.ids.tagsmenu_widget
-        ev.bind(on_active_guide=self.set_tagsmenu_items)
-        self.set_tagsmenu_items()
+        ev.bind(on_active_guide=self._set_tagsmenu_items)
+        ev.bind(on_ui_lang_code=self._translate_ui)
+        self._set_tagsmenu_items()
 
-    def translate_ui(self, *args):
-        self.screen_title = tr.translate('Tags')
+    def on_tagsmenu_items(self, instance, tagsmenu_items):
+        """ Updates the object attributes according to `tagsmenu_items` attribute/argument. """
 
-    def on_tagsmenu_items(self, instance, value):
         self.tagsmenu_widget.clear_widgets()
-        for item in self.tagsmenu_items:
+        for item in tagsmenu_items:
             item_widget = TagsMenuItem(item['tag_id'], item['tag_name'],
                                        item['tag_count_categories'], item['tag_count_articles'])
             self.tagsmenu_widget.add_widget(item_widget)
 
-    def set_tagsmenu_items(self, *args):
+    def _set_tagsmenu_items(self, *args):
         if guides.active_guide is not None:
             self.tagsmenu_items = guides.active_guide.tags_list()
         else:
             self.tagsmenu_items = []
 
+    def _translate_ui(self, *args):
+        self.screen_title = tr.translate('Tags')
+
 
 class TagScreen(Screen):
+    """
+    Presents data to the Tag 'tag_screen.kv' screen view.
+    """
+
     tag_id = NumericProperty(0)
 
     def __init__(self, **kwargs):
@@ -55,21 +76,14 @@ class TagScreen(Screen):
         self.ids.categoriesmenu_container.add_widget(self.categoriesmenu_widget)
         self.articlesmenu_widget = ArticlesMenu()
         self.ids.articlesmenu_container.add_widget(self.articlesmenu_widget)
-        ev.bind(on_active_guide=self.clear_tag_screen_items)
-        ev.bind(on_ui_lang_code=self.translate_ui)
+        ev.bind(on_active_guide=self._clear_tag_screen_items)
+        ev.bind(on_ui_lang_code=self._translate_ui)
 
-    def translate_ui(self, *args):
-        self.screen_title = tr.translate('Tag')
-        self.tagged_categories_subtitle = tr.translate('Tagged categories')
-        self.tagged_articles_subtitle = tr.translate('Tagged articles')
+    def on_tag_id(self, instance, tag_id):
+        """" Updates object attributes according to `tag_id` attribute/argument. """
 
-    def clear_tag_screen_items(self, *args):
-        if self.tag_id:
-            self.tag_id = 0
-
-    def on_tag_id(self, *args):
-        if self.tag_id:
-            tag = guides.active_guide.tag_by_id(self.tag_id)
+        if tag_id:
+            tag = guides.active_guide.tag_by_id(tag_id)
             self.tag_name = tag.tag_name
             self.categoriesmenu_widget.categoriesmenu_items = tag.tagged_categories_list()
             self.tag_has_tagged_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
@@ -81,3 +95,12 @@ class TagScreen(Screen):
             self.tag_has_tagged_categories = False
             self.articlesmenu_widget.articlesmenu_items = []
             self.tag_has_tagged_articles = False
+
+    def _translate_ui(self, *args):
+        self.screen_title = tr.translate('Tag')
+        self.tagged_categories_subtitle = tr.translate('Tagged categories')
+        self.tagged_articles_subtitle = tr.translate('Tagged articles')
+
+    def _clear_tag_screen_items(self, *args):
+        if self.tag_id:
+            self.tag_id = 0

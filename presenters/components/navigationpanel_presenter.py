@@ -1,7 +1,7 @@
 """
 Navigation panel presenter
 ==========================
-
+Contains NavigationPanel class which presents data to Navigation panel 'navigationpanel.kv' view.
 """
 
 from kivy.uix.scrollview import ScrollView
@@ -13,12 +13,12 @@ from models.guides_model import guides
 
 class NavigationPanel(ScrollView):
     """
-
+    Presents data to the Navigation panel 'navigationpanel.kv' view component.
     """
 
     def __init__(self, **kwargs):
         super(NavigationPanel, self).__init__(**kwargs)
-        self.set_has_active_guide()
+        self._set_has_active_guide()
         ev.bind(on_active_guide=self._set_has_active_guide)
         ev.bind(on_ui_lang_code=self._translate_ui)
 

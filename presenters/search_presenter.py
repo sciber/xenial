@@ -1,3 +1,9 @@
+"""
+Guide's articles search presenter
+=================================
+Contains SearchScreen class which presents data to the 'search_screen.kv' screen view.
+"""
+
 from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
@@ -9,10 +15,18 @@ from translator import tr
 
 
 class BlockSearchResultsItem(Label):
+    """
+    Presents data to the article's block search results item component view (defined in 'search_screen.kv').
+    """
+
     pass
 
 
 class ArticleSearchResultsItem(Button):
+    """
+    Presents data to the article search results item component view (defined in 'search_screen.kv').
+    """
+
     def __init__(self, article_search_results_item, **kwargs):
         super(ArticleSearchResultsItem, self).__init__(**kwargs)
         self.article_search_results_item = article_search_results_item
@@ -36,6 +50,10 @@ class ArticleSearchResultsItem(Button):
 
 
 class SearchScreen(Screen):
+    """
+    Presents data to the Search screen 'search_screen.kv' view.
+    """
+
     articles_search_results = []
     search_input = ObjectProperty()
 
@@ -43,16 +61,13 @@ class SearchScreen(Screen):
         super(SearchScreen, self).__init__(**kwargs)
         self.search_query = ''
         self.search_results_container = self.ids.search_results_container
-        ev.bind(on_ui_lang_code=self.translate_ui)
         self.search_input.bind(on_text_validate=self.search_articles)
-
-    def translate_ui(self, *args):
-        self.screen_title = tr.translate('Search')
-        self.search_intput_hint_text = tr.translate('Search active guide articles')
-        self.search_results_head = tr.translate('{0} results for [b]"{1}"[/b]'.
-                                                format(len(self.articles_search_results), self.search_query))
+        ev.bind(on_ui_lang_code=self._translate_ui)
 
     def search_articles(self, *args):
+        """ Search in articles texts (stored in database 'article_block_search' table) for phrase submitted from
+            the screen's text input. """
+
         self.search_query = self.search_input.text
         self.search_input.text = ''
         self.articles_search_results = []
@@ -75,5 +90,11 @@ class SearchScreen(Screen):
                 self.search_results_container.add_widget(article_search_results_item_widget)
         else:
             self.search_input_hint_text = tr.translate('Search active guide articles')
+        self.search_results_head = tr.translate('{0} results for [b]"{1}"[/b]'.
+                                                format(len(self.articles_search_results), self.search_query))
+
+    def _translate_ui(self, *args):
+        self.screen_title = tr.translate('Search')
+        self.search_intput_hint_text = tr.translate('Search active guide articles')
         self.search_results_head = tr.translate('{0} results for [b]"{1}"[/b]'.
                                                 format(len(self.articles_search_results), self.search_query))

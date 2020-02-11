@@ -1,7 +1,15 @@
+"""
+Guide presenter
+===============
+Contains GuidesMenuScreen and GuideScreen classes presenting data to the 'guidesmenu_screen.kv' and 'guide_screen.kv'
+screens views, respectively.
+Contains LoadGuidePopup, GuideLoadFailedWarning and RemoveGuideWarningPopup classes which present data to corresponding
+popup components views.
+"""
+
 import os
 
-from kivy.base import EventLoop
-from kivy.properties import BooleanProperty, StringProperty, ListProperty
+from kivy.properties import StringProperty, ListProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
@@ -14,6 +22,10 @@ from presenters.components.tagslist_presenter import TagsList
 
 
 class GuidesMenuItem(BoxLayout):
+    """
+    Presents data to the Guides menu item component view (defined in 'guidesmenu_screen.kv').
+    """
+
     def __init__(self, guide_name, guide_icon, guide_title, guide_description,
                  guide_lang, guide_from_place, guide_to_place, **kwargs):
         super(GuidesMenuItem, self).__init__(**kwargs)
@@ -27,63 +39,73 @@ class GuidesMenuItem(BoxLayout):
         self.guide_to_place = guide_to_place
         self.guide_to_place_label = (tr.translate('To') + ': [b]{}[/b]').format(self.guide_to_place)
         self.is_active_guide = (guides.active_guide is not None and self.guide_name == guides.active_guide.guide_name)
-        ev.bind(on_ui_lang_code=self.translate_ui)
-        ev.bind(on_active_guide=self.check_is_guide_active)
-
-    def translate_ui(self, *args):
-        self.guide_from_place_label = (tr.translate('From') + ': [b]{}[/b]').format(self.guide_from_place)
-        self.guide_to_place_label = (tr.translate('To') + ': [b]{}[/b]').format(self.guide_to_place)
-
-    def check_is_guide_active(self, *args):
-        self.is_active_guide = guides.active_guide is not None and self.guide_name == guides.active_guide.guide_name
+        ev.bind(on_active_guide=self._check_is_guide_active)
+        ev.bind(on_ui_lang_code=self._translate_ui)
 
     def activate_guide(self):
+        """ Activate guide upon selecting radio checkbox in the corresponding component view. """
+
         guides.set_active_guide(self.guide_name)
         ev.dispatch('on_active_guide')
 
+    def _check_is_guide_active(self, *args):
+        self.is_active_guide = guides.active_guide is not None and self.guide_name == guides.active_guide.guide_name
+
+    def _translate_ui(self, *args):
+        self.guide_from_place_label = (tr.translate('From') + ': [b]{}[/b]').format(self.guide_from_place)
+        self.guide_to_place_label = (tr.translate('To') + ': [b]{}[/b]').format(self.guide_to_place)
+
 
 class GuidesMenuScreen(Screen):
+    """
+     Presents data to the Guides menu screen view in 'guidesmenu_screen.kv'.
+    """
+
     guidesmenu_items = ListProperty()
 
     def __init__(self, **kwargs):
         super(GuidesMenuScreen, self).__init__(**kwargs)
-        ev.bind(on_ui_lang_code=self.translate_ui)
         self.guidesmenu_widget = self.ids.guidesmenu_widget
-        ev.bind(on_change_guides_list=self.set_guidesmenu_items)
-        # ev.bind(on_unload_guide=self.set_guidesmenu_items)
-        self.set_guidesmenu_items()
+        ev.bind(on_change_guides_list=self._set_guidesmenu_items)
+        ev.bind(on_ui_lang_code=self._translate_ui)
+        self._set_guidesmenu_items()
 
-    def translate_ui(self, *args):
-        self.screen_title = tr.translate('Guides')
-        self.import_button_text = tr.translate('Import guide')
+    def on_guidesmenu_items(self, instance, guidesmenu_items):
+        """ Updates the object attributes according to `guidesmenu_items` attribute/argument. """
 
-    def on_guidesmenu_items(self, instance, value):
         self.guidesmenu_widget.clear_widgets()
-        for item in self.guidesmenu_items:
+        for item in guidesmenu_items:
             item_widget = GuidesMenuItem(item['guide_name'], item['guide_icon'], item['guide_title'],
                                          item['guide_description'], item['guide_lang'],
                                          item['guide_from_place'], item['guide_to_place'])
             self.guidesmenu_widget.add_widget(item_widget)
 
-    def set_guidesmenu_items(self, *args):
+    def _set_guidesmenu_items(self, *args):
         self.guidesmenu_items = guides.guides_list
+
+    def _translate_ui(self, *args):
+        self.screen_title = tr.translate('Guides')
+        self.import_button_text = tr.translate('Import guide')
 
 
 class LoadGuidePopup(Popup):
+    """
+    Presents data to the guide loading popup component view (in 'guidesmenu_screen.kv') and processes returned
+    guide archive name.
+    """
+
     def __init__(self, **kwargs):
         super(LoadGuidePopup, self).__init__(**kwargs)
         self.title = tr.translate('Select guide (zip) archive file')
         self.cancel_button_text = tr.translate('Cancel')
         self.load_button_text = tr.translate('Load')
 
-    def _handle_keyboard(self, window, key, *largs):
-        super(LoadGuidePopup, self)._handle_keyboard(window, key, *largs)
-        if key == 27:
-            self.dismiss()
-            return True
-
     @staticmethod
     def load_guide(archive):
+        """ Loads guide from selected archive.
+            On success returns guide list item (data stored in the corresponding 'guide.json' file);
+            otherwise returns None. Opens warning popup when guide import fails. """
+
         guide_name = os.path.splitext(os.path.basename(archive))[0]
         guides_list_item = guides.load_guide(guide_name)
         if guides_list_item is None:
@@ -91,8 +113,19 @@ class LoadGuidePopup(Popup):
             return
         ev.dispatch('on_load_guide', guides_list_item['guide_name'])
 
+    def _handle_keyboard(self, window, key, *largs):
+        super(LoadGuidePopup, self)._handle_keyboard(window, key, *largs)
+        if key == 27:
+            self.dismiss()
+            return True
+
 
 class GuideLoadFailedWarning(Popup):
+    """
+    Provides data to the corresponding popup informing about failed guide import (defined in 'guidesmenu_screen.kv')
+    and handles Esc/Back button event for the popup dismissal.
+    """
+
     def __init__(self, archive, **kwargs):
         super(GuideLoadFailedWarning, self).__init__(**kwargs)
         self.message = tr.translate('"[b]{}[/b]"\n guide load failed!').format(os.path.basename(archive))
@@ -107,6 +140,10 @@ class GuideLoadFailedWarning(Popup):
 
 
 class GuideScreen(Screen):
+    """
+    Presents data to the Guide screen 'guide_screen.kv' view.
+    """
+
     guide_name = StringProperty('')
 
     def __init__(self, **kwargs):
@@ -116,22 +153,13 @@ class GuideScreen(Screen):
         self.guide_to_place = ''
         self.tagslist_widget = TagsList()
         self.ids.tagslist_container.add_widget(self.tagslist_widget)
-        ev.bind(on_ui_lang_code=self.translate_ui)
+        ev.bind(on_ui_lang_code=self._translate_ui)
 
-    def translate_ui(self, *args):
-        self.screen_title = tr.translate('Guide')
-        self.lang_name_label = tr.translate('Language') + ': [b]{}[/b]'.format(self.guide_lang[0])
-        self.from_place_label = tr.translate('From') + ': [b]{}[/b]'.format(self.guide_from_place)
-        self.to_place_label = tr.translate('To') + ': [b]{}[/b]'.format(self.guide_to_place)
-        self.delete_guide_button_text = tr.translate('Delete guide')
+    def on_guide_name(self, instance, guide_name):
+        """ Updates object attributes according to `guide_name` attribute/argument. """
 
-    def clear_guide_screen_items(self, *args):
-        if self.guide_name:
-            self.guide_name = ''
-
-    def on_guide_name(self, *args):
-        if self.guide_name:
-            guide = guides.guide_by_name(self.guide_name)
+        if guide_name:
+            guide = guides.guide_by_name(guide_name)
             self.guide_icon = guide.guide_icon
             self.guide_title = guide.guide_title
             self.guide_description = guide.guide_description
@@ -147,16 +175,26 @@ class GuideScreen(Screen):
             self.guide_from_place = ''
             self.guide_to_place = ''
             self.tagslist_widget.tagslist_items = []
-        self.translate_ui()
-    #
-    # def remove_guide(self, instance, guide_name):
-    #     if guide_name != self.guide_name:
-    #         return
-    #     guides.unload_guide(guide_name)
-    #     ev.dispatch('on_unload_guide', guide_name)
+        self._translate_ui()
+
+    def _clear_guide_screen_items(self, *args):
+        if self.guide_name:
+            self.guide_name = ''
+
+    def _translate_ui(self, *args):
+        self.screen_title = tr.translate('Guide')
+        self.lang_name_label = tr.translate('Language') + ': [b]{}[/b]'.format(self.guide_lang[0])
+        self.from_place_label = tr.translate('From') + ': [b]{}[/b]'.format(self.guide_from_place)
+        self.to_place_label = tr.translate('To') + ': [b]{}[/b]'.format(self.guide_to_place)
+        self.delete_guide_button_text = tr.translate('Delete guide')
 
 
 class RemoveGuideWarningPopup(Popup):
+    """
+    Presents data to the popup warning about guide unload (defined in 'guide_screen.kv')
+    and process the guide unload upon confirmation action.
+    """
+
     def __init__(self, guide_name, guide_title, **kwargs):
         super(RemoveGuideWarningPopup, self).__init__(**kwargs)
         self.guide_name = guide_name
@@ -166,6 +204,8 @@ class RemoveGuideWarningPopup(Popup):
         self.delete_button_text = tr.translate('Delete')
 
     def unload_guide(self):
+        """ Unload guide from the application. """
+
         guides.unload_guide(self.guide_name)
         ev.dispatch('on_unload_guide', self.guide_name)
 
