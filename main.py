@@ -9,11 +9,12 @@ from kivy.uix.popup import Popup
 
 from kivy.garden.navigationdrawer import NavigationDrawer
 
-from settings import app_settings
 from events.global_events import ev
 from translations.translator import transl
-from models.guides_model import guides
+from settings.settings import app_settings
 from history import hist
+
+from models.guides_model import guides
 
 from presenters.log_presenter import LogScreen
 from presenters.category_presenter import CategoriesMenuScreen, CategoryScreen

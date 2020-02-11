@@ -10,6 +10,7 @@ from kivy.uix.screenmanager import Screen
 
 from events.global_events import ev
 from translations.translator import transl
+
 from models.guides_model import guides
 
 from presenters.components.tagslist_presenter import TagsList
