@@ -10,7 +10,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.image import Image
 
-from connector import audio, video
+from media_connectors.audio_connector import audio
+from media_connectors.video_connector import video
 
 
 class ArticleSubtitle(Label):

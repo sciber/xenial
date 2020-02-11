@@ -17,7 +17,8 @@ from presenters.components.categoriesmenu_presenter import CategoriesMenu
 from presenters.components.articlesmenu_presenter import ArticlesMenu
 from presenters.components.articlecontent_presenter import ArticleContent
 
-from connector import audio, video
+from media_connectors.audio_connector import audio
+from media_connectors.video_connector import video
 
 
 class ArticlesMenuScreen(Screen):
