@@ -11,7 +11,7 @@ from kivy.uix.label import Label
 
 from models.guides_model import guides
 from events import ev
-from translator import tr
+from translations.translator import transl
 
 
 class BlockSearchResultsItem(Label):
@@ -89,12 +89,12 @@ class SearchScreen(Screen):
                 article_search_results_item_widget = ArticleSearchResultsItem(article_results_item)
                 self.search_results_container.add_widget(article_search_results_item_widget)
         else:
-            self.search_input_hint_text = tr.translate('Search active guide articles')
-        self.search_results_head = tr.translate('{0} results for [b]"{1}"[/b]'.
+            self.search_input_hint_text = transl.translate('Search active guide articles')
+        self.search_results_head = transl.translate('{0} results for [b]"{1}"[/b]'.
                                                 format(len(self.articles_search_results), self.search_query))
 
     def _translate_ui(self, *args):
-        self.screen_title = tr.translate('Search')
-        self.search_intput_hint_text = tr.translate('Search active guide articles')
-        self.search_results_head = tr.translate('{0} results for [b]"{1}"[/b]'.
+        self.screen_title = transl.translate('Search')
+        self.search_intput_hint_text = transl.translate('Search active guide articles')
+        self.search_results_head = transl.translate('{0} results for [b]"{1}"[/b]'.
                                                 format(len(self.articles_search_results), self.search_query))

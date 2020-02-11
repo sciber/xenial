@@ -9,15 +9,11 @@ from kivy.garden.navigationdrawer import NavigationDrawer
 
 from settings import app_settings
 from events import ev
-from translator import tr
+from translations.translator import transl
 from models.guides_model import guides
 from history import hist
 
-import os
-
 from kivy.base import EventLoop
-from kivy.properties import BooleanProperty, StringProperty
-from kivy.uix.scrollview import ScrollView
 from kivy.uix.popup import Popup
 
 
@@ -29,13 +25,9 @@ from presenters.tag_presenter import TagsMenuScreen, TagScreen
 from presenters.article_presenter import ArticlesMenuScreen, ArticleScreen
 from presenters.settings_presenter import SettingsScreen
 from presenters.components.navigationpanel_presenter import NavigationPanel
-from presenters.guide_presenter import GuidesMenuScreen, GuideScreen, GuideLoadFailedWarning
+from presenters.guide_presenter import GuidesMenuScreen, GuideScreen
 from presenters.bookmark_presenter import BookmarksMenuScreen
 from presenters.search_presenter import SearchScreen
-
-# from history import history
-#
-# from translator import translator
 
 kivy.require('1.11.1')
 
@@ -76,14 +68,14 @@ Builder.load_string('''
 class LeaveAppPrompt(Popup):
     def __init__(self, **kwargs):
         super(LeaveAppPrompt, self).__init__(**kwargs)
-        ev.bind(on_ui_lang_code=self.translate_ui)
-        self.translate_ui()
+        ev.bind(on_ui_lang_code=self._translate_ui)
+        self._translate_ui()
 
-    def translate_ui(self, *args):
-        self.title = tr.translate('Warning')
-        self.prompt_text = tr.translate('Do you want to leave the app?')
-        self.cancel_button_text = tr.translate('Cancel')
-        self.quit_button_text = tr.translate('Quit')
+    def _translate_ui(self, *args):
+        self.title = transl.translate('Warning')
+        self.prompt_text = transl.translate('Do you want to leave the app?')
+        self.cancel_button_text = transl.translate('Cancel')
+        self.quit_button_text = transl.translate('Quit')
 
     def _handle_keyboard(self, window, key, *largs):
         super(LeaveAppPrompt, self)._handle_keyboard(window, key, *largs)
@@ -343,7 +335,7 @@ class XenialApp(App):
             self.set_active_guide_name_settings(self, guides.active_guide.guide_name)
         ev.bind(on_active_guide=self.set_active_guide_name_settings)
         if app_settings.exists('ui_lang_code'):
-            tr.ui_lang_code = app_settings.get('ui_lang_code')
+            transl.ui_lang_code = app_settings.get('ui_lang_code')
         ev.bind(on_ui_lang_code=self.set_translator_ui_lang_code_settings)
 
     @staticmethod

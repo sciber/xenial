@@ -10,7 +10,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
 
 from events import ev
-from translator import tr
+from translations.translator import transl
 from models.guides_model import guides
 
 from presenters.components.categoriesmenu_presenter import CategoriesMenu
@@ -60,7 +60,7 @@ class TagsMenuScreen(Screen):
             self.tagsmenu_items = []
 
     def _translate_ui(self, *args):
-        self.screen_title = tr.translate('Tags')
+        self.screen_title = transl.translate('Tags')
 
 
 class TagScreen(Screen):
@@ -97,9 +97,9 @@ class TagScreen(Screen):
             self.tag_has_tagged_articles = False
 
     def _translate_ui(self, *args):
-        self.screen_title = tr.translate('Tag')
-        self.tagged_categories_subtitle = tr.translate('Tagged categories')
-        self.tagged_articles_subtitle = tr.translate('Tagged articles')
+        self.screen_title = transl.translate('Tag')
+        self.tagged_categories_subtitle = transl.translate('Tagged categories')
+        self.tagged_articles_subtitle = transl.translate('Tagged articles')
 
     def _clear_tag_screen_items(self, *args):
         if self.tag_id:

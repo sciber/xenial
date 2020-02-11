@@ -1,6 +1,6 @@
 #:kivy 1.11.1
 
-#:import tr translator.tr
+#:import transl translations.translator.transl
 
 <LanguageSettingsMenuItem>:
     lang: ('', '')
@@ -16,7 +16,7 @@
         valign: 'middle'
         color: .2, .2, .2, 1
     CheckBox:
-        active: root.lang[1] == tr.ui_lang_code
+        active: root.lang[1] == transl.ui_lang_code
         group: 'app_lang'
         allow_no_selection: False
         size_hint_x: None

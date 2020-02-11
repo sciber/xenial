@@ -7,7 +7,7 @@ Contains NavigationPanel class which presents data to Navigation panel 'navigati
 from kivy.uix.scrollview import ScrollView
 
 from events import ev
-from translator import tr
+from translations.translator import transl
 from models.guides_model import guides
 
 
@@ -26,10 +26,10 @@ class NavigationPanel(ScrollView):
         self.has_active_guide = bool(guides.active_guide is not None)
 
     def _translate_ui(self, *args):
-        self.search_button_title = tr.translate('Search')
-        self.categories_button_title = tr.translate('Categories')
-        self.tags_button_title = tr.translate('Tags')
-        self.articles_button_title = tr.translate('Articles')
-        self.bookmarks_button_title = tr.translate('Bookmarks')
-        self.guides_button_title = tr.translate('Guides')
-        self.settings_button_title = tr.translate('Settings')
+        self.search_button_title = transl.translate('Search')
+        self.categories_button_title = transl.translate('Categories')
+        self.tags_button_title = transl.translate('Tags')
+        self.articles_button_title = transl.translate('Articles')
+        self.bookmarks_button_title = transl.translate('Bookmarks')
+        self.guides_button_title = transl.translate('Guides')
+        self.settings_button_title = transl.translate('Settings')

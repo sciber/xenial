@@ -9,7 +9,7 @@ from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
 
 from events import ev
-from translator import tr
+from translations.translator import transl
 from models.guides_model import guides
 
 from presenters.components.tagslist_presenter import TagsList
@@ -31,7 +31,7 @@ class CategoriesMenuScreen(Screen):
         self._set_categoriesmenu_items()
 
     def _translate_ui(self, *args):
-        self.screen_title = tr.translate('Categories')
+        self.screen_title = transl.translate('Categories')
 
     def _set_categoriesmenu_items(self, *args):
         if guides.active_guide is not None:
@@ -86,6 +86,6 @@ class CategoryScreen(Screen):
             self.category_id = 0
 
     def _translate_ui(self, *args):
-        self.screen_title = tr.translate('Category')
-        self.related_categories_subtitle = tr.translate('Related categories')
-        self.related_articles_subtitle = tr.translate('Related articles')
+        self.screen_title = transl.translate('Category')
+        self.related_categories_subtitle = transl.translate('Related categories')
+        self.related_articles_subtitle = transl.translate('Related articles')

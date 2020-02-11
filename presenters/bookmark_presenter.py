@@ -9,7 +9,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 
 from events import ev
-from translator import tr
+from translations.translator import transl
 from models.guides_model import guides
 
 
@@ -67,4 +67,4 @@ class BookmarksMenuScreen(Screen):
             self.bookmarksmenu_items = []
 
     def _translate_ui(self, *args):
-        self.screen_title = tr.translate('Bookmarks')
+        self.screen_title = transl.translate('Bookmarks')

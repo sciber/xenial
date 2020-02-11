@@ -15,7 +15,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 
 from events import ev
-from translator import tr
+from translations.translator import transl
 from models.guides_model import guides
 
 from presenters.components.tagslist_presenter import TagsList
@@ -35,9 +35,9 @@ class GuidesMenuItem(BoxLayout):
         self.guide_description = guide_description
         self.guide_lang = guide_lang
         self.guide_from_place = guide_from_place
-        self.guide_from_place_label = (tr.translate('From') + ': [b]{}[/b]').format(self.guide_from_place)
+        self.guide_from_place_label = (transl.translate('From') + ': [b]{}[/b]').format(self.guide_from_place)
         self.guide_to_place = guide_to_place
-        self.guide_to_place_label = (tr.translate('To') + ': [b]{}[/b]').format(self.guide_to_place)
+        self.guide_to_place_label = (transl.translate('To') + ': [b]{}[/b]').format(self.guide_to_place)
         self.is_active_guide = (guides.active_guide is not None and self.guide_name == guides.active_guide.guide_name)
         ev.bind(on_active_guide=self._check_is_guide_active)
         ev.bind(on_ui_lang_code=self._translate_ui)
@@ -52,8 +52,8 @@ class GuidesMenuItem(BoxLayout):
         self.is_active_guide = guides.active_guide is not None and self.guide_name == guides.active_guide.guide_name
 
     def _translate_ui(self, *args):
-        self.guide_from_place_label = (tr.translate('From') + ': [b]{}[/b]').format(self.guide_from_place)
-        self.guide_to_place_label = (tr.translate('To') + ': [b]{}[/b]').format(self.guide_to_place)
+        self.guide_from_place_label = (transl.translate('From') + ': [b]{}[/b]').format(self.guide_from_place)
+        self.guide_to_place_label = (transl.translate('To') + ': [b]{}[/b]').format(self.guide_to_place)
 
 
 class GuidesMenuScreen(Screen):
@@ -84,8 +84,8 @@ class GuidesMenuScreen(Screen):
         self.guidesmenu_items = guides.guides_list
 
     def _translate_ui(self, *args):
-        self.screen_title = tr.translate('Guides')
-        self.import_button_text = tr.translate('Import guide')
+        self.screen_title = transl.translate('Guides')
+        self.import_button_text = transl.translate('Import guide')
 
 
 class LoadGuidePopup(Popup):
@@ -96,9 +96,9 @@ class LoadGuidePopup(Popup):
 
     def __init__(self, **kwargs):
         super(LoadGuidePopup, self).__init__(**kwargs)
-        self.title = tr.translate('Select guide (zip) archive file')
-        self.cancel_button_text = tr.translate('Cancel')
-        self.load_button_text = tr.translate('Load')
+        self.title = transl.translate('Select guide (zip) archive file')
+        self.cancel_button_text = transl.translate('Cancel')
+        self.load_button_text = transl.translate('Load')
 
     @staticmethod
     def load_guide(archive):
@@ -128,9 +128,9 @@ class GuideLoadFailedWarning(Popup):
 
     def __init__(self, archive, **kwargs):
         super(GuideLoadFailedWarning, self).__init__(**kwargs)
-        self.message = tr.translate('"[b]{}[/b]"\n guide load failed!').format(os.path.basename(archive))
-        self.title = tr.translate('Error')
-        self.ok_button_text = tr.translate('OK')
+        self.message = transl.translate('"[b]{}[/b]"\n guide load failed!').format(os.path.basename(archive))
+        self.title = transl.translate('Error')
+        self.ok_button_text = transl.translate('OK')
 
     def _handle_keyboard(self, window, key, *largs):
         super(GuideLoadFailedWarning, self)._handle_keyboard(window, key, *largs)
@@ -182,11 +182,11 @@ class GuideScreen(Screen):
             self.guide_name = ''
 
     def _translate_ui(self, *args):
-        self.screen_title = tr.translate('Guide')
-        self.lang_name_label = tr.translate('Language') + ': [b]{}[/b]'.format(self.guide_lang[0])
-        self.from_place_label = tr.translate('From') + ': [b]{}[/b]'.format(self.guide_from_place)
-        self.to_place_label = tr.translate('To') + ': [b]{}[/b]'.format(self.guide_to_place)
-        self.delete_guide_button_text = tr.translate('Delete guide')
+        self.screen_title = transl.translate('Guide')
+        self.lang_name_label = transl.translate('Language') + ': [b]{}[/b]'.format(self.guide_lang[0])
+        self.from_place_label = transl.translate('From') + ': [b]{}[/b]'.format(self.guide_from_place)
+        self.to_place_label = transl.translate('To') + ': [b]{}[/b]'.format(self.guide_to_place)
+        self.delete_guide_button_text = transl.translate('Delete guide')
 
 
 class RemoveGuideWarningPopup(Popup):
@@ -198,10 +198,10 @@ class RemoveGuideWarningPopup(Popup):
     def __init__(self, guide_name, guide_title, **kwargs):
         super(RemoveGuideWarningPopup, self).__init__(**kwargs)
         self.guide_name = guide_name
-        self.title = tr.translate('Warning')
-        self.message = (tr.translate('Delete guide') + '\n"[b]{}[/b]"?').format(guide_title)
-        self.cancel_button_text = tr.translate('Cancel')
-        self.delete_button_text = tr.translate('Delete')
+        self.title = transl.translate('Warning')
+        self.message = (transl.translate('Delete guide') + '\n"[b]{}[/b]"?').format(guide_title)
+        self.cancel_button_text = transl.translate('Cancel')
+        self.delete_button_text = transl.translate('Delete')
 
     def unload_guide(self):
         """ Unload guide from the application. """

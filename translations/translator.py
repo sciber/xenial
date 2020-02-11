@@ -1,4 +1,14 @@
-translations = {
+"""
+UI translator
+=============
+Provides single instance of UITranslator class which translates keys in TRANSLATIONS dictionary into corresponding
+value according to the instance's `ui_lang_code` value.
+"""
+
+AVAILABLE_LANGUAGES = [('English', 'en'),
+                       ('Slovenčina', 'sk')]
+
+TRANSLATIONS = {
     'Prompt': {
         'en': 'Prompt',
         'sk': 'Otázka'
@@ -147,15 +157,18 @@ translations = {
 
 
 class UITranslator:
-    LANGUAGES = [('English', 'en'),
-                 ('Slovenčina', 'sk')]
+    """
+    Provides functionality for translation of the application's UI to `AVAILABLE LANGUAGES`.
+    """
 
     ui_lang_code = 'en'
 
     def translate(self, phrase):
-        if phrase not in translations or self.ui_lang_code not in translations[phrase]:
+        """ Translates `phrase` into language defined by `ui_lang_code` attribute. """
+
+        if phrase not in TRANSLATIONS or self.ui_lang_code not in TRANSLATIONS[phrase]:
             return phrase
-        return translations[phrase][self.ui_lang_code]
+        return TRANSLATIONS[phrase][self.ui_lang_code]
 
 
-tr = UITranslator()
+transl = UITranslator()
