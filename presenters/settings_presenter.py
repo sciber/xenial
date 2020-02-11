@@ -7,7 +7,7 @@ Contains SettingsScreen class which presents data to the 'settings_screen.kv' sc
 from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 
-from events import ev
+from events.global_events import ev
 from translations.translator import AVAILABLE_LANGUAGES, transl
 
 

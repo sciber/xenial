@@ -14,7 +14,7 @@ from kivy.uix.screenmanager import Screen
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.popup import Popup
 
-from events import ev
+from events.global_events import ev
 from translations.translator import transl
 from models.guides_model import guides
 

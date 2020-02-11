@@ -4,20 +4,16 @@ import kivy
 
 from kivy.app import App
 from kivy.lang.builder import Builder
+from kivy.base import EventLoop
+from kivy.uix.popup import Popup
 
 from kivy.garden.navigationdrawer import NavigationDrawer
 
 from settings import app_settings
-from events import ev
+from events.global_events import ev
 from translations.translator import transl
 from models.guides_model import guides
 from history import hist
-
-from kivy.base import EventLoop
-from kivy.uix.popup import Popup
-
-
-# from models import guides, bookmarks
 
 from presenters.log_presenter import LogScreen
 from presenters.category_presenter import CategoriesMenuScreen, CategoryScreen
@@ -248,7 +244,6 @@ class ApplicationRoot(NavigationDrawer):
         self.sm.current = 'articlesmenu'
 
     def show_article_screen(self, article_id, search_results=None, is_prev_screen=False):
-        print(article_id, search_results, is_prev_screen)
         if not is_prev_screen:
             self._push_prev_screen_to_history()
             self.sm.transition.direction = 'left'

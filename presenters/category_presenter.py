@@ -8,7 +8,7 @@ Contains CategoriesMenuScreen and CategoryScreen classes presenting data to the 
 from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
 
-from events import ev
+from events.global_events import ev
 from translations.translator import transl
 from models.guides_model import guides
 

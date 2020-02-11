@@ -8,7 +8,7 @@ Contains ArticlesMenuScreen, ArticleScreen classes which present data to the 'ar
 from kivy.properties import NumericProperty
 from kivy.uix.screenmanager import Screen
 
-from events import ev
+from events.global_events import ev
 from translations.translator import transl
 from models.guides_model import guides
 

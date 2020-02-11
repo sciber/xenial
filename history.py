@@ -1,4 +1,4 @@
-from events import ev
+from events.global_events import ev
 from models.guides_model import guides
 
 
