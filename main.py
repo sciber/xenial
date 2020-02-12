@@ -10,7 +10,6 @@ import kivy
 from kivy.app import App
 from kivy.lang.builder import Builder
 from kivy.base import EventLoop
-from kivy.uix.popup import Popup
 
 from kivy.garden.navigationdrawer import NavigationDrawer
 
@@ -22,6 +21,7 @@ from history.screens_history import hist
 from models.guides_model import guides
 
 from presenters.components.navigationpanel_presenter import NavigationPanel
+from presenters.components.leaveappprompt_presenter import LeaveAppPrompt
 from presenters.search_presenter import SearchScreen
 from presenters.category_presenter import CategoriesMenuScreen, CategoryScreen
 from presenters.article_presenter import ArticlesMenuScreen, ArticleScreen
@@ -67,26 +67,11 @@ Builder.load_string('''
 ''')
 
 
-class LeaveAppPrompt(Popup):
-    def __init__(self, **kwargs):
-        super(LeaveAppPrompt, self).__init__(**kwargs)
-        ev.bind(on_ui_lang_code=self._translate_ui)
-        self._translate_ui()
-
-    def _translate_ui(self, *args):
-        self.title = transl.translate('Warning')
-        self.prompt_text = transl.translate('Do you want to leave the app?')
-        self.cancel_button_text = transl.translate('Cancel')
-        self.quit_button_text = transl.translate('Quit')
-
-    def _handle_keyboard(self, window, key, *largs):
-        super(LeaveAppPrompt, self)._handle_keyboard(window, key, *largs)
-        if key == 27:
-            self.dismiss()
-            return True
-
-
 class ApplicationRoot(NavigationDrawer):
+    """
+    Stores the application's main logic.
+    """
+
     def __init__(self, **kwargs):
         super(ApplicationRoot, self).__init__(**kwargs)
         EventLoop.window.bind(on_keyboard=self.key_handler)
@@ -195,40 +180,50 @@ class ApplicationRoot(NavigationDrawer):
             self.show_guidesmenu_screen()
 
     def key_handler(self, window, key, *largs):
+        """ Manages showing previous screen after pressing Esc/Back button
+            (unless the effect si defined in an underlying widget). """
+
         if key == 27:
             prev_screen = hist.pop_screen()
-
             if prev_screen is None:
                 LeaveAppPrompt().open()
                 return True
-
             if prev_screen[0] == 'article':
                 self.show_article_screen(prev_screen[1], is_prev_screen=True)
             elif prev_screen[0] == 'category':
                 self.show_category_screen(prev_screen[1], is_prev_screen=True)
             elif prev_screen[0] == 'tag':
                 self.show_tag_screen(prev_screen[1], is_prev_screen=True)
-
             return True
 
     def show_log_screen(self):
+        """ Shows the log screen. """
+
         self._push_prev_screen_to_history()
         self.log_screen.ids.logslist_widget.parent.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'log'
 
     def show_search_screen(self):
+        """ Shows the search screen. """
+
         self._push_prev_screen_to_history()
         self.sm.transition.direction = 'left'
         self.sm.current = 'search'
 
     def show_categoriesmenu_screen(self):
+        """ Shows the category menu screen. """
+
         self._push_prev_screen_to_history()
         self.categoriesmenu_screen.ids.categoriesmenu_container.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'categoriesmenu'
 
     def show_category_screen(self, category_id, is_prev_screen=False):
+        """ Shows screen for a particular category defined by its `category_id` parameter.
+            Category screen identifier is stored in the application screens history list
+            (if it is not previously visited screen invoked by moving back in the history). """
+
         if not is_prev_screen:
             self._push_prev_screen_to_history()
             self.sm.transition.direction = 'left'
@@ -244,12 +239,18 @@ class ApplicationRoot(NavigationDrawer):
         self._remove_current_screen_from_history()
 
     def show_articlesmenu_screen(self):
+        """ Shows the articles menu screen. """
+
         self._push_prev_screen_to_history()
         self.articlesmenu_screen.ids.articlesmenu_container.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'articlesmenu'
 
     def show_article_screen(self, article_id, search_results=None, is_prev_screen=False):
+        """ Shows screen for a particular article defined by its `article_id` parameter.
+            Article screen identifier is stored in the application screens history list
+            (if it is not previously visited screen invoked by moving back in the history). """
+
         if not is_prev_screen:
             self._push_prev_screen_to_history()
             self.sm.transition.direction = 'left'
@@ -269,18 +270,26 @@ class ApplicationRoot(NavigationDrawer):
         self._remove_current_screen_from_history()
 
     def show_bookmarksmenu_screen(self):
+        """ Shows the bookmarks menu screen. """
+
         self._push_prev_screen_to_history()
         self.bookmarksmenu_screen.ids.bookmarksmenu_widget.parent.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'bookmarksmenu'
 
     def show_tagsmenu_screen(self):
+        """ Shows the tags menu screen. """
+
         self._push_prev_screen_to_history()
         self.tagsmenu_screen.ids.tagsmenu_widget.parent.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'tagsmenu'
 
     def show_tag_screen(self, tag_id, is_prev_screen=False):
+        """ Shows screen for a particular tag defined by its `tag_id` parameter.
+            Tag screen identifier is stored in the application screens history list
+            (if it is not previously visited screen invoked by moving back in the history). """
+
         if not is_prev_screen:
             self._push_prev_screen_to_history()
             self.sm.transition.direction = 'left'
@@ -296,12 +305,16 @@ class ApplicationRoot(NavigationDrawer):
         self._remove_current_screen_from_history()
 
     def show_guidesmenu_screen(self):
+        """ Show the guides menu screen. """
+
         self._push_prev_screen_to_history()
         self.guidesmenu_screen.ids.guidesmenu_widget.parent.scroll_y = 1
         self.sm.transition.direction = 'left'
         self.sm.current = 'guidesmenu'
 
     def show_guide_screen(self, guide_name):
+        """ Shows screen for a particular guide defined by its `guide_id` parameter. """
+
         self._push_prev_screen_to_history()
         self.guide_screen.guide_name = guide_name
         self.guide_screen.ids.screen_content_scrollview.scroll_y = 1
@@ -309,6 +322,8 @@ class ApplicationRoot(NavigationDrawer):
         self.sm.current = 'guide'
 
     def show_settings_screen(self):
+        """ Shows the settings screen. """
+
         self._push_prev_screen_to_history()
         self.sm.transition.direction = 'left'
         self.sm.current = 'settings'
@@ -331,6 +346,11 @@ class ApplicationRoot(NavigationDrawer):
 
 
 class XenialApp(App):
+    """
+    Is kivy application class; it sets application root.
+    Reads or (if not defined) stores the application's settings.
+    """
+
     def __init__(self, **kwargs):
         super(XenialApp, self).__init__(**kwargs)
         if app_settings.exists('active_guide_name') and guides.does_guide_exist(app_settings.get('active_guide_name')):
@@ -344,6 +364,8 @@ class XenialApp(App):
 
     @staticmethod
     def set_active_guide_name_settings(*args):
+        """ Uses settings management to store the application's active guide. """
+
         if guides.active_guide is not None:
             app_settings.set('active_guide_name', guides.active_guide.guide_name)
         else:
@@ -351,9 +373,13 @@ class XenialApp(App):
 
     @staticmethod
     def set_translator_ui_lang_code_settings(instance, lang_code):
+        """ Uses settings management to store the application's UI language. """
+
         app_settings.set('ui_lang_code', lang_code)
 
     def build(self):
+        """ Returns the application's root widget. """
+
         start_time = time.time()
         self.root = ApplicationRoot()
         stop_time = time.time()
