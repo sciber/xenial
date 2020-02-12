@@ -9,6 +9,13 @@
     orientation: 'horizontal'
     size_hint_y: None
     height: '120dp'
+    padding: '4dp', '10dp'
+    canvas:
+        Color:
+            rgba: .5, .5, .5, 1
+        Line:
+            width: 1
+            points: (self.x + dp(12), self.y - dp(2), self.x + self.width - dp(12), self.y - dp(2))
     Button:
         background_normal: ''
         on_release: app.root.show_article_screen(root.bookmark_article_id)
@@ -38,7 +45,7 @@
                     size_hint_y: .4
                     text_size: self.size
                     halign: 'left'
-                    valign: 'bottom'
+                    valign: 'top'
                 Label:
                     text: root.bookmark_article_synopsis
                     markup: True

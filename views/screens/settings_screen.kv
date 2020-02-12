@@ -8,14 +8,18 @@
     size_hint_y: None
     height: '50dp'
     padding: '16dp', '8dp', '8dp', '8dp'
-    Label:
+    Button:
         text: root.lang[0]
         font_size: '18dp'
         text_size: self.width, self.height
         halign: 'left'
         valign: 'middle'
+        background_normal: ''
+        background_down: ''
         color: .2, .2, .2, 1
+        on_release: ui_lang_checkbox.active = True
     CheckBox:
+        id: ui_lang_checkbox
         active: root.lang[1] == transl.ui_lang_code
         group: 'app_lang'
         allow_no_selection: False

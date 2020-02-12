@@ -1,15 +1,11 @@
 #:kivy 1.11.1
 
-#:set categoriesmenu_item_width dp(100)
-#:set categoriesmenu_item_height dp(140)
-
 <CategoriesMenuItem>:
     category_id: 0
     category_icon: ''
     category_name: ''
-    size_hint: None, None
-    width: categoriesmenu_item_width
-    height: categoriesmenu_item_height
+    size_hint_y: None
+    height: '140dp'
     background_normal: ''
     on_release: app.root.show_category_screen(self.category_id)
     BoxLayout:
@@ -34,7 +30,7 @@
             valign: 'top'
 
 <CategoriesMenu>:
-    cols: int(self.width // categoriesmenu_item_width) or 1
+    cols: int(self.width // dp(110)) or 1
     size_hint_y: None
     height: self.minimum_height
     spacing: '4dp'

@@ -103,8 +103,10 @@ class Guide:
                         LEFT JOIN (
                             SELECT tag_id, COUNT(category_id) AS count_categories FROM tags_categories
                             GROUP BY tag_id) AS tc
-                        ON t.id=tc.tag_id; """)
+                        ON t.id=tc.tag_id
+                        ORDER BY ta.count_articles DESC, tc.count_categories DESC; """)
         tags_rows = cur.fetchall()
+        print(tags_rows)
         return [dict(zip(TAGS_KEYS, row)) for row in tags_rows]
 
     def tag_by_id(self, tag_id):
