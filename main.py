@@ -1,3 +1,8 @@
+"""
+Application initiation and root
+===============================
+"""
+
 import time
 
 import kivy
@@ -12,19 +17,19 @@ from kivy.garden.navigationdrawer import NavigationDrawer
 from events.global_events import ev
 from translations.translator import transl
 from settings.settings import app_settings
-from history import hist
+from history.screens_history import hist
 
 from models.guides_model import guides
 
-from presenters.log_presenter import LogScreen
-from presenters.category_presenter import CategoriesMenuScreen, CategoryScreen
-from presenters.tag_presenter import TagsMenuScreen, TagScreen
-from presenters.article_presenter import ArticlesMenuScreen, ArticleScreen
-from presenters.settings_presenter import SettingsScreen
 from presenters.components.navigationpanel_presenter import NavigationPanel
-from presenters.guide_presenter import GuidesMenuScreen, GuideScreen
-from presenters.bookmark_presenter import BookmarksMenuScreen
 from presenters.search_presenter import SearchScreen
+from presenters.category_presenter import CategoriesMenuScreen, CategoryScreen
+from presenters.article_presenter import ArticlesMenuScreen, ArticleScreen
+from presenters.bookmark_presenter import BookmarksMenuScreen
+from presenters.tag_presenter import TagsMenuScreen, TagScreen
+from presenters.guide_presenter import GuidesMenuScreen, GuideScreen
+from presenters.settings_presenter import SettingsScreen
+from presenters.log_presenter import LogScreen
 
 kivy.require('1.11.1')
 
