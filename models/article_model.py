@@ -49,7 +49,8 @@ class Article:
         cur.execute(""" SELECT t.id, t.name FROM tags AS t
                         INNER JOIN tags_articles AS ta
                         ON t.id=ta.tag_id
-                        WHERE ta.article_id=?; """, (self.article_id,))
+                        WHERE ta.article_id=?
+                        ORDER BY t.name; """, (self.article_id,))
         tags_rows = cur.fetchall()
         return [dict(zip(TAGS_KEYS, row)) for row in tags_rows]
 

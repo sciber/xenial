@@ -106,7 +106,6 @@ class Guide:
                         ON t.id=tc.tag_id
                         ORDER BY ta.count_articles DESC, tc.count_categories DESC; """)
         tags_rows = cur.fetchall()
-        print(tags_rows)
         return [dict(zip(TAGS_KEYS, row)) for row in tags_rows]
 
     def tag_by_id(self, tag_id):

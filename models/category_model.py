@@ -24,7 +24,8 @@ class Category:
         cur.execute(""" SELECT t.id, t.name FROM tags AS t
                         INNER JOIN tags_categories AS tc
                         ON t.id=tc.tag_id
-                        WHERE tc.category_id=?; """, (self.category_id,))
+                        WHERE tc.category_id=?
+                        ORDER BY t.name; """, (self.category_id,))
         tags_rows = cur.fetchall()
         return [dict(zip(TAGS_KEYS, row)) for row in tags_rows]
 

@@ -1,6 +1,6 @@
 """
-Application initiation and root
-===============================
+Application initialization and the root widget
+==============================================
 """
 
 import time
