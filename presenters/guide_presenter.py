@@ -18,8 +18,6 @@ from events.global_events import ev
 from translations.translator import transl
 from models.guides_model import guides
 
-from presenters.components.tagslist_presenter import TagsList
-
 
 class GuidesMenuItem(BoxLayout):
     """
@@ -151,9 +149,9 @@ class GuideScreen(Screen):
         self.guide_lang = ('', '')
         self.guide_from_place = ''
         self.guide_to_place = ''
-        self.tagslist_widget = TagsList()
-        self.ids.tagslist_container.add_widget(self.tagslist_widget)
+        self.is_active_guide = False
         ev.bind(on_ui_lang_code=self._translate_ui)
+        ev.bind(on_active_guide=self._update_activation_button)
 
     def on_guide_name(self, instance, guide_name):
         """ Updates object attributes according to `guide_name` attribute/argument. """
@@ -166,7 +164,7 @@ class GuideScreen(Screen):
             self.guide_lang = guide.guide_lang
             self.guide_from_place = guide.guide_from_place
             self.guide_to_place = guide.guide_to_place
-            self.tagslist_widget.tagslist_items = guide.tags_list()
+            self._update_activation_button()
         else:
             self.guide_icon = ''
             self.guide_title = ''
@@ -174,8 +172,15 @@ class GuideScreen(Screen):
             self.guide_lang = ('', '')
             self.guide_from_place = ''
             self.guide_to_place = ''
-            self.tagslist_widget.tagslist_items = []
+            self.is_active_guide = False
         self._translate_ui()
+
+    def activate_guide(self):
+        guides.set_active_guide(self.guide_name)
+        ev.dispatch('on_active_guide')
+
+    def _update_activation_button(self, *args):
+        self.is_active_guide = self.guide_name == guides.active_guide.guide_name
 
     def _clear_guide_screen_items(self, *args):
         if self.guide_name:
@@ -186,6 +191,8 @@ class GuideScreen(Screen):
         self.lang_name_label = transl.translate('Language') + ': [b]{}[/b]'.format(self.guide_lang[0])
         self.from_place_label = transl.translate('From') + ': [b]{}[/b]'.format(self.guide_from_place)
         self.to_place_label = transl.translate('To') + ': [b]{}[/b]'.format(self.guide_to_place)
+        self.activate_guide_button_text = transl.translate('Activate the guide')
+        self.guide_is_active_label_text = transl.translate('The guide is active')
         self.delete_guide_button_text = transl.translate('Delete guide')
 
 

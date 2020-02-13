@@ -42,11 +42,14 @@
     lang_name_label: 'Language:'
     from_place_label: 'From:'
     to_place_label: 'To:'
+    activate_guide_button_text: 'Activate the guide'
+    guide_is_active_label_text: 'The guide is active'
     delete_guide_button_text: 'Delete guide'
     guide_name: ''
     guide_icon: ''
     guide_title: ''
     guide_description: ''
+    is_active_guide: False
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -65,62 +68,66 @@
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                spacing: '8dp'
+                spacing: '16dp'
                 padding: '4dp'
                 BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    height: '80dp'
-                    AnchorLayout:
-                        anchor_x: 'center'
-                        anchor_y: 'center'
-                        size_hint_x: None
-                        width: self.height
-                        padding: '8dp'
-                        Image:
-                            source: root.guide_icon
-                    Label:
-                        text: root.guide_title
-                        font_size: '24dp'
-                        bold: True
-                        text_size: self.size
-                        valign: 'middle'
-                        color: .2, .2, .2, 1
-                Label:
-                    text: root.lang_name_label
-                    markup: True
-                    text_size: self.size
-                    font_size: '18dp'
-                    halign: 'left'
-                    valign: 'middle'
-                    size_hint_y: None
-                    height: '20dp'
-                    color: .4, .4, .4, 1
-                Label:
-                    text: root.from_place_label
-                    markup: True
-                    text_size: self.size
-                    font_size: '18dp'
-                    halign: 'left'
-                    valign: 'middle'
-                    size_hint_y: None
-                    height: '20dp'
-                    color: .4, .4, .4, 1
-                Label:
-                    text: root.to_place_label
-                    markup: True
-                    text_size: self.size
-                    font_size: '18dp'
-                    halign: 'left'
-                    valign: 'middle'
-                    size_hint_y: None
-                    height: '20dp'
-                    color: .4, .4, .4, 1
-                BoxLayout:
-                    id: tagslist_container
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
+                    spacing: '8dp'
+                    BoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: guide_title_label.height if guide_title_label.height > dp(110) else '110dp'
+                        AnchorLayout:
+                            anchor_x: 'center'
+                            anchor_y: 'top'
+                            size_hint_x: None
+                            width: '110dp'
+                            padding: '8dp'
+                            Image:
+                                source: root.guide_icon
+                                size_hint_y: None
+                                height: self.width
+                        Label:
+                            id: guide_title_label
+                            text: root.guide_title
+                            font_size: '24dp'
+                            bold: True
+                            text_size: self.width, None
+                            height: self.texture_size[1]
+                            valign: 'top'
+                            color: .2, .2, .2, 1
+                    Label:
+                        text: root.lang_name_label
+                        markup: True
+                        text_size: self.size
+                        font_size: '18dp'
+                        halign: 'left'
+                        valign: 'middle'
+                        size_hint_y: None
+                        height: '20dp'
+                        color: .4, .4, .4, 1
+                    Label:
+                        text: root.from_place_label
+                        markup: True
+                        text_size: self.size
+                        font_size: '18dp'
+                        halign: 'left'
+                        valign: 'middle'
+                        size_hint_y: None
+                        height: '20dp'
+                        color: .4, .4, .4, 1
+                    Label:
+                        text: root.to_place_label
+                        markup: True
+                        text_size: self.size
+                        font_size: '18dp'
+                        halign: 'left'
+                        valign: 'middle'
+                        size_hint_y: None
+                        height: '20dp'
+                        color: .4, .4, .4, 1
                 Label:
                     text: root.guide_description
                     markup: True
@@ -129,6 +136,30 @@
                     height: self.texture_size[1]
                     font_size: '18dp'
                     color: .2, .2, .2, 1
+        Button:
+            text: root.activate_guide_button_text
+            font_size: '18dp'
+            color: 0, 0, 0, 1
+            background_normal: ''
+            background_color: 0, .6, .4, 1
+            size_hint_y: None
+            height: '60dp' if not root.is_active_guide else 0
+            opacity: 1 if not root.is_active_guide else 0
+            disabled: root.is_active_guide
+            on_release: root.activate_guide()
+        Label:
+            text: root.guide_is_active_label_text
+            font_size: '18dp'
+            color: 1, 1, 1, 1
+            size_hint_y: None
+            height: '60dp' if root.is_active_guide else 0
+            opacity: 1 if root.is_active_guide else 0
+            canvas.before:
+                Color:
+                    rgba: 0, .6, .4, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
         Button:
             text: root.delete_guide_button_text
             font_size: '18dp'

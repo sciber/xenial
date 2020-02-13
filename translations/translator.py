@@ -61,6 +61,14 @@ TRANSLATIONS = {
         'en': 'Guide',
         'sk': 'Sprievodca'
     },
+    'Activate the guide': {
+        'en': 'Activate the guide',
+        'sk': 'Aktivuj sprievodcu'
+    },
+    'The guide is active': {
+        'en': 'The guide is active',
+        'sk': 'Sprievodca je aktívny'
+    },
     'Delete guide': {
         'en': 'Delete guide',
         'sk': 'Zmazať sprievodcu'
