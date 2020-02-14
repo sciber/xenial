@@ -6,10 +6,10 @@ Contains CategoriesMenu class presenting data to the 'categoriesmenu.kv' compone
 
 from kivy.properties import ListProperty
 from kivy.uix.gridlayout import GridLayout
-from kivy.uix.button import Button
+from kivy.uix.anchorlayout import AnchorLayout
 
 
-class CategoriesMenuItem(Button):
+class CategoriesMenuItem(AnchorLayout):
     """
     Presents data to the Categories menu item view component.
     """

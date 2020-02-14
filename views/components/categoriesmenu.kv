@@ -4,30 +4,35 @@
     category_id: 0
     category_icon: ''
     category_name: ''
+    anchor_x: 'center'
+    anchor_y: 'center'
     size_hint_y: None
     height: '140dp'
-    background_normal: ''
-    on_release: app.root.show_category_screen(self.category_id)
-    BoxLayout:
-        orientation: 'vertical'
-        pos: self.parent.pos
-        size: self.parent.size
-        AnchorLayout:
-            anchor_x: 'center'
-            anchor_y: 'center'
-            size_hint_y: .6
-            padding: '8dp'
-            Image:
-                source: root.category_icon if root.category_icon else None
-        Label:
-            text: root.category_name
-            color: .2, .2, .2, 1
-            font_size: '16dp'
-            size_hint_y: .4
-            text_size: self.size[0] - dp(8), self.size[1]
-            padding: '4dp', 0
-            halign: 'center'
-            valign: 'top'
+    Button:
+        size_hint_x: None
+        width: '110dp'
+        background_normal: ''
+        on_release: app.root.show_category_screen(root.category_id)
+        BoxLayout:
+            orientation: 'vertical'
+            pos: self.parent.pos
+            size: self.parent.size
+            AnchorLayout:
+                anchor_x: 'center'
+                anchor_y: 'center'
+                size_hint_y: .6
+                padding: '8dp'
+                Image:
+                    source: root.category_icon if root.category_icon else None
+            Label:
+                text: root.category_name
+                color: .2, .2, .2, 1
+                font_size: '16dp'
+                size_hint_y: .4
+                text_size: self.size[0] - dp(8), self.size[1]
+                padding: '4dp', 0
+                halign: 'center'
+                valign: 'top'
 
 <CategoriesMenu>:
     cols: int(self.width // dp(110)) or 1
