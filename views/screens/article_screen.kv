@@ -38,90 +38,119 @@
                 BoxLayout:
                     orientation: 'horizontal'
                     size_hint_y: None
-                    height: '80dp'
+                    height: article_title_label.height if article_title_label.height > dp(100) else '100dp'
+                    spacing: '8dp'
                     AnchorLayout:
                         anchor_x: 'center'
-                        anchor_y: 'center'
+                        anchor_y: 'top'
                         size_hint_x: None
-                        width: self.height
+                        width: '80dp'
                         padding: '8dp'
                         Image:
                             source: root.article_icon
+                            size_hint_y: None
+                            height: self.width
                     Label:
+                        id: article_title_label
                         text: root.article_title
                         font_size: '24dp'
                         bold: True
-                        text_size: self.size
-                        valign: 'middle'
+                        text_size: self.width, None
+                        height: self.texture_size[1]
+                        valign: 'top'
                         color: .2, .2, .2, 1
                 BoxLayout:
                     id: tagslist_container
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
-                Label:
-                    text: root.article_synopsis
-                    markup: True
-                    text_size: self.width, None
+                BoxLayout:
                     size_hint_y: None
-                    height: self.texture_size[1]
-                    font_size: '18dp'
-                    color: .2, .2, .2, 1
-                    on_ref_press: app.root.show_article_screen(args[1])
+                    height: self.minimum_height
+                    padding: 0, '10dp'
+                    Label:
+                        text: root.article_synopsis
+                        markup: True
+                        text_size: self.width, None
+                        size_hint_y: None
+                        height: self.texture_size[1]
+                        font_size: '18dp'
+                        color: .2, .2, .2, 1
+                        on_ref_press: app.root.show_article_screen(args[1])
                 BoxLayout:
                     id: articlecontent_container
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
                 BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    height: '40dp' if root.article_has_categories else 0
-                    opacity: 1 if root.article_has_categories else 0
-                    Image:
-                        pos: self.parent.pos
-                        source: 'assets/img/category.png'
-                        size_hint_x: None
-                        width: self.height
-                        color: 1, 1, 1, .5
-                    Label:
-                        text: root.related_categories_subtitle
-                        font_size: '18dp'
-                        bold: True
-                        padding: '8dp', '8dp'
-                        text_size: self.size
-                        halign: 'left'
-                        valign: 'middle'
-                        color: .6, .6, .6, 1
-                BoxLayout:
-                    id: categoriesmenu_container
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
-                BoxLayout:
-                    orientation: 'horizontal'
-                    size_hint_y: None
-                    height: '40dp' if root.article_has_related_articles else 0
-                    opacity: 1 if root.article_has_related_articles else 0
-                    Image:
-                        pos: self.parent.pos
-                        source: 'assets/img/article.png'
-                        size_hint_x: None
-                        width: self.height
-                        color: 1, 1, 1, .5
-                    Label:
-                        text: root.related_articles_subtitle
-                        font_size: '18dp'
-                        bold: True
-                        padding: '8dp', '8dp'
+                    spacing: '10dp'
+                    padding: (0, '10dp') if root.article_has_categories else (0, 0)
+                    AnchorLayout:
+                        anchor_x: 'center'
                         size_hint_y: None
-                        height: '40dp'
-                        text_size: self.width, self.height
-                        halign: 'left'
-                        valign: 'middle'
-                        color: .6, .6, .6, 1
+                        height: '40dp' if root.article_has_categories else 0
+                        opacity: 1 if root.article_has_categories else 0
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            size_hint_x: None
+                            width: self.minimum_width
+                            Image:
+                                pos: self.parent.pos
+                                source: 'assets/img/category.png'
+                                size_hint_x: None
+                                width: self.height
+                                color: 1, 1, 1, .5
+                            Label:
+                                text: root.related_categories_subtitle
+                                font_size: '20dp'
+                                bold: True
+                                padding: '8dp', '8dp'
+                                size_hint_x: None
+                                width: self.texture_size[0]
+                                halign: 'left'
+                                valign: 'middle'
+                                color: .6, .6, .6, 1
+                    BoxLayout:
+                        id: categoriesmenu_container
+                        orientation: 'vertical'
+                        size_hint_y: None
+                        height: self.minimum_height
                 BoxLayout:
-                    id: articlesmenu_container
                     orientation: 'vertical'
                     size_hint_y: None
                     height: self.minimum_height
+                    spacing: '10dp'
+                    padding: (0, '10dp') if root.article_has_related_articles else (0, 0)
+                    AnchorLayout:
+                        anchor_x: 'center'
+                        size_hint_y: None
+                        height: '40dp' if root.article_has_related_articles else 0
+                        opacity: 1 if root.article_has_related_articles else 0
+                        BoxLayout:
+                            orientation: 'horizontal'
+                            size_hint_x: None
+                            width: self.minimum_width
+                            Image:
+                                pos: self.parent.pos
+                                source: 'assets/img/article.png'
+                                size_hint_x: None
+                                width: self.height
+                                color: 1, 1, 1, .5
+                            Label:
+                                text: root.related_articles_subtitle
+                                font_size: '20dp'
+                                bold: True
+                                padding: '8dp', '8dp'
+                                size_hint_x: None
+                                width: self.texture_size[0]
+                                halign: 'left'
+                                valign: 'middle'
+                                color: .6, .6, .6, 1
+                    BoxLayout:
+                        id: articlesmenu_container
+                        orientation: 'vertical'
+                        size_hint_y: None
+                        height: self.minimum_height

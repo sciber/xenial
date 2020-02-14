@@ -2,29 +2,32 @@
 
 <ArticleSubtitle>:
     subtitle_text: ''
-    text: self.subtitle_text
-    font_size: '20dp'
-    text_size: self.size
-    bold: True
-    markup: True
-    halign: 'left'
-    valign: 'bottom'
-    color: .2, .2, .2, 1
+    content_order: 0
+    orientation: 'vertical'
     size_hint_y: None
-    height: '60dp'
+    height: self.minimum_height
+    padding: (0, '20dp', 0, 0) if self.content_order > 0 else (0, 0)
+    Label:
+        text: root.subtitle_text + str(root.content_order)
+        font_size: '18dp'
+        text_size: self.width, None
+        bold: True
+        markup: True
+        color: .2, .2, .2, 1
+        size_hint_y: None
+        height: self.texture_size[1]
+        on_ref_press: app.root.show_article_screen(args[1])
 
 <ArticleParagraph>:
     paragraph_text: ''
     text: self.paragraph_text
-    markup: True
     font_size: '16dp'
     text_size: self.width, None
+    markup: True
     color: .2, .2, .2, 1
     size_hint_y: None
     height: self.texture_size[1]
-    on_ref_press:
-        print(args[1])
-        app.root.show_article_screen(args[1])
+    on_ref_press: app.root.show_article_screen(args[1])
 
 <ArticleImage>:
     image_source: ''
@@ -32,12 +35,19 @@
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
+    padding: '6dp'
     spacing: '8dp'
+    canvas:
+        Color:
+            rgba: .9, .9, .9, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
     Image:
         source: root.image_source
         size_hint: None, None
         width: self.parent.width - (2 * self.parent.padding[0])
-        height: self.parent.width/self.image_ratio
+        height: self.width/self.image_ratio
         keep_ratio: True
         allow_stretch: True
     Label:
@@ -59,13 +69,25 @@
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
+    padding: '6dp'
     spacing: '8dp'
+    canvas:
+        Color:
+            rgba: .9, .9, .9, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
     BoxLayout:
         orientation: 'horizontal'
         size_hint_y: None
         height: '80dp'
         padding: '4dp'
         canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
             Color:
                 rgba: .2, .2, .2, 1
             Line:
@@ -131,7 +153,14 @@
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
+    padding: '6dp'
     spacing: '8dp'
+    canvas:
+        Color:
+            rgba: .9, .9, .9, 1
+        Rectangle:
+            pos: self.pos
+            size: self.size
     BoxLayout:
         orientation: 'vertical'
         size_hint_y: None
@@ -153,6 +182,11 @@
             height: '80dp'
             padding: '4dp'
             canvas:
+                Color:
+                    rgba: 1, 1, 1, 1
+                Rectangle:
+                    pos: self.pos
+                    size: self.size
                 Color:
                     rgba: .2, .2, .2, 1
                 Line:
@@ -204,5 +238,5 @@
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
-    padding: 0, '20dp'
-    spacing: '20dp'
+    padding: 0, 0, 0, '20dp'
+    spacing: '14dp'

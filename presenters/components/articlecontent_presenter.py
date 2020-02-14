@@ -14,15 +14,16 @@ from media_connectors.audio_connector import audio
 from media_connectors.video_connector import video
 
 
-class ArticleSubtitle(Label):
+class ArticleSubtitle(BoxLayout):
     """
     Presents data to the article's subtitle view component.
     :attr `subtitle_text` is the label text.
     """
 
-    def __init__(self, subtitle_text, **kwargs):
+    def __init__(self, subtitle_text, content_order, **kwargs):
         super(ArticleSubtitle, self).__init__(**kwargs)
         self.subtitle_text = subtitle_text
+        self.content_order = content_order
 
 
 class ArticleParagraph(Label):
@@ -137,7 +138,8 @@ class ArticleContent(BoxLayout):
         self.clear_widgets()
         for content_block in articlecontent_blocks:
             if content_block['block_type'] == 'subtitle':
-                item_widget = ArticleSubtitle(subtitle_text=content_block['subtitle_text'])
+                item_widget = ArticleSubtitle(subtitle_text=content_block['subtitle_text'],
+                                              content_order=content_block['content_order'])
             elif content_block['block_type'] == 'paragraph':
                 item_widget = ArticleParagraph(paragraph_text=content_block['paragraph_text'])
             elif content_block['block_type'] == 'image':
