@@ -180,7 +180,7 @@ class GuideScreen(Screen):
         ev.dispatch('on_active_guide')
 
     def _update_activation_button(self, *args):
-        self.is_active_guide = self.guide_name == guides.active_guide.guide_name
+        self.is_active_guide = guides.active_guide is not None and self.guide_name == guides.active_guide.guide_name
 
     def _clear_guide_screen_items(self, *args):
         if self.guide_name:
