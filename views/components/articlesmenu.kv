@@ -28,9 +28,11 @@
             anchor_y: 'center'
             size_hint_x: None
             width: '80dp'
-            padding: '8dp', 0
+            padding: '8dp'
             Image:
-                source: root.article_icon if root.article_icon else None
+                source: root.article_icon
+                size_hint_x: None
+                width: '64dp'
                 size_hint_y: None
                 height: self.width
         BoxLayout:
