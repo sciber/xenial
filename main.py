@@ -3,7 +3,12 @@ Application initialization and the root widget
 ==============================================
 """
 
+import os
 import time
+
+os.environ['KIVY_IMAGE'] = 'pil'
+os.environ['KIVY_AUDIO'] = 'ffpyplayer'
+os.environ['KIVY_VIDEO'] = 'ffpyplayer'
 
 import kivy
 
