@@ -4,6 +4,8 @@ Guide's articles search presenter
 Contains SearchScreen class which presents data to the 'search_screen.kv' screen view.
 """
 
+import re
+
 from kivy.properties import ObjectProperty
 from kivy.uix.screenmanager import Screen
 from kivy.uix.button import Button
@@ -74,9 +76,11 @@ class SearchScreen(Screen):
         self.search_results_container.clear_widgets()
         if self.search_query:
             self.search_input_hint_text = self.search_query
-            search_results_rows = guides.active_guide.search_articles(('block_text:({})'.format(self.search_query),))
+            search_results_rows = guides.active_guide.search_articles((self.search_query,))
             articles_ranks_indices = {}
             for row in search_results_rows:
+                row = list(row)
+                row[4] = self._highlight_search_query(row[4], self.search_query)
                 article_id = row[0]
                 if article_id in articles_ranks_indices:
                     article_idx = articles_ranks_indices[article_id]
@@ -91,7 +95,14 @@ class SearchScreen(Screen):
         else:
             self.search_input_hint_text = transl.translate('Search active guide articles')
         self.search_results_head = transl.translate('{0} results for [b]"{1}"[/b]'.
-                                                format(len(self.articles_search_results), self.search_query))
+                                                    format(len(self.articles_search_results), self.search_query))
+
+    @staticmethod
+    def _highlight_search_query(text, query):
+        return re.sub(f'({query})',
+                      lambda matchobj: f'[color=#24AF24]{matchobj.group(1)}[/color]',
+                      text,
+                      flags=re.IGNORECASE)
 
     def _translate_ui(self, *args):
         self.screen_title = transl.translate('Search')

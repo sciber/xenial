@@ -55,10 +55,9 @@ class Guide:
         """ Search articles textual data for presence of given `query` text. """
 
         cur = self.conn.cursor()
-        cur.execute(""" SELECT article_id, block_order, block_type, block_id, 
-                            highlight(article_block_search, 4, '[color=#24AF24]', '[/color]')
+        cur.execute(""" SELECT article_id, block_order, block_type, block_id, block_text
                         FROM article_block_search
-                        WHERE article_block_search MATCH ? ORDER BY rank;""", query)
+                        WHERE block_text MATCH ?; """, query)
         return cur.fetchall()
 
     def bookmarks_list(self):
