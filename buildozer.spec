@@ -1,28 +1,28 @@
 [app]
 
 # (str) Title of your application
-title = Xenail Guide
+title = Xenial Guide
 
 # (str) Package name
 package.name = xenial
 
 # (str) Package domain (needed for android/ios packaging)
-package.domain = net.sciber
+package.domain = world.xenial
 
 # (str) Source code where the main.py live
 source.dir = .
 
 # (list) Source files to include (let empty to include all the files)
-source.include_exts = py, kv, json, png, ttf, tgz
+source.include_exts = py,kv,png,jpeg,jpg,m4a,mp4,json,zip,db
 
 # (list) List of inclusions using pattern matching
-source.include_patterns = assets/*, guides/*
+#source.include_patterns = assets/*,images/*.png
 
 # (list) Source files to exclude (let empty to not exclude anything)
-source.exclude_exts = spec
+#source.exclude_exts = spec
 
 # (list) List of directory to exclude (let empty to not exclude anything)
-source.exclude_dirs = tests, bin, venv
+source.exclude_dirs = bin,venv
 
 # (list) List of exclusions using pattern matching
 #source.exclude_patterns = license,images/*/*.jpg
@@ -36,14 +36,14 @@ version = 0.1
 
 # (list) Application requirements
 # comma separated e.g. requirements = sqlite3,kivy
-requirements = python3, kivy
+requirements = python3,kivy,sqlite3,ffpyplayer,ffpyplayer_codecs,pillow
 
 # (str) Custom source folders for requirements
 # Sets custom source for any requirements with recipes
 # requirements.source.kivy = ../../kivy
 
 # (list) Garden requirements
-garden_requirements = navigationdrawer
+#garden_requirements =
 
 # (str) Presplash of the application
 presplash.filename = %(source.dir)s/presplash.png
@@ -87,7 +87,6 @@ android.presplash_color = #FFFFFF
 # (list) Permissions
 android.permissions = INTERNET
 
-
 # (int) Target Android API, should be as high as possible.
 #android.api = 27
 
@@ -104,7 +103,7 @@ android.permissions = INTERNET
 #android.ndk_api = 21
 
 # (bool) Use --private data storage (True) or --dir public storage (False)
-#android.private_storage = True
+android.private_storage = True
 
 # (str) Android NDK directory (if empty, it will be automatically downloaded.)
 #android.ndk_path =
@@ -159,6 +158,12 @@ android.permissions = INTERNET
 # (list) Java classes to add as activities to the manifest.
 #android.add_activites = com.example.ExampleActivity
 
+# (str) python-for-android fork to use, defaults to kivy
+p4a.fork = sciber
+
+# (str) python-for-android branch to use, defaults to master
+p4a.branch = for-xenial
+
 # (str) OUYA Console category. Should be one of GAME or APP
 # If you leave this blank, OUYA support will not be enabled
 #android.ouya.category = GAME
@@ -175,7 +180,6 @@ android.permissions = INTERNET
 # (list) Android additional libraries to copy into libs/armeabi
 #android.add_libs_armeabi = libs/android/*.so
 #android.add_libs_armeabi_v7a = libs/android-v7/*.so
-#android.add_libs_arm64_v8a = libs/android-v8/*.so
 #android.add_libs_x86 = libs/android-x86/*.so
 #android.add_libs_mips = libs/android-mips/*.so
 
@@ -205,12 +209,6 @@ android.arch = armeabi-v7a
 #
 # Python for android (p4a) specific
 #
-
-# (str) python-for-android fork to use, defaults to upstream (kivy)
-#p4a.fork = kivy
-
-# (str) python-for-android branch to use, defaults to master
-#p4a.branch = master
 
 # (str) python-for-android git clone directory (if empty, it will be automatically cloned from github)
 #p4a.source_dir =
