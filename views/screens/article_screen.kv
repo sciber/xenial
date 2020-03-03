@@ -44,10 +44,12 @@
                         anchor_x: 'center'
                         anchor_y: 'top'
                         size_hint_x: None
-                        width: '80dp'
+                        width: self.height
                         padding: '8dp'
                         Image:
                             source: root.article_icon
+                            size_hint_x: None
+                            width: '64dp'
                             size_hint_y: None
                             height: self.width
                     Label:
@@ -55,6 +57,7 @@
                         text: root.article_title
                         font_size: '24dp'
                         bold: True
+                        markup: True
                         text_size: self.width, None
                         height: self.texture_size[1]
                         valign: 'top'
