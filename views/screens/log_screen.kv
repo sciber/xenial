@@ -1,15 +1,9 @@
 #:kivy 1.11.1
 
-<LogItem>:
-    markup: True
-    font_size: '14dp'
-    text_size: self.width, None
-    color: .2, .2, .2, 1
-    size_hint_y: None
-    height: self.texture_size[1]
-
 <LogScreen>:
     name: 'log'
+    log_filename: ''
+    log_text: ''
     BoxLayout:
         orientation: 'vertical'
         padding: '4dp'
@@ -24,9 +18,25 @@
             title: 'Log'
         ScrollView:
             BoxLayout:
-                id: logslist_widget
                 orientation: 'vertical'
                 size_hint_y: None
                 height: self.minimum_height
-                spacing: '8dp'
                 padding: '4dp'
+                Label:
+                    text: root.log_filename
+                    font_size: '18dp'
+                    bold: True
+                    size_hint_y: None
+                    height: '60dp'
+                    text_size: self.size
+                    halign: 'center'
+                    valign: 'middle'
+                    color: .2, .2, .2, 1
+                Label:
+                    text: root.log_text
+                    font_size: '15dp'
+                    text_size: self.width, None
+                    size_hint_y: None
+                    height: self.texture_size[1]
+                    color: .2, .2, .2, 1
+                    markup: True

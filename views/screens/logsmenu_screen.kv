@@ -1,0 +1,51 @@
+#:kivy 1.11.1
+
+<LogsMenuButton>:
+    log_filename: ''
+    text: self.log_filename
+    size_hint_y: None
+    height: '30dp'
+    font_size: '14dp'
+    on_release: app.root.show_log_screen(self.log_filename)
+
+<LogsMenuItem>:
+    markup: True
+    font_size: '14dp'
+    text_size: self.width, None
+    color: .2, .2, .2, 1
+    size_hint_y: None
+    height: self.texture_size[1]
+
+<LogsMenuScreen>:
+    name: 'logsmenu'
+    BoxLayout:
+        orientation: 'vertical'
+        padding: '4dp'
+        spacing: '4dp'
+        canvas:
+            Color:
+                rgba: 1, 1, 1, 1
+            Rectangle:
+                pos: self.pos
+                size: self.size
+        ScreenTitleBar:
+            title: 'Logs'
+        ScrollView:
+            BoxLayout:
+                orientation: 'vertical'
+                size_hint_y: None
+                height: self.minimum_height
+                BoxLayout:
+                    id: logsbuttons_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: '8dp'
+                    padding: '4dp'
+                BoxLayout:
+                    id: logsmenu_items_container
+                    orientation: 'vertical'
+                    size_hint_y: None
+                    height: self.minimum_height
+                    spacing: '8dp'
+                    padding: '4dp'
