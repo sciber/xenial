@@ -80,10 +80,10 @@ class ArticleScreen(Screen):
             self.article_title = article.article_title
             self.article_synopsis = article.article_synopsis
             self.tagslist_widget.tagslist_items = article.tags_list()
-            self.categoriesmenu_widget.categoriesmenu_items = article.categories_list()
-            self.article_has_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
-            self.articlesmenu_widget.articlesmenu_items = article.related_articles_list()
-            self.article_has_related_articles = bool(self.articlesmenu_widget.articlesmenu_items)
+            self.categoriesmenu_widget.categoriesmenu_items = []
+            self.article_has_categories = False
+            self.articlesmenu_widget.articlesmenu_items = []
+            self.article_has_related_articles = False
             self.articlecontent_widget.articlecontent_blocks = []
             self.article_is_bookmarked = article.bookmark() is not None
         else:
@@ -99,7 +99,8 @@ class ArticleScreen(Screen):
             self.article_is_bookmarked = False
 
     def on_enter(self):
-        """ Highlights search results (if present) in the article's texts when entering the page. """
+        """ Load article content and lists of related articles and categories
+            and highlights search results (if present) in the article's texts when entering the page. """
 
         article = guides.active_guide.article_by_id(self.article_id)
         self.articlecontent_widget.articlecontent_blocks = article.content_blocks_list()
@@ -125,6 +126,10 @@ class ArticleScreen(Screen):
                     block = self.articlecontent_widget.articlecontent_blocks[item[1]].copy()
                     block[block_text_key] = item[4]
                     self.articlecontent_widget.articlecontent_blocks[item[1]] = block
+        self.categoriesmenu_widget.categoriesmenu_items = article.categories_list()
+        self.article_has_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
+        self.articlesmenu_widget.articlesmenu_items = article.related_articles_list()
+        self.article_has_related_articles = bool(self.articlesmenu_widget.articlesmenu_items)
 
     @staticmethod
     def on_pre_leave():

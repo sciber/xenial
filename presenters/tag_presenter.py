@@ -85,16 +85,25 @@ class TagScreen(Screen):
         if tag_id:
             tag = guides.active_guide.tag_by_id(tag_id)
             self.tag_name = tag.tag_name
-            self.categoriesmenu_widget.categoriesmenu_items = tag.tagged_categories_list()
-            self.tag_has_tagged_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
-            self.articlesmenu_widget.articlesmenu_items = tag.tagged_articles_list()
-            self.tag_has_tagged_articles = bool(self.articlesmenu_widget.articlesmenu_items)
+            self.categoriesmenu_widget.categoriesmenu_items = []
+            self.tag_has_tagged_categories = False
+            self.articlesmenu_widget.articlesmenu_items = []
+            self.tag_has_tagged_articles = False
         else:
             self.tag_name = ''
             self.categoriesmenu_widget.categoriesmenu_items = []
             self.tag_has_tagged_categories = False
             self.articlesmenu_widget.articlesmenu_items = []
             self.tag_has_tagged_articles = False
+
+    def on_enter(self):
+        """ Load lists of tagged articles and categories when entering the page. """
+
+        tag = guides.active_guide.tag_by_id(self.tag_id)
+        self.categoriesmenu_widget.categoriesmenu_items = tag.tagged_categories_list()
+        self.tag_has_tagged_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
+        self.articlesmenu_widget.articlesmenu_items = tag.tagged_articles_list()
+        self.tag_has_tagged_articles = bool(self.articlesmenu_widget.articlesmenu_items)
 
     def _translate_ui(self, *args):
         self.screen_title = transl.translate('Tag')

@@ -67,10 +67,10 @@ class CategoryScreen(Screen):
             self.category_icon = category.category_icon
             self.category_description = category.category_description
             self.tagslist_widget.tagslist_items = category.tags_list()
-            self.categoriesmenu_widget.categoriesmenu_items = category.related_categories_list()
-            self.category_has_related_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
-            self.articlesmenu_widget.articlesmenu_items = category.articles_list()
-            self.category_has_articles = bool(self.articlesmenu_widget.articlesmenu_items)
+            self.categoriesmenu_widget.categoriesmenu_items = []
+            self.category_has_related_categories = False
+            self.articlesmenu_widget.articlesmenu_items = []
+            self.category_has_articles = False
         else:
             self.category_name = ''
             self.category_icon = ''
@@ -80,6 +80,15 @@ class CategoryScreen(Screen):
             self.category_has_related_categories = False
             self.articlesmenu_widget.articlesmenu_items = []
             self.category_has_articles = False
+
+    def on_enter(self):
+        """ Load lists of related articles and categories when entering the page. """
+
+        category = guides.active_guide.category_by_id(self.category_id)
+        self.categoriesmenu_widget.categoriesmenu_items = category.related_categories_list()
+        self.category_has_related_categories = bool(self.categoriesmenu_widget.categoriesmenu_items)
+        self.articlesmenu_widget.articlesmenu_items = category.articles_list()
+        self.category_has_articles = bool(self.articlesmenu_widget.articlesmenu_items)
 
     def _clear_category_screen_items(self, *args):
         if self.category_id:
