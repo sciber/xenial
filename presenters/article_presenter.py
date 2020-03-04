@@ -18,8 +18,8 @@ from presenters.components.categoriesmenu_presenter import CategoriesMenu
 from presenters.components.articlesmenu_presenter import ArticlesMenu
 from presenters.components.articlecontent_presenter import ArticleContent
 
-from media_connectors.audio_connector import audio
-from media_connectors.video_connector import video
+from plugins.audio import audio_player
+from plugins.video import video_player
 
 
 class ArticlesMenuScreen(Screen):
@@ -130,8 +130,8 @@ class ArticleScreen(Screen):
     def on_pre_leave():
         """ Turn off any article's audio/video playing component when leaving the article's screen. """
 
-        audio.stop()
-        video.stop()
+        audio_player.pause_playback()
+        video_player.pause_playback()
 
     def on_toggle_bookmark(self, instance, article_id):
         """ Change the bookmark's sign upon `on_add_bookmark` and `on_remove_bookmark` events. """

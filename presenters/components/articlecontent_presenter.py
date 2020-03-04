@@ -10,8 +10,8 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.image import Image
 
-from media_connectors.audio_connector import audio
-from media_connectors.video_connector import video
+from plugins.audio import audio_player
+from plugins.video import video_player
 
 
 class ArticleSubtitle(BoxLayout):
@@ -60,33 +60,33 @@ class ArticleAudio(BoxLayout):
 
     def __init__(self, audio_source, audio_length, audio_caption_text, **kwargs):
         super(ArticleAudio, self).__init__(**kwargs)
-        self.source = audio_source
+        self.audio_source = audio_source
         self.audio_length = audio_length
         self.audio_caption_text = audio_caption_text
-        self.audio_state = 'stop'
+        self.audio_state = 'pause'
         self.audio_pos = 0
-        self.slider_value = 0
 
-    def toggle_audio_play(self):
+    def toggle_audio_playback(self):
         """ Toggles state of the audio playback. When turning the audio play on, any other media playback is turned off.
             The method is called from the corresponding article audio component view. """
 
-        audio.toggle_play(self)
+        audio_player.toggle_playback(self)
 
-    def slider_changed(self, slider_value):
-        """ Updates audio position upon changed slider position in corresponding audio component view. """
+    def touch_down(self, touch):
+        """ Updates audio position upon changed progress bar position in corresponding audio component view. """
 
-        if self.slider_value != slider_value:
-            audio.change_pos(self, slider_value)
+        if self.seek.collide_point(*touch.pos):
+            pts = (touch.pos[0] - self.seek.pos[0]) / self.seek.width * self.audio_length
+            audio_player.update_audio_pos(self, pts)
 
 
-class VideoCoverImage(Image):
+class VideoImage(Image):
     """
     Presents uri of video cover image to the corresponding component view.
     """
 
     def __init__(self, source, **kwargs):
-        super(VideoCoverImage, self).__init__(**kwargs)
+        super(VideoImage, self).__init__(**kwargs)
         self.source = source
 
 
@@ -104,25 +104,25 @@ class ArticleVideo(BoxLayout):
         self.video_source = video_source
         self.video_length = video_length
         self.video_cover_source = video_cover_source
-        self.video_cover_image = VideoCoverImage(video_cover_source)
-        self.ids.video_container.add_widget(self.video_cover_image)
+        self.video_image = VideoImage(video_cover_source)
+        self.video_cover_image_texture = self.video_image.texture
+        self.ids.video_container.add_widget(self.video_image)
         self.video_caption_text = video_caption_text
-        self.video_state = 'stop'
+        self.video_state = 'pause'
         self.video_pos = 0
-        self.slider_value = 0
-        self.video_track_timer = None
 
     def toggle_video_play(self):
         """ Toggles state of the video playback. When turning the video play on, any other media playback is turned off.
             The method is called from the corresponding article video component view. """
 
-        video.toggle_play(self)
+        video_player.toggle_playback(self)
 
-    def slider_changed(self, slider_value):
-        """ Updates video position upon changed slider position in corresponding video component view. """
+    def touch_down(self, touch):
+        """ Updates video position upon changed progress bar position in corresponding video component view. """
 
-        if self.slider_value != slider_value:
-            video.change_pos(self, slider_value)
+        if self.seek.collide_point(*touch.pos):
+            pts = (touch.pos[0] - self.seek.pos[0]) / self.seek.width * self.video_length
+            video_player.update_video_pos(self, pts)
 
 
 class ArticleContent(BoxLayout):

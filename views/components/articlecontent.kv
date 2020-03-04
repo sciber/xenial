@@ -61,11 +61,11 @@
         on_ref_press: app.root.show_article_screen(args[1])
 
 <ArticleAudio>:
-    audio_state: 'stop'
+    audio_state: 'pause'
     audio_pos: 0
     audio_length: 0
-    slider_value: 0
     audio_caption_text: ''
+    seek: seek
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -98,23 +98,22 @@
             width: '80dp'
             background_normal: ''
             background_down: ''
-            on_release: root.toggle_audio_play()
+            on_release: root.toggle_audio_playback()
             Image:
-                source: 'assets/img/play-darkgray.png' if root.audio_state == 'stop' else 'assets/img/pause-darkgray.png'
+                source: 'assets/img/play-darkgray.png' if root.audio_state == 'pause' else 'assets/img/pause-darkgray.png'
                 pos: self.parent.pos
                 size: self.parent.size
         BoxLayout:
             orientation: 'vertical'
             padding: '8dp'
-            Slider:
-                orientation: 'horizontal'
+            ProgressBar:
+                id: seek
+                value: root.audio_pos
                 min: 0
-                max: 100
-                step: 1
-                value: root.slider_value
+                max: root.audio_length
                 value_track: True
                 value_track_color: 0, .6, .7, 1
-                on_value: root.slider_changed(self.value)
+                on_touch_down: root.touch_down(args[1])
             Label:
                 text:
                     '{:>02}:{:02} / {:>02}:{:02}'.format(
@@ -135,7 +134,7 @@
         color: .4, .4, .4, 1
         on_ref_press: app.root.show_article_screen(args[1])
 
-<VideoCoverImage>:
+<VideoImage>:
     size_hint: None, None
     width: 0 if self.parent is None else self.parent.width - (2 * self.parent.padding[0])
     height: 0 if self.parent is None else self.parent.width/self.image_ratio
@@ -143,13 +142,12 @@
     allow_stretch: True
 
 <ArticleVideo>:
-    video_state: 'stop'
+    video_state: 'pause'
     video_pos: 0
     video_length: 0
-    video_cover_source: ''
-    slider_value: 0
     video_aspect_ratio: (16, 9)
     video_caption_text: ''
+    seek: seek
     orientation: 'vertical'
     size_hint_y: None
     height: self.minimum_height
@@ -199,21 +197,20 @@
                 background_down: ''
                 on_release: root.toggle_video_play()
                 Image:
-                    source: 'assets/img/play-darkgray.png' if root.video_state == 'stop' else 'assets/img/pause-darkgray.png'
+                    source: 'assets/img/play-darkgray.png' if root.video_state == 'pause' else 'assets/img/pause-darkgray.png'
                     pos: self.parent.pos
                     size: self.parent.size
             BoxLayout:
                 orientation: 'vertical'
                 padding: '8dp'
-                Slider:
-                    orientation: 'horizontal'
+                ProgressBar:
+                    id: seek
+                    value: root.video_pos
                     min: 0
-                    max: 100
-                    step: 1
-                    value: root.slider_value
+                    max: root.video_length
                     value_track: True
                     value_track_color: 0, .6, .7, 1
-                    on_value: root.slider_changed(self.value)
+                    on_touch_down: root.touch_down(args[1])
                 Label:
                     text:
                         '{:>02}:{:02} / {:>02}:{:02}'.format(

@@ -87,7 +87,6 @@ class ApplicationRoot(NavigationDrawer):
         start_time = time.time()
         self.logsmenu_screen = LogsMenuScreen()
         self.sm.add_widget(self.logsmenu_screen)
-        self.sm.current = 'logsmenu'
         stop_time = time.time()
         dt = (stop_time - start_time) * 1000
         self.logsmenu_screen.add_logsmenu_item('[b]Logs menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
@@ -401,7 +400,6 @@ class XenialApp(App):
 
     def build(self):
         """ Returns the application's root widget. """
-
         start_time = time.time()
         self.root = ApplicationRoot()
         stop_time = time.time()
