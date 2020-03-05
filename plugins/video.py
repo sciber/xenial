@@ -21,7 +21,7 @@ class VideoPlayer:
                 plugins.audio.audio_player.pause_playback()
                 self._player.set_pause(False)
                 self._widget.video_state = 'play'
-                Clock.schedule_once(self._next_frame, -1)
+                Clock.schedule_once(self._next_frame)
             else:
                 self.pause_playback()
         else:
@@ -30,9 +30,9 @@ class VideoPlayer:
                 self.pause_playback()
             self._widget = widget
             self._widget.video_state = 'play'
+            self._texture = None
             self._player = MediaPlayer(filename=self._widget.video_source,
                                        ff_opts={'paused': True, 'ss': self._widget.video_pos})
-            self._texture = None
             Clock.schedule_interval(self._start_playback, .1)
 
     def _start_playback(self, dt):
@@ -46,8 +46,10 @@ class VideoPlayer:
     def pause_playback(self):
         if self._timer is not None:
             self._timer.cancel()
-        if self._player is not None and not self._player.get_pause():
+        if self._player is not None:
             self._player.set_pause(True)
+        self._frame = None
+        self._texture = None
         if self._widget is not None:
             self._widget.video_state = 'pause'
 
@@ -75,7 +77,7 @@ class VideoPlayer:
             Clock.schedule_once(self._next_frame, val)
 
     def _redraw(self, dt):
-        if not self._player:
+        if self._player.get_pause() is None or self._frame is None:
             return
         img, pts = self._frame
         if self._texture is None:
