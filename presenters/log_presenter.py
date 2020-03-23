@@ -35,18 +35,11 @@ class LogsMenuScreen(Screen):
 
     def __init__(self, **kwargs):
         super(LogsMenuScreen, self).__init__(**kwargs)
-        self.logsbuttons_container = self.ids.logsbuttons_container
-        logs_dir = os.path.join(kivy.kivy_home_dir, Config.get('kivy', 'log_dir'))
-        for log_filename in sorted(os.listdir(logs_dir)):
-            logsmenu_button_widget = LogsMenuButton(log_filename)
-            self.logsbuttons_container.add_widget(logsmenu_button_widget)
         self.logsmenu_items_container = self.ids.logsmenu_items_container
-
-    def add_logsmenu_item(self, text):
-        """ Adds item with given text to the logslist. """
-
-        log_item_widget = LogsMenuItem(text=text)
-        self.logsmenu_items_container.add_widget(log_item_widget)
+        logs_dir = os.path.join(kivy.kivy_home_dir, Config.get('kivy', 'log_dir'))
+        for log_filename in sorted(os.listdir(logs_dir), reverse=True):
+            logsmenu_button_widget = LogsMenuButton(log_filename)
+            self.logsmenu_items_container.add_widget(logsmenu_button_widget)
 
 
 class LogScreen(Screen):

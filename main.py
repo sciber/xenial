@@ -84,111 +84,55 @@ class ApplicationRoot(NavigationDrawer):
 
         self.sm = self.ids.manager
 
-        start_time = time.time()
         self.logsmenu_screen = LogsMenuScreen()
         self.sm.add_widget(self.logsmenu_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Logs menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.log_screen = LogScreen()
         self.sm.add_widget(self.log_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Log[/b] screen stub was built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.search_screen = SearchScreen()
         self.sm.add_widget(self.search_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Search[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.categoriesmenu_screen = CategoriesMenuScreen()
         self.sm.add_widget(self.categoriesmenu_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Categories menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.category_screen = CategoryScreen(name='category')
         self.sm.add_widget(self.category_screen)
         self.other_category_screen = CategoryScreen(name='other_category')
         self.sm.add_widget(self.other_category_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Category[/b] screens stubs were built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.tagsmenu_screen = TagsMenuScreen()
         self.sm.add_widget(self.tagsmenu_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Tags menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.tag_screen = TagScreen(name='tag')
         self.sm.add_widget(self.tag_screen)
         self.other_tag_screen = TagScreen(name='other_tag')
         self.sm.add_widget(self.other_tag_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Tag[/b] screens stubs were built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.articlesmenu_screen = ArticlesMenuScreen()
         self.sm.add_widget(self.articlesmenu_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Articles menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.article_screen = ArticleScreen(name='article')
         self.sm.add_widget(self.article_screen)
         self.other_article_screen = ArticleScreen(name='other_article')
         self.sm.add_widget(self.other_article_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Article[/b] screens stubs were built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.bookmarksmenu_screen = BookmarksMenuScreen()
         self.sm.add_widget(self.bookmarksmenu_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Bookmarks menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.guidesmenu_screen = GuidesMenuScreen()
         self.sm.add_widget(self.guidesmenu_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Guides menu[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.guide_screen = GuideScreen()
         self.sm.add_widget(self.guide_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Guide[/b] screen stub was built in: {dt:.2f} ms'.format(dt=dt))
 
-        start_time = time.time()
         self.navigation_panel_container = self.ids.navigation_panel_container
         self.navigation_panel = NavigationPanel()
         self.navigation_panel_container.add_widget(self.navigation_panel)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Navigation panel[/b] was built in: {dt:.2f} ms'.format(dt=dt))
 
         # Settings screen should be initialized last so all the UI of the previous screens is translated automatically
-        start_time = time.time()
         self.settings_screen = SettingsScreen()
         self.sm.add_widget(self.settings_screen)
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.logsmenu_screen.add_logsmenu_item('[b]Settings[/b] screen was built in: {dt:.2f} ms'.format(dt=dt))
 
         if guides.active_guide is not None:
             self.show_categoriesmenu_screen()
@@ -199,7 +143,7 @@ class ApplicationRoot(NavigationDrawer):
         """ Manages showing previous screen after pressing Esc/Back button
             (unless the effect si defined in an underlying widget). """
 
-        if key == 27:
+        if key == 27:  # Esc key/Back button
             prev_screen = hist.pop_screen()
             if prev_screen is None:
                 LeaveAppPrompt().open()
@@ -372,8 +316,7 @@ class XenialApp(App):
     Reads or (if not defined) stores the application's settings.
     """
 
-    def __init__(self, **kwargs):
-        super(XenialApp, self).__init__(**kwargs)
+    def on_start(self):
         if app_settings.exists('active_guide_name') and guides.does_guide_exist(app_settings.get('active_guide_name')):
             guides.set_active_guide(app_settings.get('active_guide_name'))
         elif guides.active_guide is not None:
@@ -400,11 +343,7 @@ class XenialApp(App):
 
     def build(self):
         """ Returns the application's root widget. """
-        start_time = time.time()
         self.root = ApplicationRoot()
-        stop_time = time.time()
-        dt = (stop_time - start_time) * 1000
-        self.root.logsmenu_screen.add_logsmenu_item('[b]Total initialization[/b] time: {dt:.2f} ms'.format(dt=dt))
         return self.root
 
     def on_pause(self):
