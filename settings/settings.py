@@ -4,6 +4,7 @@ Application settings
 Contains single shared instance of SettingsManager class which reads and stores application's settings.
 """
 
+import os
 import json
 
 SETTINGS_FILE = 'settings.json'
@@ -15,6 +16,10 @@ class SettingsManager:
     """
 
     def __init__(self):
+        if not os.path.exists(SETTINGS_FILE):
+            with open(SETTINGS_FILE, 'w') as f:
+                json.dump({}, f)
+
         with open(SETTINGS_FILE, 'r') as f:
             self.settings_dict = json.load(f)
 
