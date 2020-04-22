@@ -7,7 +7,7 @@ especially aimed on people voluntarily or involuntarily migrating from one count
 to another. An embedded artificial intelligence application layer is expected to present a guide content which is
 most appropriate in a particular context for the application user. To learn more about our motivation to build such
 an application, its proposed functionality, and expected requirements, please read the software requirements 
-[SPECIFICATION.md](https://github.com/sciber/xenial/blob/master/CONTRIBUTING.md) file. 
+[SPECIFICATION.md](https://github.com/sciber/xenial/blob/master/SPECIFICATION.md) file. 
 
 
 ## Screenshots
